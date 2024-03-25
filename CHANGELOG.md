@@ -6,7 +6,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
-- Initial release of the M365FoundationsCISReport PowerShell module.
+- Initial release of the M365FoundationsCISReport PowerShell module v0.0.1.
 - Function `Invoke-M365SecurityAudit` for conducting a comprehensive security audit in Microsoft 365 environments.
 - Support for multiple parameter sets including ELevelFilter, IGFilters, RecFilter, and SkipRecFilter to cater to diverse audit requirements.
 - Implementation of `-NoModuleCheck`, `-DoNotConnect`, and `-DoNotDisconnect` switches for enhanced control over module behavior.
