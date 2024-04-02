@@ -10,7 +10,7 @@ This PowerShell module is based on CIS benchmarks and is distributed under the C
 
 For full license details, please visit [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en).
 
-[CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
+[Register for and download CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
 
 ## Invoke-M365SecurityAudit
 ### Synopsis
