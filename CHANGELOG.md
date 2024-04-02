@@ -4,6 +4,17 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed Test-ModernAuthExchangeOnline Profile Level in object.
+
+### Added
+
+- CIS Download Notes to Comment-Help Block.
+- Notes to README.md for CIS Download.
+
+## [0.1.0-preview0001] - 2024-03-25
+
 ### Added
 
 - Initial release of the M365FoundationsCISReport PowerShell module v0.0.1.
