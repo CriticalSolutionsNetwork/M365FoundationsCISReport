@@ -27,7 +27,7 @@ function Test-ModernAuthExchangeOnline {
             $auditResults.IG2 = $true # As per CIS Control v8 mapping for IG2
             $auditResults.IG3 = $true # As per CIS Control v8 mapping for IG3
             $auditResults.ELevel = "E3" # Based on your environment (E3, E5, etc.)
-            $auditResults.Profile = "L1"
+            $auditResults.ProfileLevel = "L1"
             $auditResults.Rec = "6.5.1"
             $auditResults.RecDescription = "Ensure modern authentication for Exchange Online is enabled (Automated)"
             $auditResults.Result = $orgConfig.OAuth2ClientProfileEnabled

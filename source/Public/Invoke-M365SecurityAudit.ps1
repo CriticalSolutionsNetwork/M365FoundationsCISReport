@@ -55,8 +55,9 @@
         - Commercial use is not permitted. This module cannot be sold or used for commercial purposes.
         - Modifications and sharing are allowed under the same license.
         - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
+        - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
     .LINK
-    Online Version: [GitHub Repository URL]
+    Online Version: https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport
 #>
 
 function Invoke-M365SecurityAudit {
