@@ -1,16 +1,14 @@
 function Test-AdministrativeAccountCompliance {
     [CmdletBinding()]
     param (
-        [switch]$SkipGraphConnection
+        # Parameters can be added if needed
     )
     begin {
         #. C:\Temp\CISAuditResult.ps1
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
     }
     process {
-        if (-not $SkipGraphConnection) {
-            Connect-MgGraph -Scopes "Directory.Read.All", "User.Read.All", "RoleManagement.Read.Directory" -NoWelcome
-        }
+
         $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
         $adminRoleUsers = @()
         foreach ($role in $adminRoles) {
