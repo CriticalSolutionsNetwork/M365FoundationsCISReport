@@ -11,6 +11,7 @@ function Test-AntiPhishingPolicy {
     }
 
     process {
+        # 2.1.7	Ensure that an anti-phishing policy has been created
 
         # Retrieve and validate the anti-phishing policies
         $antiPhishPolicies = Get-AntiPhishPolicy

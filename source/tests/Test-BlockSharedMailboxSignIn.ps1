@@ -14,6 +14,7 @@ function Test-BlockSharedMailboxSignIn {
         # 1.2.2 (L1) Ensure sign-in to shared mailboxes is blocked
         # Pass if all shared mailboxes have AccountEnabled set to False.
         # Fail if any shared mailbox has AccountEnabled set to True.
+        # Review: Details property - Add verbosity.
 
         $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
         $sharedMailboxDetails = $MBX | ForEach-Object { Get-AzureADUser -ObjectId $_.ExternalDirectoryObjectId }
