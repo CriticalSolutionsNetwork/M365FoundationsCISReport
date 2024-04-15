@@ -27,7 +27,7 @@
     - It is recommended to backup the Excel file before running this script to prevent accidental data loss.
     - This function is part of the CIS Excel and CSV Data Management Toolkit.
     .LINK
-    Online documentation: [Your Documentation Link Here]
+    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Get-AdminRoleUserLicense
 #>
 
 function Sync-CISExcelAndCsvData {
