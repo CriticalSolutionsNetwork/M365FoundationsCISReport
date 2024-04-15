@@ -248,12 +248,12 @@ function Invoke-M365SecurityAudit {
     }
 
     End {
-        # Return all collected audit results
-        return $allAuditResults
-        # Check if the Disconnect switch is present
         if (!($DoNotDisconnect)) {
             # Clean up sessions
             Disconnect-M365Suite
         }
+        # Return all collected audit results
+        return $allAuditResults
+        # Check if the Disconnect switch is present
     }
 }
