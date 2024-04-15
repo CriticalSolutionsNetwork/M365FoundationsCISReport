@@ -13,37 +13,41 @@ function Get-AdminRoleUserLicense {
         $adminRoleUsers = @()
         $userIds = @()
     }
-    Process {    # Connect to Microsoft Graph if not skipping connection
 
+    Process {
         $adminroles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
 
         foreach ($role in $adminroles) {
             $usersInRole = Get-MgRoleManagementDirectoryRoleAssignment -Filter "roleDefinitionId eq '$($role.Id)'"
 
             foreach ($user in $usersInRole) {
-                $userIds += $user.PrincipalId
-                $userDetails = Get-MgUser -UserId $user.PrincipalId -Property "DisplayName, UserPrincipalName, Id, onPremisesSyncEnabled"
+                $userDetails = Get-MgUser -UserId $user.PrincipalId -Property "DisplayName, UserPrincipalName, Id, onPremisesSyncEnabled" -ErrorAction SilentlyContinue
 
-                $adminRoleUsers += [PSCustomObject]@{
-                    RoleName = $role.DisplayName
-                    UserName = $userDetails.DisplayName
-                    UserPrincipalName = $userDetails.UserPrincipalName
-                    UserId = $userDetails.Id
-                    HybridUser = $userDetails.onPremisesSyncEnabled
-                    Licenses = ""  # Placeholder for licenses, to be filled later
+                if ($userDetails) {
+                    $userIds += $user.PrincipalId
+                    $adminRoleUsers += [PSCustomObject]@{
+                        RoleName = $role.DisplayName
+                        UserName = $userDetails.DisplayName
+                        UserPrincipalName = $userDetails.UserPrincipalName
+                        UserId = $userDetails.Id
+                        HybridUser = $userDetails.onPremisesSyncEnabled
+                        Licenses = $null  # Initialize as $null
+                    }
                 }
             }
         }
 
         foreach ($userId in $userIds | Select-Object -Unique) {
-            $licenses = Get-MgUserLicenseDetail -UserId $userId
-            $licenseList = ($licenses.SkuPartNumber -join '|')
-
-            $adminRoleUsers | Where-Object { $_.UserId -eq $userId } | ForEach-Object {
-                $_.Licenses = $licenseList
+            $licenses = Get-MgUserLicenseDetail -UserId $userId -ErrorAction SilentlyContinue
+            if ($licenses) {
+                $licenseList = ($licenses.SkuPartNumber -join '|')
+                $adminRoleUsers | Where-Object { $_.UserId -eq $userId } | ForEach-Object {
+                    $_.Licenses = $licenseList
+                }
             }
         }
     }
+
     End {
         Write-Host "Disconnecting from Microsoft Graph..." -ForegroundColor Green
         Disconnect-MgGraph | Out-Null
