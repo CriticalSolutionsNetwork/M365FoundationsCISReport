@@ -1,5 +1,5 @@
 ﻿Index,TestFileName,Rec,ELevel,ProfileLevel,IG1,IG2,IG3,Automated
-1,Test-AdministrativeAccountCompliance .ps1,1.1.1,E3,L1,TRUE,TRUE,TRUE,FALSE
+1,Test-AdministrativeAccountCompliance.ps1,1.1.1,E3,L1,TRUE,TRUE,TRUE,FALSE
 2,Test-GlobalAdminsCount.ps1,1.1.3,E3,L1,TRUE,TRUE,TRUE,TRUE
 3,Test-ManagedApprovedPublicGroups.ps1,1.2.1,E3,L2,TRUE,TRUE,TRUE,TRUE
 4,Test-BlockSharedMailboxSignIn.ps1,1.2.2,E3,L1,FALSE,FALSE,FALSE,TRUE
