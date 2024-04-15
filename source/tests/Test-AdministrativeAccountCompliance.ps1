@@ -8,23 +8,29 @@ function Test-AdministrativeAccountCompliance {
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
     }
     process {
-
         $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
         $adminRoleUsers = @()
+
         foreach ($role in $adminRoles) {
             $roleAssignments = Get-MgRoleManagementDirectoryRoleAssignment -Filter "roleDefinitionId eq '$($role.Id)'"
+
             foreach ($assignment in $roleAssignments) {
-                $userDetails = Get-MgUser -UserId $assignment.PrincipalId -Property "DisplayName, UserPrincipalName, Id, OnPremisesSyncEnabled"
-                $licenses = (Get-MgUserLicenseDetail -UserId $assignment.PrincipalId).SkuPartNumber -join '|'
-                $adminRoleUsers += [PSCustomObject]@{
-                    UserName   = $userDetails.UserPrincipalName
-                    RoleName   = $role.DisplayName
-                    UserId     = $userDetails.Id
-                    HybridUser = $userDetails.OnPremisesSyncEnabled
-                    Licenses   = $licenses
+                $userDetails = Get-MgUser -UserId $assignment.PrincipalId -Property "DisplayName, UserPrincipalName, Id, OnPremisesSyncEnabled" -ErrorAction SilentlyContinue
+                if ($userDetails) {
+                    $licenses = Get-MgUserLicenseDetail -UserId $assignment.PrincipalId -ErrorAction SilentlyContinue
+                    $licenseString = if ($licenses) { ($licenses.SkuPartNumber -join '|') } else { "No Licenses Found" }
+
+                    $adminRoleUsers += [PSCustomObject]@{
+                        UserName   = $userDetails.UserPrincipalName
+                        RoleName   = $role.DisplayName
+                        UserId     = $userDetails.Id
+                        HybridUser = $userDetails.OnPremisesSyncEnabled
+                        Licenses   = $licenseString
+                    }
                 }
             }
         }
+
         $uniqueAdminRoleUsers = $adminRoleUsers | Group-Object -Property UserName | ForEach-Object {
             $first = $_.Group | Select-Object -First 1
             $roles = ($_.Group.RoleName -join ', ')
@@ -32,10 +38,12 @@ function Test-AdministrativeAccountCompliance {
 
             $first | Select-Object UserName, UserId, HybridUser, @{Name = 'Roles'; Expression = { $roles } }, @{Name = 'Licenses'; Expression = { $licenses -join '|' } }
         }
+
         $nonCompliantUsers = $uniqueAdminRoleUsers | Where-Object {
             $_.HybridUser -or
             -not ($_.Licenses -split '\|' | Where-Object { $validLicenses -contains $_ })
         }
+
         $failureReasons = $nonCompliantUsers | ForEach-Object {
             $accountType = if ($_.HybridUser) { "Hybrid" } else { "Cloud-Only" }
             $missingLicenses = $validLicenses | Where-Object { $_ -notin ($_.Licenses -split '\|') }
