@@ -19,8 +19,6 @@
     PSCustomObject
     Returns a custom object for each user with administrative roles that includes the following properties: RoleName, UserName, UserPrincipalName, UserId, HybridUser, and Licenses.
 .NOTES
-    Version:        1.0
-    Author:         Your Name
     Creation Date:  2024-04-15
     Purpose/Change: Initial function development to support Microsoft 365 administrative role auditing.
 .LINK
