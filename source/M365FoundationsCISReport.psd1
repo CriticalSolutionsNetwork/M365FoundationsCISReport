@@ -102,10 +102,10 @@ PrivateData = @{
         LicenseUri = 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport'
 
         # A URL to an icon representing this module.
-        # IconUri = ''
+        IconUri = 'https://csn-source.s3.us-east-2.amazonaws.com/CSN-Icon.png'
 
         # ReleaseNotes of this module
         ReleaseNotes = ''
