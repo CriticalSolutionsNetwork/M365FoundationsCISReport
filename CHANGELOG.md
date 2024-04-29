@@ -4,6 +4,29 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Automated and organized CSV testing and added test 1.1.1.
+- Functions to merge tests into an Excel benchmark.
+- Public function for merging tests.
+- Testing for guest users under test 1.1.4.
+- Error handling for `Get-AdminRoleUserLicense`.
+- Project URI and icon added to manifest.
+
+### Fixed
+
+- Format for `TestDefinitions.csv`.
+- Filename for `Test-AdministrativeAccountCompliance`.
+- Error handling in test 1.1.1.
+- Properties for skipping and including tests.
+
+### Docs
+
+- Updated comments for new functions.
+- Updated help documentation.
+
+## [0.1.1] - 2024-04-02
+
 ### Fixed
 
 - Fixed Test-ModernAuthExchangeOnline Profile Level in object.

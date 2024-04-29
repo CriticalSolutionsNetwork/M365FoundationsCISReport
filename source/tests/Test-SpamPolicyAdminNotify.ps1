@@ -10,6 +10,8 @@ function Test-SpamPolicyAdminNotify {
     }
 
     process {
+        # 2.1.6	Ensure Exchange Online Spam Policies are set to notify administrators
+
         # Get the default hosted outbound spam filter policy
         $hostedOutboundSpamFilterPolicy = Get-HostedOutboundSpamFilterPolicy | Where-Object { $_.IsDefault -eq $true }
 

@@ -13,6 +13,7 @@ function Test-IdentifyExternalEmail {
     process {
         # 6.2.3 (L1) Ensure email from external senders is identified
         # Requirement is to have external sender tagging enabled
+        # Review
 
         $externalInOutlook = Get-ExternalInOutlook
         $externalTaggingEnabled = ($externalInOutlook | ForEach-Object { $_.Enabled }) -contains $true
