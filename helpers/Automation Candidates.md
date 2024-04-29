@@ -37,7 +37,7 @@ $Report
 - Commands:
 
 ```powershell
-$groups = Get-MgGroup | Where-Object { $_.GroupTypes -contains "DynamicMembership" } 
+$groups = Get-MgGroup | Where-Object { $_.GroupTypes -contains "DynamicMembership" }
 $groups | ft DisplayName,GroupTypes,MembershipRule
 ```
 
