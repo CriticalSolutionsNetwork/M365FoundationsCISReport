@@ -5,13 +5,14 @@ function Test-AntiPhishingPolicy {
     )
 
     begin {
-        # Dot source the class script
+        # Dot source the class script if necessary
 
-        $auditResults = @()
+        # Initialization code, if needed
+        #$auditResults = @()
     }
 
     process {
-        # 2.1.7	Ensure that an anti-phishing policy has been created
+        # 2.1.7 Ensure that an anti-phishing policy has been created
 
         # Retrieve and validate the anti-phishing policies
         $antiPhishPolicies = Get-AntiPhishPolicy
@@ -24,37 +25,59 @@ function Test-AntiPhishingPolicy {
         }
 
         # Check if there is at least one policy that meets the requirements
-        $isCompliant = $validatedPolicies.Count -gt 0
+        $nonCompliantItems = $antiPhishPolicies | Where-Object {
+            $_.Enabled -ne $true -or
+            $_.PhishThresholdLevel -lt 2 -or
+            $_.EnableMailboxIntelligenceProtection -ne $true -or
+            $_.EnableMailboxIntelligence -ne $true -or
+            $_.EnableSpoofIntelligence -ne $true
+        }
+        $compliantItems = $validatedPolicies
+        $isCompliant = $compliantItems.Count -gt 0
 
-        # Prepare failure details if policies are not compliant
-        $failureDetails = if (-not $isCompliant) {
-            "No anti-phishing policy is fully compliant with CIS benchmark requirements."
+        # Prepare failure reasons for non-compliant items
+        $nonCompliantNames = $nonCompliantItems | ForEach-Object { $_.Name }
+        $failureReasons = if ($nonCompliantNames.Count -gt 0) {
+            "Reason: Does not meet one or more compliance criteria.`nNon-compliant Policies:`n" + ($nonCompliantNames -join "`n")
         } else {
-            "Compliant Anti-Phish Policy Names: " + ($validatedPolicies.Name -join ', ')
+            "N/A"
         }
 
-        # Create an instance of CISAuditResult and populate it
+        # Prepare details for non-compliant items
+        $nonCompliantDetails = $nonCompliantItems | ForEach-Object {
+            "Policy: $($_.Name)"
+        }
+        $nonCompliantDetails = $nonCompliantDetails -join "`n"
+
+        # Prepare details based on compliance
+        $details = if ($nonCompliantItems) {
+            "Non-Compliant Items: $($nonCompliantItems.Count)`nDetails:`n$nonCompliantDetails"
+        }
+        else {
+            "Compliant Items: $($compliantItems.Count)"
+        }
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($isCompliant) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "2.1.7"
-        $auditResult.RecDescription = "Ensure that an anti-phishing policy has been created"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "9.7"
-        $auditResult.CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $true
-        $auditResult.Result = $isCompliant
-        $auditResult.Details = $failureDetails
-        $auditResult.FailureReason = if (-not $isCompliant) { "Anti-phishing policies do not meet CIS benchmark requirements." } else { "N/A" }
+        $auditResult.ELevel = 'E5'  # Modify as needed
+        $auditResult.ProfileLevel = 'L1'  # Modify as needed
+        $auditResult.Rec = '2.1.7'  # Modify as needed
+        $auditResult.RecDescription = "Ensure that an anti-phishing policy has been created"  # Modify as needed
+        $auditResult.CISControlVer = 'v8'  # Modify as needed
+        $auditResult.CISControl = "9.7"  # Modify as needed
+        $auditResult.CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections"  # Modify as needed
+        $auditResult.IG1 = $false  # Modify as needed
+        $auditResult.IG2 = $false  # Modify as needed
+        $auditResult.IG3 = $true  # Modify as needed
+        $auditResult.Result = $nonCompliantItems.Count -eq 0
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
 
-        $auditResults += $auditResult
     }
 
     end {
         # Return auditResults
-        return $auditResults
+        return $auditResult
     }
 }
