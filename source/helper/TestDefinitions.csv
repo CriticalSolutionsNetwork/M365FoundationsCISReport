@@ -1,52 +1,52 @@
-﻿Index,TestFileName,Rec,ELevel,ProfileLevel,IG1,IG2,IG3,Automated
-1,Test-AdministrativeAccountCompliance.ps1,1.1.1,E3,L1,TRUE,TRUE,TRUE,FALSE
-2,Test-GlobalAdminsCount.ps1,1.1.3,E3,L1,TRUE,TRUE,TRUE,TRUE
-3,Test-ManagedApprovedPublicGroups.ps1,1.2.1,E3,L2,TRUE,TRUE,TRUE,TRUE
-4,Test-BlockSharedMailboxSignIn.ps1,1.2.2,E3,L1,FALSE,FALSE,FALSE,TRUE
-5,Test-PasswordNeverExpirePolicy.ps1,1.3.1,E3,L1,TRUE,TRUE,TRUE,TRUE
-6,Test-ExternalSharingCalendars.ps1,1.3.3,E3,L2,FALSE,TRUE,TRUE,TRUE
-7,Test-CustomerLockbox.ps1,1.3.6,E5,L2,FALSE,FALSE,FALSE,TRUE
-8,Test-SafeLinksOfficeApps.ps1,2.1.1,E5,L2,TRUE,TRUE,TRUE,TRUE
-9,Test-CommonAttachmentFilter.ps1,2.1.2,E3,L1,FALSE,TRUE,TRUE,TRUE
-10,Test-NotifyMalwareInternal.ps1,2.1.3,E3,L1,FALSE,TRUE,TRUE,TRUE
-11,Test-SafeAttachmentsPolicy.ps1,2.1.4,E5,L2,FALSE,FALSE,TRUE,TRUE
-12,Test-SafeAttachmentsTeams.ps1,2.1.5,E5,L2,TRUE,TRUE,TRUE,TRUE
-13,Test-SpamPolicyAdminNotify.ps1,2.1.6,E3,L1,FALSE,TRUE,TRUE,TRUE
-14,Test-AntiPhishingPolicy.ps1,2.1.7,E5,L1,FALSE,FALSE,TRUE,TRUE
-15,Test-EnableDKIM.ps1,2.1.9,E3,L1,FALSE,TRUE,TRUE,TRUE
-16,Test-AuditLogSearch.ps1,3.1.1,E3,L1,TRUE,TRUE,TRUE,TRUE
-17,Test-RestrictTenantCreation.ps1,5.1.2.3,E3,L1,FALSE,FALSE,FALSE,TRUE
-18,Test-PasswordHashSync.ps1,5.1.8.1,E3,L1,FALSE,TRUE,TRUE,TRUE
-19,Test-AuditDisabledFalse.ps1,6.1.1,E3,L1,TRUE,TRUE,TRUE,TRUE
-20,Test-MailboxAuditingE3.ps1,6.1.2,E3,L1,TRUE,TRUE,TRUE,TRUE
-21,Test-MailboxAuditingE5.ps1,6.1.3,E5,L1,TRUE,TRUE,TRUE,TRUE
-22,Test-BlockMailForwarding.ps1,6.2.1,E3,L1,FALSE,FALSE,FALSE,TRUE
-23,Test-NoWhitelistDomains.ps1,6.2.2,E3,L1,FALSE,FALSE,FALSE,TRUE
-24,Test-IdentifyExternalEmail.ps1,6.2.3,E3,L1,FALSE,FALSE,FALSE,TRUE
-25,Test-RestrictOutlookAddins.ps1,6.3.1,E3,L2,FALSE,TRUE,TRUE,TRUE
-26,Test-ModernAuthExchangeOnline.ps1,6.5.1,E3,L1,FALSE,TRUE,TRUE,TRUE
-27,Test-MailTipsEnabled.ps1,6.5.2,E3,L2,FALSE,FALSE,FALSE,TRUE
-28,Test-RestrictStorageProvidersOutlook.ps1,6.5.3,E3,L2,TRUE,TRUE,TRUE,TRUE
-29,Test-ModernAuthSharePoint.ps1,7.2.1,E3,L1,FALSE,TRUE,TRUE,TRUE
-30,Test-SharePointAADB2B.ps1,7.2.2,E3,L1,FALSE,FALSE,FALSE,TRUE
-31,Test-RestrictExternalSharing.ps1,7.2.3,E3,L1,TRUE,TRUE,TRUE,TRUE
-32,Test-OneDriveContentRestrictions.ps1,7.2.4,E3,L2,TRUE,TRUE,TRUE,TRUE
-33,Test-SharePointGuestsItemSharing.ps1,7.2.5,E3,L2,TRUE,TRUE,TRUE,TRUE
-34,Test-SharePointExternalSharingDomains.ps1,7.2.6,E3,L2,TRUE,TRUE,TRUE,TRUE
-35,Test-LinkSharingRestrictions.ps1,7.2.7,E3,L1,TRUE,TRUE,TRUE,TRUE
-36,Test-GuestAccessExpiration.ps1,7.2.9,E3,L1,FALSE,FALSE,FALSE,TRUE
-37,Test-ReauthWithCode.ps1,7.2.10,E3,L1,FALSE,FALSE,FALSE,TRUE
-38,Test-DisallowInfectedFilesDownload.ps1,7.3.1,E5,L2,TRUE,TRUE,TRUE,TRUE
-39,Test-OneDriveSyncRestrictions.ps1,7.3.2,E3,L2,FALSE,FALSE,FALSE,TRUE
-40,Test-RestrictCustomScripts.ps1,7.3.4,E3,L1,FALSE,FALSE,TRUE,TRUE
-41,Test-TeamsExternalFileSharing.ps1,8.1.1,E3,L2,TRUE,TRUE,TRUE,TRUE
-42,Test-BlockChannelEmails.ps1,8.1.2,E3,L1,FALSE,FALSE,FALSE,TRUE
-43,Test-TeamsExternalAccess.ps1,8.2.1,E3,L2,FALSE,FALSE,FALSE,TRUE
-44,Test-NoAnonymousMeetingJoin.ps1,8.5.1,E3,L2,FALSE,FALSE,FALSE,TRUE
-45,Test-NoAnonymousMeetingStart.ps1,8.5.2,E3,L1,FALSE,FALSE,FALSE,TRUE
-46,Test-OrgOnlyBypassLobby.ps1,8.5.3,E3,L1,FALSE,FALSE,TRUE,TRUE
-47,Test-DialInBypassLobby.ps1,8.5.4,E3,L1,FALSE,FALSE,FALSE,TRUE
-48,Test-MeetingChatNoAnonymous.ps1,8.5.5,E3,L1,FALSE,FALSE,FALSE,TRUE
-49,Test-OrganizersPresent.ps1,8.5.6,E3,L1,FALSE,FALSE,FALSE,TRUE
-50,Test-ExternalNoControl.ps1,8.5.7,E3,L1,FALSE,FALSE,FALSE,TRUE
-51,Test-ReportSecurityInTeams.ps1,8.6.1,E3,L1,FALSE,FALSE,FALSE,TRUE
+﻿Index,TestFileName,Rec,ELevel,ProfileLevel,IG1,IG2,IG3,Automated,Connection
+1,Test-AdministrativeAccountCompliance.ps1,1.1.1,E3,L1,TRUE,TRUE,TRUE,FALSE,AzureAD
+2,Test-GlobalAdminsCount.ps1,1.1.3,E3,L1,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
+3,Test-ManagedApprovedPublicGroups.ps1,1.2.1,E3,L2,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
+4,Test-BlockSharedMailboxSignIn.ps1,1.2.2,E3,L1,FALSE,FALSE,FALSE,TRUE,AzureAD | EXO
+5,Test-PasswordNeverExpirePolicy.ps1,1.3.1,E3,L1,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
+6,Test-ExternalSharingCalendars.ps1,1.3.3,E3,L2,FALSE,TRUE,TRUE,TRUE,EXO
+7,Test-CustomerLockbox.ps1,1.3.6,E5,L2,FALSE,FALSE,FALSE,TRUE,EXO
+8,Test-SafeLinksOfficeApps.ps1,2.1.1,E5,L2,TRUE,TRUE,TRUE,TRUE,EXO
+9,Test-CommonAttachmentFilter.ps1,2.1.2,E3,L1,FALSE,TRUE,TRUE,TRUE,EXO
+10,Test-NotifyMalwareInternal.ps1,2.1.3,E3,L1,FALSE,TRUE,TRUE,TRUE,EXO
+11,Test-SafeAttachmentsPolicy.ps1,2.1.4,E5,L2,FALSE,FALSE,TRUE,TRUE,EXO
+12,Test-SafeAttachmentsTeams.ps1,2.1.5,E5,L2,TRUE,TRUE,TRUE,TRUE,EXO
+13,Test-SpamPolicyAdminNotify.ps1,2.1.6,E3,L1,FALSE,TRUE,TRUE,TRUE,EXO
+14,Test-AntiPhishingPolicy.ps1,2.1.7,E5,L1,FALSE,FALSE,TRUE,TRUE,EXO
+15,Test-EnableDKIM.ps1,2.1.9,E3,L1,FALSE,TRUE,TRUE,TRUE,EXO
+16,Test-AuditLogSearch.ps1,3.1.1,E3,L1,TRUE,TRUE,TRUE,TRUE,EXO
+17,Test-RestrictTenantCreation.ps1,5.1.2.3,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Graph
+18,Test-PasswordHashSync.ps1,5.1.8.1,E3,L1,FALSE,TRUE,TRUE,TRUE,Microsoft Graph
+19,Test-AuditDisabledFalse.ps1,6.1.1,E3,L1,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
+20,Test-MailboxAuditingE3.ps1,6.1.2,E3,L1,TRUE,TRUE,TRUE,TRUE,EXO
+21,Test-MailboxAuditingE5.ps1,6.1.3,E5,L1,TRUE,TRUE,TRUE,TRUE,EXO
+22,Test-BlockMailForwarding.ps1,6.2.1,E3,L1,FALSE,FALSE,FALSE,TRUE,EXO
+23,Test-NoWhitelistDomains.ps1,6.2.2,E3,L1,FALSE,FALSE,FALSE,TRUE,EXO
+24,Test-IdentifyExternalEmail.ps1,6.2.3,E3,L1,FALSE,FALSE,FALSE,TRUE,EXO
+25,Test-RestrictOutlookAddins.ps1,6.3.1,E3,L2,FALSE,TRUE,TRUE,TRUE,EXO
+26,Test-ModernAuthExchangeOnline.ps1,6.5.1,E3,L1,FALSE,TRUE,TRUE,TRUE,EXO
+27,Test-MailTipsEnabled.ps1,6.5.2,E3,L2,FALSE,FALSE,FALSE,TRUE,EXO
+28,Test-RestrictStorageProvidersOutlook.ps1,6.5.3,E3,L2,TRUE,TRUE,TRUE,TRUE,EXO
+29,Test-ModernAuthSharePoint.ps1,7.2.1,E3,L1,FALSE,TRUE,TRUE,TRUE,SPO
+30,Test-SharePointAADB2B.ps1,7.2.2,E3,L1,FALSE,FALSE,FALSE,TRUE,SPO
+31,Test-RestrictExternalSharing.ps1,7.2.3,E3,L1,TRUE,TRUE,TRUE,TRUE,SPO
+32,Test-OneDriveContentRestrictions.ps1,7.2.4,E3,L2,TRUE,TRUE,TRUE,TRUE,SPO
+33,Test-SharePointGuestsItemSharing.ps1,7.2.5,E3,L2,TRUE,TRUE,TRUE,TRUE,SPO
+34,Test-SharePointExternalSharingDomains.ps1,7.2.6,E3,L2,TRUE,TRUE,TRUE,TRUE,SPO
+35,Test-LinkSharingRestrictions.ps1,7.2.7,E3,L1,TRUE,TRUE,TRUE,TRUE,SPO
+36,Test-GuestAccessExpiration.ps1,7.2.9,E3,L1,FALSE,FALSE,FALSE,TRUE,SPO
+37,Test-ReauthWithCode.ps1,7.2.10,E3,L1,FALSE,FALSE,FALSE,TRUE,SPO
+38,Test-DisallowInfectedFilesDownload.ps1,7.3.1,E5,L2,TRUE,TRUE,TRUE,TRUE,SPO
+39,Test-OneDriveSyncRestrictions.ps1,7.3.2,E3,L2,FALSE,FALSE,FALSE,TRUE,SPO
+40,Test-RestrictCustomScripts.ps1,7.3.4,E3,L1,FALSE,FALSE,TRUE,TRUE,SPO
+41,Test-TeamsExternalFileSharing.ps1,8.1.1,E3,L2,TRUE,TRUE,TRUE,TRUE,Microsoft Teams
+42,Test-BlockChannelEmails.ps1,8.1.2,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+43,Test-TeamsExternalAccess.ps1,8.2.1,E3,L2,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+44,Test-NoAnonymousMeetingJoin.ps1,8.5.1,E3,L2,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+45,Test-NoAnonymousMeetingStart.ps1,8.5.2,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+46,Test-OrgOnlyBypassLobby.ps1,8.5.3,E3,L1,FALSE,FALSE,TRUE,TRUE,Microsoft Teams
+47,Test-DialInBypassLobby.ps1,8.5.4,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+48,Test-MeetingChatNoAnonymous.ps1,8.5.5,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+49,Test-OrganizersPresent.ps1,8.5.6,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+50,Test-ExternalNoControl.ps1,8.5.7,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Teams
+51,Test-ReportSecurityInTeams.ps1,8.6.1,E3,L1,FALSE,FALSE,FALSE,TRUE,Microsoft Teams | EXO
