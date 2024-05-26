@@ -5,18 +5,34 @@ function Test-AuditDisabledFalse {
     )
 
     begin {
-        # Dot source the class script
+        # Dot source the class script if necessary
 
-        $auditResults = @()
+        # Initialization code, if needed
     }
 
     process {
         # 6.1.1 (L1) Ensure 'AuditDisabled' organizationally is set to 'False'
-        # Pass if AuditDisabled is False. Fail otherwise.
+
+        # Retrieve the AuditDisabled configuration
         $auditDisabledConfig = Get-OrganizationConfig | Select-Object AuditDisabled
         $auditNotDisabled = -not $auditDisabledConfig.AuditDisabled
 
-        # Create an instance of CISAuditResult and populate it
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $auditNotDisabled) {
+            "AuditDisabled is set to True"
+        }
+        else {
+            "N/A"
+        }
+
+        $details = if ($auditNotDisabled) {
+            "Audit is not disabled organizationally"
+        }
+        else {
+            "Audit is disabled organizationally"
+        }
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($auditNotDisabled) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E3"
@@ -30,14 +46,12 @@ function Test-AuditDisabledFalse {
         $auditResult.IG2 = $true
         $auditResult.IG3 = $true
         $auditResult.Result = $auditNotDisabled
-        $auditResult.Details = if ($auditNotDisabled) { "Audit is not disabled organizationally" } else { "Audit is disabled organizationally" }
-        $auditResult.FailureReason = if (-not $auditNotDisabled) { "AuditDisabled is set to True" } else { "N/A" }
-
-        $auditResults += $auditResult
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
