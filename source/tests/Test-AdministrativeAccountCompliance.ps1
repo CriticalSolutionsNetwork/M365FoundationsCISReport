@@ -50,6 +50,12 @@ function Test-AdministrativeAccountCompliance {
             "$($_.UserName)|$($_.Roles)|$accountType|Missing: $($missingLicenses -join ',')"
         }
         $failureReasons = $failureReasons -join "`n"
+        $details = if ($nonCompliantUsers) {
+            "Non-Compliant Accounts: $($nonCompliantUsers.Count)`nDetails:`n" + ($nonCompliantUsers | ForEach-Object { $_.UserName }) -join "`n"
+        }
+        else {
+            "Compliant Accounts: $($uniqueAdminRoleUsers.Count)"
+        }
 
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($nonCompliantUsers) { 'Fail' } else { 'Pass' }
@@ -64,7 +70,7 @@ function Test-AdministrativeAccountCompliance {
         $auditResult.IG2 = $true
         $auditResult.IG3 = $true
         $auditResult.Result = $nonCompliantUsers.Count -eq 0
-        $auditResult.Details = "Compliant Accounts: $($uniqueAdminRoleUsers.Count - $nonCompliantUsers.Count); Non-Compliant Accounts: $($nonCompliantUsers.Count)"
+        $auditResult.Details = $Details
         $auditResult.FailureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons" } else { "N/A" }
     }
 
