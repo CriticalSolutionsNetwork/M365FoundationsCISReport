@@ -17,17 +17,24 @@ function Test-Template {
         # Example: $compliantItems = $data | Where-Object { $_.Property -eq 'ExpectedValue' }
         # Example: $nonCompliantItems = $data | Where-Object { $_.Property -ne 'ExpectedValue' }
 
-        # Prepare failure reasons and details for non-compliant items
+        # Prepare failure reasons for non-compliant items
         $failureReasons = $nonCompliantItems | ForEach-Object {
             # Example: "Item: $($_.Name) - Reason: Missing expected value"
         }
         $failureReasons = $failureReasons -join "`n"
 
-        # Prepare details for compliant items
-        $compliantDetails = $compliantItems | ForEach-Object {
-            # Example: "Item: $($_.Name) - Value: $($_.Property)"
+        # Prepare details for non-compliant items
+        $nonCompliantDetails = $nonCompliantItems | ForEach-Object {
+            # Example: "$($_.Name) - Value: $($_.Property)"
         }
-        $compliantDetails = $compliantDetails -join "`n"
+        $nonCompliantDetails = $nonCompliantDetails -join "`n"
+
+        # Prepare details based on compliance
+        $details = if ($nonCompliantItems) {
+            "Non-Compliant Items: $($nonCompliantItems.Count)`nDetails:`n$nonCompliantDetails"
+        } else {
+            "Compliant Items: $($compliantItems.Count)"
+        }
 
         # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
@@ -43,11 +50,7 @@ function Test-Template {
         $auditResult.IG2 = $true  # Modify as needed
         $auditResult.IG3 = $true  # Modify as needed
         $auditResult.Result = $nonCompliantItems.Count -eq 0
-        $auditResult.Details = if ($nonCompliantItems) {
-            "Non-Compliant Items: $($nonCompliantItems.Count)`nDetails:`n" + ($nonCompliantItems | ForEach-Object { $_.Details } -join "`n")
-        } else {
-            "Compliant Items: $($compliantItems.Count)`nDetails:`n$compliantDetails"
-        }
+        $auditResult.Details = $details
         $auditResult.FailureReason = if ($nonCompliantItems) {
             "Non-compliant items:`n$failureReasons"
         } else {
@@ -68,8 +71,6 @@ function Test-Template {
         # IG3            : True
         # Result         : True
         # Details        : Compliant Items: 5
-        #                  Item: Team1 - Storage: OneDrive
-        #                  Item: Team2 - Storage: SharePoint
         # FailureReason  : N/A
 
         # Example output object for a fail result
@@ -86,8 +87,6 @@ function Test-Template {
         # IG3            : True
         # Result         : False
         # Details        : Non-Compliant Items: 2
-        #                  Item: Team3 - Storage: Dropbox (Unapproved)
-        #                  Item: Team4 - Storage: Google Drive (Unapproved)
         # FailureReason  : Non-compliant items:`nUsername | Roles | HybridStatus | Missing Licence
     }
 
