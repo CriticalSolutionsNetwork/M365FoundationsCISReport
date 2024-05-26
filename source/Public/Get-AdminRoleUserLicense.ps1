@@ -36,8 +36,8 @@ function Get-AdminRoleUserLicense {
             Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome
         }
 
-        $adminRoleUsers = @()
-        $userIds = @()
+        $adminRoleUsers = [System.Collections.ArrayList]::new()
+        $userIds = [System.Collections.ArrayList]::new()
     }
 
     Process {
@@ -50,24 +50,28 @@ function Get-AdminRoleUserLicense {
                 $userDetails = Get-MgUser -UserId $user.PrincipalId -Property "DisplayName, UserPrincipalName, Id, onPremisesSyncEnabled" -ErrorAction SilentlyContinue
 
                 if ($userDetails) {
-                    $userIds += $user.PrincipalId
-                    $adminRoleUsers += [PSCustomObject]@{
-                        RoleName = $role.DisplayName
-                        UserName = $userDetails.DisplayName
-                        UserPrincipalName = $userDetails.UserPrincipalName
-                        UserId = $userDetails.Id
-                        HybridUser = $userDetails.onPremisesSyncEnabled
-                        Licenses = $null  # Initialize as $null
-                    }
+                    [void]($userIds.Add($user.PrincipalId))
+                    [void](
+                        $adminRoleUsers.Add(
+                            [PSCustomObject]@{
+                                RoleName          = $role.DisplayName
+                                UserName          = $userDetails.DisplayName
+                                UserPrincipalName = $userDetails.UserPrincipalName
+                                UserId            = $userDetails.Id
+                                HybridUser        = $userDetails.onPremisesSyncEnabled
+                                Licenses          = $null  # Initialize as $null
+                            }
+                        )
+                    )
                 }
             }
         }
 
-        foreach ($userId in $userIds | Select-Object -Unique) {
+        foreach ($userId in $userIds.ToArray() | Select-Object -Unique) {
             $licenses = Get-MgUserLicenseDetail -UserId $userId -ErrorAction SilentlyContinue
             if ($licenses) {
                 $licenseList = ($licenses.SkuPartNumber -join '|')
-                $adminRoleUsers | Where-Object { $_.UserId -eq $userId } | ForEach-Object {
+                $adminRoleUsers.ToArray() | Where-Object { $_.UserId -eq $userId } | ForEach-Object {
                     $_.Licenses = $licenseList
                 }
             }
