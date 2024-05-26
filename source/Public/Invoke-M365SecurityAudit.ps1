@@ -209,7 +209,7 @@ function Invoke-M365SecurityAudit {
     } # End Begin
 
     Process {
-        $allAuditResults = @()  # Initialize a collection to hold all results
+        $allAuditResults = [System.Collections.ArrayList]::new() #@()  # Initialize a collection to hold all results
 
         # Dynamically dot-source the test scripts
         $testsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "tests"
@@ -242,7 +242,7 @@ function Invoke-M365SecurityAudit {
                 Write-Host "Running $functionName..."
                 $result = & $functionName @paramList
                 # Assuming each function returns an array of CISAuditResult or a single CISAuditResult
-                $allAuditResults += $result
+                [void]($allAuditResults.add($Result))
             }
         }
     }
@@ -253,7 +253,7 @@ function Invoke-M365SecurityAudit {
             Disconnect-M365Suite
         }
         # Return all collected audit results
-        return $allAuditResults
+        return $allAuditResults.ToArray()
         # Check if the Disconnect switch is present
     }
 }

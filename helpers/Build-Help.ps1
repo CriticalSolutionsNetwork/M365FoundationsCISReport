@@ -3,8 +3,8 @@ Import-Module .\output\module\M365FoundationsCISReport\*\*.psd1
 .\helpers\psDoc-master\src\psDoc.ps1 -moduleName M365FoundationsCISReport -outputDir ".\" -template ".\helpers\psDoc-master\src\out-markdown-template.ps1" -fileName ".\README.md"
 
 
-<#
-    $ver = "v0.1.1"
+#<#
+    $ver = "v0.1.2"
     git checkout main
     git pull origin main
     git tag -a $ver -m "Release version $ver Bugfix Update"
