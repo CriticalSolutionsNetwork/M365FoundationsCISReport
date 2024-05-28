@@ -1,13 +1,16 @@
 function Test-TeamsExternalAccess {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be defined here if needed
     )
 
     begin {
-        # Dot source the class script
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
 
-        $auditResults = @()
+        $auditResult = [CISAuditResult]::new()
     }
 
     process {
@@ -26,7 +29,6 @@ function Test-TeamsExternalAccess {
         $isCompliant = -not $externalAccessConfig.AllowTeamsConsumer -and -not $externalAccessConfig.AllowPublicUsers -and (-not $externalAccessConfig.AllowFederatedUsers -or $allowedDomainsLimited)
 
         # Create an instance of CISAuditResult and populate it
-        $auditResult = [CISAuditResult]::new()
         $auditResult.CISControlVer = "v8"
         $auditResult.CISControl = "0.0" # The control is Explicitly Not Mapped as per the image provided
         $auditResult.CISDescription = "Explicitly Not Mapped"
@@ -41,12 +43,10 @@ function Test-TeamsExternalAccess {
         $auditResult.Details = "AllowTeamsConsumer: $($externalAccessConfig.AllowTeamsConsumer); AllowPublicUsers: $($externalAccessConfig.AllowPublicUsers); AllowFederatedUsers: $($externalAccessConfig.AllowFederatedUsers); AllowedDomains limited: $allowedDomainsLimited"
         $auditResult.FailureReason = if (-not $isCompliant) { "One or more external access configurations are not compliant." } else { "N/A" }
         $auditResult.Status = if ($isCompliant) { "Pass" } else { "Fail" }
-
-        $auditResults += $auditResult
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return auditResult
+        return $auditResult
     }
 }
