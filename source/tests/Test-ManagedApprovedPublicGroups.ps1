@@ -1,21 +1,40 @@
 function Test-ManagedApprovedPublicGroups {
     [CmdletBinding()]
     param (
-        # Define your parameters here
+        # Aligned
+        # Parameters can be added if needed
     )
 
     begin {
-        # Dot source the class script
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
 
-        $auditResults = @()
     }
 
     process {
         # 1.2.1 (L2) Ensure that only organizationally managed/approved public groups exist (Automated)
 
+        # Retrieve all public groups
         $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
 
-        # Check if there are public groups and if they are organizationally managed/approved
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if ($null -ne $allGroups -and $allGroups.Count -gt 0) {
+            "There are public groups present that are not organizationally managed/approved."
+        }
+        else {
+            "N/A"
+        }
+
+        $details = if ($null -eq $allGroups -or $allGroups.Count -eq 0) {
+            "No public groups found."
+        }
+        else {
+            $groupDetails = $allGroups | ForEach-Object { $_.DisplayName + " (" + $_.Visibility + ")" }
+            "Public groups found: $($groupDetails -join ', ')"
+        }
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.CISControlVer = "v8"
         $auditResult.CISControl = "3.3"
@@ -25,30 +44,16 @@ function Test-ManagedApprovedPublicGroups {
         $auditResult.ProfileLevel = "L2"
         $auditResult.IG1 = $true
         $auditResult.IG2 = $true
-        $auditResult.IG3 = $true # Based on the provided CIS Control image, IG3 is not applicable
+        $auditResult.IG3 = $true
         $auditResult.RecDescription = "Ensure that only organizationally managed/approved public groups exist"
-
-        if ($null -eq $allGroups -or $allGroups.Count -eq 0) {
-            $auditResult.Result = $true
-            $auditResult.Details = "No public groups found."
-            $auditResult.FailureReason = "N/A"
-            $auditResult.Status = "Pass"
-        }
-        else {
-            $groupDetails = $allGroups | ForEach-Object { $_.DisplayName + " (" + $_.Visibility + ")" }
-            $detailsString = $groupDetails -join ', '
-
-            $auditResult.Result = $false
-            $auditResult.Details = "Public groups found: $detailsString"
-            $auditResult.FailureReason = "There are public groups present that are not organizationally managed/approved."
-            $auditResult.Status = "Fail"
-        }
-
-        $auditResults += $auditResult
+        $auditResult.Result = $null -eq $allGroups -or $allGroups.Count -eq 0
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
+        $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
     }
 
     end {
         # Return auditResults
-        return $auditResults
+        return $auditResult
     }
 }
