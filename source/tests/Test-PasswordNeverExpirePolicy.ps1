@@ -30,21 +30,17 @@ function Test-PasswordNeverExpirePolicy {
         $details = "Validity Period: $passwordPolicy days"
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($passwordPolicy -eq 0) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "1.3.1"
-        $auditResult.RecDescription = "Ensure the 'Password expiration policy' is set to 'Set passwords to never expire'"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "5.2"
-        $auditResult.CISDescription = "Use Unique Passwords"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $passwordPolicy -eq 0
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "1.3.1"
+            Result         = $passwordPolicy -eq 0
+            Status         = if ($passwordPolicy -eq 0) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure the 'Password expiration policy' is set to 'Set passwords to never expire'"
+            CISControl     = "5.2"
+            CISDescription = "Use Unique Passwords"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

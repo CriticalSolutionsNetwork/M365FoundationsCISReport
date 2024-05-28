@@ -33,20 +33,17 @@ function Test-TeamsExternalFileSharing {
         }
 
         # Create an instance of CISAuditResult and populate it
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "3.3"
-        $auditResult.CISDescription = "Configure Data Access Control Lists"
-        $auditResult.Rec = "8.1.1"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.IG1 = $true # Set based on the benchmark
-        $auditResult.IG2 = $true # Set based on the benchmark
-        $auditResult.IG3 = $true # Set based on the benchmark
-        $auditResult.RecDescription = "Ensure external file sharing in Teams is enabled for only approved cloud storage services"
-        $auditResult.Result = $isCompliant
-        $auditResult.Details = if (-not $isCompliant) { "Non-approved providers enabled: $($nonCompliantProviders -join ', ')" } else { "All cloud storage services are approved providers" }
-        $auditResult.FailureReason = if (-not $isCompliant) { "The following non-approved providers are enabled: $($nonCompliantProviders -join ', ')" } else { "N/A" }
-        $auditResult.Status = if ($isCompliant) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "8.1.1"
+            Result         = $isCompliant
+            Status         = if ($isCompliant) { "Pass" } else { "Fail" }
+            Details        = if (-not $isCompliant) { "Non-approved providers enabled: $($nonCompliantProviders -join ', ')" } else { "All cloud storage services are approved providers" }
+            FailureReason  = if (-not $isCompliant) { "The following non-approved providers are enabled: $($nonCompliantProviders -join ', ')" } else { "N/A" }
+            RecDescription = "Ensure external file sharing in Teams is enabled for only approved cloud storage services"
+            CISControl     = "3.3"
+            CISDescription = "Configure Data Access Control Lists"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

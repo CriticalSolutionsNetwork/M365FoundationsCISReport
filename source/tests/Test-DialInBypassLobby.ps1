@@ -34,21 +34,17 @@ function Test-DialInBypassLobby {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0"  # Explicitly Not Mapped
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.Rec = "8.5.4"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false  # Set based on the CIS Controls image
-        $auditResult.IG2 = $false  # Set based on the CIS Controls image
-        $auditResult.IG3 = $false  # Set based on the CIS Controls image
-        $auditResult.RecDescription = "Ensure users dialing in can't bypass the lobby"
-        $auditResult.Result = $PSTNBypassDisabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($PSTNBypassDisabled) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "8.5.4"
+            Result         = $PSTNBypassDisabled
+            Status         = if ($PSTNBypassDisabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure users dialing in can't bypass the lobby"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

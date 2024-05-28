@@ -36,21 +36,17 @@ function Test-OrganizersPresent {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($presenterRoleRestricted) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "8.5.6"
-        $auditResult.RecDescription = "Ensure only organizers and co-organizers can present"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0" # Explicitly Not Mapped
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.IG1 = $false # Set based on the CIS Controls image
-        $auditResult.IG2 = $false # Set based on the CIS Controls image
-        $auditResult.IG3 = $false # Set based on the CIS Controls image
-        $auditResult.Result = $presenterRoleRestricted
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "8.5.6"
+            Result         = $presenterRoleRestricted
+            Status         = if ($presenterRoleRestricted) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure only organizers and co-organizers can present"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

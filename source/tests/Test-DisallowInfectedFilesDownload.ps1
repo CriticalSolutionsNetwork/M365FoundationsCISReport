@@ -35,21 +35,18 @@ function Test-DisallowInfectedFilesDownload {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "10.1"
-        $auditResult.CISDescription = "Deploy and Maintain Anti-Malware Software"
-        $auditResult.Rec = "7.3.1"
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.RecDescription = "Ensure Office 365 SharePoint infected files are disallowed for download"
-        $auditResult.Result = $isDisallowInfectedFileDownloadEnabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($isDisallowInfectedFileDownloadEnabled) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "7.3.1"
+            Result         = $isDisallowInfectedFileDownloadEnabled
+            Status         = if ($isDisallowInfectedFileDownloadEnabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure Office 365 SharePoint infected files are disallowed for download"
+            CISControl     = "10.1"
+            CISDescription = "Deploy and Maintain Anti-Malware Software"
+        }
+        $auditResult = Initialize-CISAuditResult @params
+
     }
 
     end {

@@ -15,17 +15,7 @@ function Test-MailboxAuditingE5 {
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MailItemsAccessed", "MoveToDeletedItems", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
 
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "6.1.3"
-        $auditResult.RecDescription = "Ensure mailbox auditing for Office E5 users is Enabled"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "8.2"
-        $auditResult.CISDescription = "Collect audit logs."
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
+
 
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
@@ -87,10 +77,17 @@ function Test-MailboxAuditingE5 {
         $details = if ($allFailures.Count -eq 0) { "All Office E5 users have correct mailbox audit settings." } else { $allFailures -join " | " }
 
         # Populate the audit result
-        $auditResult.Result = $allFailures.Count -eq 0
-        $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "6.1.3"
+            Result         = $allFailures.Count -eq 0
+            Status         = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure mailbox auditing for Office E5 users is Enabled"
+            CISControl     = "8.2"
+            CISDescription = "Collect audit logs."
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

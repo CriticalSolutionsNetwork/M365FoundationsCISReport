@@ -30,21 +30,17 @@ function Test-LinkSharingRestrictions {
         $details = "DefaultSharingLinkType: $($SPOTenantLinkSharing.DefaultSharingLinkType)"
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($isLinkSharingRestricted) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "7.2.7"
-        $auditResult.RecDescription = "Ensure link sharing is restricted in SharePoint and OneDrive"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "3.3"
-        $auditResult.CISDescription = "Configure Data Access Control Lists"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $isLinkSharingRestricted
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "7.2.7"
+            Result         = $isLinkSharingRestricted
+            Status         = if ($isLinkSharingRestricted) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure link sharing is restricted in SharePoint and OneDrive"
+            CISControl     = "3.3"
+            CISDescription = "Configure Data Access Control Lists"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

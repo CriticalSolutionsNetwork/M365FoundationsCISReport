@@ -30,21 +30,17 @@ function Test-NoAnonymousMeetingStart {
         $details = "AllowAnonymousUsersToStartMeeting is set to $($CsTeamsMeetingPolicyAnonymous.AllowAnonymousUsersToStartMeeting)"
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0" # Explicitly Not Mapped as per the image provided
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.Rec = "8.5.2"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false # Set based on the CIS Controls image
-        $auditResult.IG2 = $false # Set based on the CIS Controls image
-        $auditResult.IG3 = $false # Set based on the CIS Controls image
-        $auditResult.RecDescription = "Ensure anonymous users and dial-in callers can't start a meeting"
-        $auditResult.Result = $anonymousStartDisabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($anonymousStartDisabled) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "8.5.2"
+            Result         = $anonymousStartDisabled
+            Status         = if ($anonymousStartDisabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure anonymous users and dial-in callers can't start a meeting"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

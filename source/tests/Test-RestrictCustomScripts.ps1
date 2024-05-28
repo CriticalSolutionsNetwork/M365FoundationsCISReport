@@ -44,21 +44,17 @@ function Test-RestrictCustomScripts {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($complianceResult) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "7.3.4"
-        $auditResult.RecDescription = "Ensure custom script execution is restricted on site collections"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "2.7"
-        $auditResult.CISDescription = "Allowlist Authorized Scripts"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $true
-        $auditResult.Result = $complianceResult
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "7.3.4"
+            Result         = $complianceResult
+            Status         = if ($complianceResult) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure custom script execution is restricted on site collections"
+            CISControl     = "2.7"
+            CISDescription = "Allowlist Authorized Scripts"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

@@ -34,21 +34,17 @@ function Test-CommonAttachmentFilter {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($result) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "2.1.2"
-        $auditResult.RecDescription = "Ensure the Common Attachment Types Filter is enabled"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "9.6"
-        $auditResult.CISDescription = "Block Unnecessary File Types"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $result
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "2.1.2"
+            Result         = $result
+            Status         = if ($result) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure the Common Attachment Types Filter is enabled"
+            CISControl     = "9.6"
+            CISDescription = "Block Unnecessary File Types"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

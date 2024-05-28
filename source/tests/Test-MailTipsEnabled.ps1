@@ -37,20 +37,17 @@ function Test-MailTipsEnabled {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0"  # Explicitly Not Mapped
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.Rec = "6.5.2"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $false
-        $auditResult.RecDescription = "Ensure MailTips are enabled for end users"
-        $auditResult.Result = $allTipsEnabled -and $externalRecipientsTipsEnabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "6.5.2"
+            Result         = $allTipsEnabled -and $externalRecipientsTipsEnabled
+            Status         = if ($allTipsEnabled -and $externalRecipientsTipsEnabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure MailTips are enabled for end users"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

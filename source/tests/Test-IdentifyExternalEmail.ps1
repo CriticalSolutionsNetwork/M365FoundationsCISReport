@@ -30,21 +30,17 @@ function Test-IdentifyExternalEmail {
         $details = "Enabled: $($externalTaggingEnabled); AllowList: $($externalInOutlook.AllowList)"
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($externalTaggingEnabled) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "6.2.3"
-        $auditResult.RecDescription = "Ensure email from external senders is identified"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0"  # Explicitly Not Mapped
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $false
-        $auditResult.Result = $externalTaggingEnabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "6.2.3"
+            Result         = $externalTaggingEnabled
+            Status         = if ($externalTaggingEnabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure email from external senders is identified"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

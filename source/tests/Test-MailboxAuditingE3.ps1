@@ -15,17 +15,6 @@ function Test-MailboxAuditingE3 {
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MoveToDeletedItems", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
 
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "6.1.2"
-        $auditResult.RecDescription = "Ensure mailbox auditing for Office E3 users is Enabled"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "8.2"
-        $auditResult.CISDescription = "Collect audit logs."
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
 
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
@@ -82,10 +71,17 @@ function Test-MailboxAuditingE3 {
         $details = if ($allFailures.Count -eq 0) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
 
         # Populate the audit result
-        $auditResult.Result = $allFailures.Count -eq 0
-        $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec = "6.1.2"
+            Result = $allFailures.Count -eq 0
+            Status = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+            Details = $details
+            FailureReason = $failureReasons
+            RecDescription = "Ensure mailbox auditing for Office E3 users is Enabled"
+            CISControl = "8.2"
+            CISDescription = "Collect audit logs."
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

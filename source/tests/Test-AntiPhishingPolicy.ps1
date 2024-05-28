@@ -40,7 +40,8 @@ function Test-AntiPhishingPolicy {
         $nonCompliantNames = $nonCompliantItems | ForEach-Object { $_.Name }
         $failureReasons = if ($nonCompliantNames.Count -gt 0) {
             "Reason: Does not meet one or more compliance criteria.`nNon-compliant Policies:`n" + ($nonCompliantNames -join "`n")
-        } else {
+        }
+        else {
             "N/A"
         }
 
@@ -58,27 +59,24 @@ function Test-AntiPhishingPolicy {
             "Compliant Items: $($compliantItems.Count)"
         }
 
-        # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($isCompliant) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = 'E5'  # Modify as needed
-        $auditResult.ProfileLevel = 'L1'  # Modify as needed
-        $auditResult.Rec = '2.1.7'  # Modify as needed
-        $auditResult.RecDescription = "Ensure that an anti-phishing policy has been created"  # Modify as needed
-        $auditResult.CISControlVer = 'v8'  # Modify as needed
-        $auditResult.CISControl = "9.7"  # Modify as needed
-        $auditResult.CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections"  # Modify as needed
-        $auditResult.IG1 = $false  # Modify as needed
-        $auditResult.IG2 = $false  # Modify as needed
-        $auditResult.IG3 = $true  # Modify as needed
-        $auditResult.Result = $nonCompliantItems.Count -eq 0
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        # Parameter splat for Initialize-CISAuditResult function
+        $params = @{
+            Rec            = "2.1.7"
+            Result         = $nonCompliantItems.Count -eq 0
+            Status         = if ($isCompliant) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure that an anti-phishing policy has been created"
+            CISControl     = "9.7"
+            CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections"
+        }
 
+        # Create and populate the CISAuditResult object
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
-        # Return auditResults
+        # Return auditResult
         return $auditResult
     }
 }

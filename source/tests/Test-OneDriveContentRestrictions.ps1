@@ -34,21 +34,17 @@ function Test-OneDriveContentRestrictions {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($isOneDriveSharingRestricted) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.Rec = "7.2.4"
-        $auditResult.RecDescription = "Ensure OneDrive content sharing is restricted"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "3.3"
-        $auditResult.CISDescription = "Configure Data Access Control Lists"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $isOneDriveSharingRestricted
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "7.2.4"
+            Result         = $isOneDriveSharingRestricted
+            Status         = if ($isOneDriveSharingRestricted) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure OneDrive content sharing is restricted"
+            CISControl     = "3.3"
+            CISDescription = "Configure Data Access Control Lists"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

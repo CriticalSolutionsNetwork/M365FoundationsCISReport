@@ -39,21 +39,17 @@ function Test-ReportSecurityInTeams {
         "ReportChatMessageToCustomizedAddressEnabled: $($ReportSubmissionPolicy.ReportChatMessageToCustomizedAddressEnabled)"
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($securityReportEnabled) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "8.6.1"
-        $auditResult.RecDescription = "Ensure users can report security concerns in Teams"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0"
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $false
-        $auditResult.Result = $securityReportEnabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "8.6.1"
+            Result         = $securityReportEnabled
+            Status         = if ($securityReportEnabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure users can report security concerns in Teams"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

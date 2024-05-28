@@ -4,10 +4,12 @@ function Test-AdministrativeAccountCompliance {
         # Aligned
         # Parameters can be added if needed
     )
+
     begin {
         #. .\source\Classes\CISAuditResult.ps1
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
     }
+
     process {
         $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
         $adminRoleUsers = @()
@@ -58,21 +60,23 @@ function Test-AdministrativeAccountCompliance {
             "Compliant Accounts: $($uniqueAdminRoleUsers.Count)"
         }
 
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($nonCompliantUsers) { 'Fail' } else { 'Pass' }
-        $auditResult.ELevel = 'E3'
-        $auditResult.ProfileLevel = 'L1'
-        $auditResult.Rec = '1.1.1'
-        $auditResult.RecDescription = "Ensure Administrative accounts are separate and cloud-only"
-        $auditResult.CISControlVer = 'v8'
-        $auditResult.CISControl = "5.4"
-        $auditResult.CISDescription = "Restrict Administrator Privileges to Dedicated Administrator Accounts"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $nonCompliantUsers.Count -eq 0
-        $auditResult.Details = $Details
-        $auditResult.FailureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons" } else { "N/A" }
+        $result = $nonCompliantUsers.Count -eq 0
+        $status = if ($result) { 'Pass' } else { 'Fail' }
+        $failureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons" } else { "N/A" }
+
+        # Create the parameter splat
+        $params = @{
+            Rec            = "1.1.1"
+            Result         = $result
+            Status         = $status
+            Details        = $details
+            FailureReason  = $failureReason
+            RecDescription = "Ensure Administrative accounts are separate and cloud-only"
+            CISControl     = "5.4"
+            CISDescription = "Restrict Administrator Privileges to Dedicated Administrator Accounts"
+        }
+
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

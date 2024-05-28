@@ -35,21 +35,17 @@ function Test-ExternalNoControl {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0"  # Explicitly Not Mapped
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.Rec = "8.5.7"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false  # Set based on the CIS Controls image
-        $auditResult.IG2 = $false  # Set based on the CIS Controls image
-        $auditResult.IG3 = $false  # Set based on the CIS Controls image
-        $auditResult.RecDescription = "Ensure external participants can't give or request control"
-        $auditResult.Result = $externalControlRestricted
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($externalControlRestricted) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "8.5.7"
+            Result         = $externalControlRestricted
+            Status         = if ($externalControlRestricted) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure external participants can't give or request control"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

@@ -33,22 +33,18 @@ function Test-CustomerLockbox {
             "Customer Lockbox Enabled: False"
         }
 
-        # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($customerLockboxEnabled) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.Rec = "1.3.6"
-        $auditResult.RecDescription = "Ensure the customer lockbox feature is enabled"
-        $auditResult.CISControlVer = 'v8'
-        $auditResult.CISControl = "0.0"  # As per the snapshot provided, this is explicitly not mapped
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $false
-        $auditResult.Result = $customerLockboxEnabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        # Create and populate the CISAuditResult object #
+        $params = @{
+            Rec            = "1.3.6"
+            Result         = $customerLockboxEnabled
+            Status         = if ($customerLockboxEnabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure the customer lockbox feature is enabled"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

@@ -27,21 +27,17 @@ function Test-ModernAuthSharePoint {
         $details = "LegacyAuthProtocolsEnabled: $($SPOTenant.LegacyAuthProtocolsEnabled)"
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "3.10"
-        $auditResult.CISDescription = "Encrypt Sensitive Data in Transit"
-        $auditResult.Rec = "7.2.1"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.RecDescription = "Modern Authentication for SharePoint Applications"
-        $auditResult.Result = $modernAuthForSPRequired
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($modernAuthForSPRequired) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "7.2.1"
+            Result         = $modernAuthForSPRequired
+            Status         = if ($modernAuthForSPRequired) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Modern Authentication for SharePoint Applications"
+            CISControl     = "3.10"
+            CISDescription = "Encrypt Sensitive Data in Transit"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

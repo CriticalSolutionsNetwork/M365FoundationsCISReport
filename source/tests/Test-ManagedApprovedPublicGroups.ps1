@@ -35,21 +35,17 @@ function Test-ManagedApprovedPublicGroups {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "3.3"
-        $auditResult.CISDescription = "Configure Data Access Control Lists"
-        $auditResult.Rec = "1.2.1"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.RecDescription = "Ensure that only organizationally managed/approved public groups exist"
-        $auditResult.Result = $null -eq $allGroups -or $allGroups.Count -eq 0
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "1.2.1"
+            Result         = $null -eq $allGroups -or $allGroups.Count -eq 0
+            Status         = if ($null -eq $allGroups -or $allGroups.Count -eq 0) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure that only organizationally managed/approved public groups exist"
+            CISControl     = "3.3"
+            CISDescription = "Configure Data Access Control Lists"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

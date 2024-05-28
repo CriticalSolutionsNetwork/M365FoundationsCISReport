@@ -34,21 +34,17 @@ function Test-BlockChannelEmails {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0" # This control is explicitly not mapped as per the image provided
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.Rec = "8.1.2"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false # Set based on the benchmark
-        $auditResult.IG2 = $false # Set based on the benchmark
-        $auditResult.IG3 = $false # Set based on the benchmark
-        $auditResult.RecDescription = "Ensure users can't send emails to a channel email address"
-        $auditResult.Result = -not $allowEmailIntoChannel
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if (-not $allowEmailIntoChannel) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "8.1.2"
+            Result         = -not $allowEmailIntoChannel
+            Status         = if (-not $allowEmailIntoChannel) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure users can't send emails to a channel email address"
+            CISControl     = "0.0"
+            CISDescription = "Explicitly Not Mapped"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

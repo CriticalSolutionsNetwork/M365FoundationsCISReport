@@ -37,21 +37,17 @@ function Test-RestrictStorageProvidersOutlook {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($allPoliciesRestricted) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3" # Based on your environment
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.Rec = "6.5.3"
-        $auditResult.RecDescription = "Ensure additional storage providers are restricted in Outlook on the web"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "3.3"
-        $auditResult.CISDescription = "Configure Data Access Control Lists"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $allPoliciesRestricted
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "6.5.3"
+            Result         = $allPoliciesRestricted
+            Status         = if ($allPoliciesRestricted) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure additional storage providers are restricted in Outlook on the web"
+            CISControl     = "3.3"
+            CISDescription = "Configure Data Access Control Lists"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

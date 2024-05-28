@@ -44,21 +44,17 @@ function Test-ExternalSharingCalendars {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Rec = "1.3.3"
-        $auditResult.RecDescription = "Ensure 'External sharing' of calendars is not available"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "4.8"
-        $auditResult.CISDescription = "Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
-        $auditResult.Result = $isExternalSharingDisabled
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
-        $auditResult.Status = if ($isExternalSharingDisabled) { "Pass" } else { "Fail" }
+        $params = @{
+            Rec            = "1.3.3"
+            Result         = $isExternalSharingDisabled
+            Status         = if ($isExternalSharingDisabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure 'External sharing' of calendars is not available"
+            CISControl     = "4.8"
+            CISDescription = "Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

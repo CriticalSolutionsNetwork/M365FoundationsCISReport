@@ -2,6 +2,8 @@ class CISAuditResult {
     [string]$Status
     [string]$ELevel
     [string]$ProfileLevel
+    [bool]$Automated
+    [string]$Connection
     [string]$Rec
     [string]$RecDescription
     [string]$CISControlVer = 'v8'

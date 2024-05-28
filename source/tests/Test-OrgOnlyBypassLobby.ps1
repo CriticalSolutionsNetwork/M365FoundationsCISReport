@@ -36,21 +36,17 @@ function Test-OrgOnlyBypassLobby {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($lobbyBypassRestricted) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "8.5.3"
-        $auditResult.RecDescription = "Ensure only people in my org can bypass the lobby"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "6.8"
-        $auditResult.CISDescription = "Define and Maintain Role-Based Access Control"
-        $auditResult.IG1 = $false # Set based on the CIS Controls image
-        $auditResult.IG2 = $false # Set based on the CIS Controls image
-        $auditResult.IG3 = $true # Set based on the CIS Controls image
-        $auditResult.Result = $lobbyBypassRestricted
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "8.5.3"
+            Result         = $lobbyBypassRestricted
+            Status         = if ($lobbyBypassRestricted) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure only people in my org can bypass the lobby"
+            CISControl     = "6.8"
+            CISDescription = "Define and Maintain Role-Based Access Control"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

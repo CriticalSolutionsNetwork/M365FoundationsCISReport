@@ -61,21 +61,17 @@ function Test-RestrictOutlookAddins {
         $isCompliant = -not ($customPolicyFailures -or $defaultPolicyFailureDetails)
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($isCompliant) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.Rec = "6.3.1"
-        $auditResult.RecDescription = "Ensure users installing Outlook add-ins is not allowed"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "9.4"
-        $auditResult.CISDescription = "Restrict Unnecessary or Unauthorized Browser and Email Client Extensions"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $isCompliant
-        $auditResult.Details = $detailsString
-        $auditResult.FailureReason = if ($isCompliant) { "N/A" } else { "Unauthorized Outlook add-ins found in custom or default policies." }
+        $params = @{
+            Rec            = "6.3.1"
+            Result         = $isCompliant
+            Status         = if ($isCompliant) { "Pass" } else { "Fail" }
+            Details        = $detailsString
+            FailureReason  = if ($isCompliant) { "N/A" } else { "Unauthorized Outlook add-ins found in custom or default policies." }
+            RecDescription = "Ensure users installing Outlook add-ins is not allowed"
+            CISControl     = "9.4"
+            CISDescription = "Restrict Unnecessary or Unauthorized Browser and Email Client Extensions"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

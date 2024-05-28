@@ -35,21 +35,17 @@ function Test-EnableDKIM {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($dkimResult) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "2.1.9"
-        $auditResult.RecDescription = "Ensure that DKIM is enabled for all Exchange Online Domains"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "9.5"
-        $auditResult.CISDescription = "Implement DMARC"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $dkimResult
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "2.1.9"
+            Result         = $dkimResult
+            Status         = if ($dkimResult) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure that DKIM is enabled for all Exchange Online Domains"
+            CISControl     = "9.5"
+            CISDescription = "Implement DMARC"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

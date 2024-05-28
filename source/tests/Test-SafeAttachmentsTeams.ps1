@@ -41,21 +41,17 @@ function Test-SafeAttachmentsTeams {
         }
 
         # Create and populate the CISAuditResult object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($result) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.Rec = "2.1.5"
-        $auditResult.RecDescription = "Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "9.7, 10.1"
-        $auditResult.CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections, Deploy and Maintain Anti-Malware Software"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $result
-        $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReasons
+        $params = @{
+            Rec            = "2.1.5"
+            Result         = $result
+            Status         = if ($result) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+            RecDescription = "Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled"
+            CISControl     = "9.7, 10.1"
+            CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections, Deploy and Maintain Anti-Malware Software"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

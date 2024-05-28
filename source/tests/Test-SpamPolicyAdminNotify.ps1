@@ -34,20 +34,17 @@ function Test-SpamPolicyAdminNotify {
         }
 
         # Create an instance of CISAuditResult and populate it
-        $auditResult.Status = if ($areSettingsEnabled) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "2.1.6"
-        $auditResult.RecDescription = "Ensure Exchange Online Spam Policies are set to notify administrators"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "17.5"
-        $auditResult.CISDescription = "Assign Key Roles and Responsibilities"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $areSettingsEnabled
-        $auditResult.Details = if ($areSettingsEnabled) { "Both BccSuspiciousOutboundMail and NotifyOutboundSpam are enabled." } else { $failureDetails -join ' ' }
-        $auditResult.FailureReason = if (-not $areSettingsEnabled) { "One or both spam policies are not set to notify administrators." } else { "N/A" }
+        $params = @{
+            Rec            = "2.1.6"
+            Result         = $areSettingsEnabled
+            Status         = if ($areSettingsEnabled) { "Pass" } else { "Fail" }
+            Details        = if ($areSettingsEnabled) { "Both BccSuspiciousOutboundMail and NotifyOutboundSpam are enabled." } else { $failureDetails -join ' ' }
+            FailureReason  = if (-not $areSettingsEnabled) { "One or both spam policies are not set to notify administrators." } else { "N/A" }
+            RecDescription = "Ensure Exchange Online Spam Policies are set to notify administrators"
+            CISControl     = "17.5"
+            CISDescription = "Assign Key Roles and Responsibilities"
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
