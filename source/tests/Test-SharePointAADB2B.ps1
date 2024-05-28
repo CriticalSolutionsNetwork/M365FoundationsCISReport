@@ -1,11 +1,14 @@
 function Test-SharePointAADB2B {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here
     )
 
     begin {
-        # Initialization code
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
 
         $auditResult = [CISAuditResult]::new()
     }
@@ -18,7 +21,6 @@ function Test-SharePointAADB2B {
         $auditResult.CISControlVer = "v8"
         $auditResult.CISControl = "0.0"
         $auditResult.CISDescription = "Explicitly Not Mapped"
-
         $auditResult.Rec = "7.2.2"
         $auditResult.ELevel = "E3"
         $auditResult.ProfileLevel = "L1"
@@ -26,7 +28,6 @@ function Test-SharePointAADB2B {
         $auditResult.IG2 = $false
         $auditResult.IG3 = $false
         $auditResult.RecDescription = "Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled"
-
         $auditResult.Result = $SPOTenantAzureADB2B.EnableAzureADB2BIntegration
         $auditResult.Details = "EnableAzureADB2BIntegration: $($SPOTenantAzureADB2B.EnableAzureADB2BIntegration)"
         $auditResult.FailureReason = if (-not $SPOTenantAzureADB2B.EnableAzureADB2BIntegration) { "Azure AD B2B integration is not enabled" } else { "N/A" }
