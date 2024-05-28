@@ -1,15 +1,19 @@
 function Test-MailboxAuditingE3 {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
 
         $e3SkuPartNumbers = @("ENTERPRISEPACK", "OFFICESUBSCRIPTION")
         $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MoveToDeletedItems", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
+
         $auditResult = [CISAuditResult]::new()
         $auditResult.ELevel = "E3"
         $auditResult.ProfileLevel = "L1"
@@ -72,10 +76,15 @@ function Test-MailboxAuditingE3 {
             }
         }
 
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+        $details = if ($allFailures.Count -eq 0) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
+
+        # Populate the audit result
         $auditResult.Result = $allFailures.Count -eq 0
         $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
-        $auditResult.Details = if ($auditResult.Result) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
-        $auditResult.FailureReason = if (-not $auditResult.Result) { "Audit issues detected." } else { "N/A" }
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
