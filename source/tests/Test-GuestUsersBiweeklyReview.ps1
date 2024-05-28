@@ -1,22 +1,42 @@
 function Test-GuestUsersBiweeklyReview {
     [CmdletBinding()]
-    param ()
+    param (
+        # Aligned
+        # Define your parameters here if needed
+    )
 
     begin {
-        #. .\source\Classes\CISAuditResult.ps1
-        $auditResults = @()
+        # Dot source the class script if necessary
+        . .\source\Classes\CISAuditResult.ps1
+
+        # Initialization code, if needed
     }
 
     process {
         # 1.1.4 (L1) Ensure Guest Users are reviewed at least biweekly
-        # The function will fail if guest users are found since they should be reviewed manually biweekly.
 
         try {
-            # Connect to Microsoft Graph - placeholder for connection command
+            # Retrieve guest users from Microsoft Graph
             # Connect-MgGraph -Scopes "User.Read.All"
             $guestUsers = Get-MgUser -All -Filter "UserType eq 'Guest'"
 
-            # Create an instance of CISAuditResult and populate it
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if ($guestUsers) {
+                "Guest users present: $($guestUsers.Count)"
+            }
+            else {
+                "N/A"
+            }
+
+            $details = if ($guestUsers) {
+                $auditCommand = "Get-MgUser -All -Property UserType,UserPrincipalName | Where {`$_.UserType -ne 'Member'} | Format-Table UserPrincipalName, UserType"
+                "Manual review required. To list guest users, run: `"$auditCommand`"."
+            }
+            else {
+                "No guest users found."
+            }
+
+            # Create and populate the CISAuditResult object
             $auditResult = [CISAuditResult]::new()
             $auditResult.CISControl = "5.1, 5.3"
             $auditResult.CISDescription = "Establish and Maintain an Inventory of Accounts, Disable Dormant Accounts"
@@ -28,34 +48,22 @@ function Test-GuestUsersBiweeklyReview {
             $auditResult.IG2 = $true
             $auditResult.IG3 = $true
             $auditResult.CISControlVer = 'v8'
-
-            if ($guestUsers) {
-                $auditCommand = "Get-MgUser -All -Property UserType,UserPrincipalName | Where {`$_.UserType -ne 'Member'} | Format-Table UserPrincipalName, UserType"
-                $auditResult.Status = "Fail"
-                $auditResult.Result = $false
-                $auditResult.Details = "Manual review required. To list guest users, run: `"$auditCommand`"."
-                $auditResult.FailureReason = "Guest users present: $($guestUsers.Count)"
-            } else {
-                $auditResult.Status = "Pass"
-                $auditResult.Result = $true
-                $auditResult.Details = "No guest users found."
-                $auditResult.FailureReason = "N/A"
-            }
+            $auditResult.Result = -not $guestUsers
+            $auditResult.Details = $details
+            $auditResult.FailureReason = $failureReasons
+            $auditResult.Status = if ($guestUsers) { "Fail" } else { "Pass" }
         }
         catch {
+            $auditResult = [CISAuditResult]::new()
             $auditResult.Status = "Error"
             $auditResult.Result = $false
             $auditResult.Details = "Error while attempting to check guest users. Error message: $($_.Exception.Message)"
             $auditResult.FailureReason = "An error occurred during the audit check."
         }
-
-        $auditResults += $auditResult
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
-
-
