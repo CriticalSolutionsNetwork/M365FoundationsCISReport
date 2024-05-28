@@ -2,6 +2,7 @@ function Test-MailboxAuditingE3 {
     [CmdletBinding()]
     param (
         # Aligned
+        # Create Table for Details
         # Parameters can be added if needed
     )
 
