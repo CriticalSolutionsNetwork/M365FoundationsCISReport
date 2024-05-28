@@ -1,24 +1,35 @@
 function Test-IdentifyExternalEmail {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be defined here if needed
     )
 
     begin {
-        # Dot source the class script
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
 
-        $auditResults = @()
+        # Initialization code, if needed
     }
 
     process {
         # 6.2.3 (L1) Ensure email from external senders is identified
-        # Requirement is to have external sender tagging enabled
-        # Review
 
+        # Retrieve external sender tagging configuration
         $externalInOutlook = Get-ExternalInOutlook
         $externalTaggingEnabled = ($externalInOutlook | ForEach-Object { $_.Enabled }) -contains $true
 
-        # Create an instance of CISAuditResult and populate it
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $externalTaggingEnabled) {
+            "External sender tagging is disabled"
+        }
+        else {
+            "N/A"
+        }
+
+        $details = "Enabled: $($externalTaggingEnabled); AllowList: $($externalInOutlook.AllowList)"
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($externalTaggingEnabled) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E3"
@@ -26,20 +37,18 @@ function Test-IdentifyExternalEmail {
         $auditResult.Rec = "6.2.3"
         $auditResult.RecDescription = "Ensure email from external senders is identified"
         $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0"
+        $auditResult.CISControl = "0.0"  # Explicitly Not Mapped
         $auditResult.CISDescription = "Explicitly Not Mapped"
         $auditResult.IG1 = $false
         $auditResult.IG2 = $false
         $auditResult.IG3 = $false
         $auditResult.Result = $externalTaggingEnabled
-        $auditResult.Details = "Enabled: $($externalTaggingEnabled); AllowList: $($externalInOutlook.AllowList)"
-        $auditResult.FailureReason = if (-not $externalTaggingEnabled) { "External sender tagging is disabled" } else { "N/A" }
-
-        $auditResults += $auditResult
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
