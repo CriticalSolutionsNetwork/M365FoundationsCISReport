@@ -1,27 +1,41 @@
 function Test-CommonAttachmentFilter {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
+        # Dot source the class script if necessary
 
-        $auditResults = @()
+        # Initialization code, if needed
     }
 
     process {
         # 2.1.2 (L1) Ensure the Common Attachment Types Filter is enabled
-        # Pass if EnableFileFilter is set to True. Fail otherwise.
 
+        # Retrieve the attachment filter policy
         $attachmentFilter = Get-MalwareFilterPolicy -Identity Default | Select-Object EnableFileFilter
         $result = $attachmentFilter.EnableFileFilter
-        $details = "File Filter Enabled: $($attachmentFilter.EnableFileFilter)"
-        $failureReason = if ($result) { "N/A" } else { "Common Attachment Types Filter is disabled" }
-        $status = if ($result) { "Pass" } else { "Fail" }
 
-        # Create an instance of CISAuditResult and populate it
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $result) {
+            "Common Attachment Types Filter is disabled"
+        }
+        else {
+            "N/A"
+        }
+
+        $details = if ($result) {
+            "File Filter Enabled: True"
+        }
+        else {
+            "File Filter Enabled: False"
+        }
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = $status
+        $auditResult.Status = if ($result) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E3"
         $auditResult.ProfileLevel = "L1"
         $auditResult.Rec = "2.1.2"
@@ -34,13 +48,11 @@ function Test-CommonAttachmentFilter {
         $auditResult.IG3 = $true
         $auditResult.Result = $result
         $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReason
-
-        $auditResults += $auditResult
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
