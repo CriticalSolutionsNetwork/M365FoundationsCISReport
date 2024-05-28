@@ -1,16 +1,19 @@
 function Test-SafeLinksOfficeApps {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here if needed
     )
 
     begin {
-        # Initialization code
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
+        # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
+
         # Retrieve all Safe Links policies
         $policies = Get-SafeLinksPolicy
 
@@ -42,8 +45,9 @@ function Test-SafeLinksOfficeApps {
         # Prepare the final result
         $result = $misconfiguredDetails.Count -eq 0
         $details = if ($result) { "All Safe Links policies are correctly configured." } else { $misconfiguredDetails -join ' | ' }
+        $failureReasons = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
 
-        # Create the audit result object
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($result) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E5"
@@ -58,13 +62,11 @@ function Test-SafeLinksOfficeApps {
         $auditResult.IG3 = $true
         $auditResult.Result = $result
         $auditResult.Details = $details
-        $auditResult.FailureReason = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
-
-        $auditResults += $auditResult
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
