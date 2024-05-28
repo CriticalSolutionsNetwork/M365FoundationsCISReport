@@ -5,7 +5,7 @@ function Test-AdministrativeAccountCompliance {
         # Parameters can be added if needed
     )
     begin {
-        #. C:\Temp\CISAuditResult.ps1
+        #. .\source\Classes\CISAuditResult.ps1
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
     }
     process {

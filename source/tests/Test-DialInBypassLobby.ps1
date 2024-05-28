@@ -7,7 +7,7 @@ function Test-DialInBypassLobby {
 
     begin {
         # Dot source the class script if necessary
-
+        #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
     }
 
