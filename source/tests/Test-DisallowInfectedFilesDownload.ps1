@@ -1,12 +1,13 @@
 function Test-DisallowInfectedFilesDownload {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here if needed
     )
 
     begin {
         # Dot source the class script if necessary
-        . .\source\Classes\CISAuditResult.ps1
+        #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
     }
