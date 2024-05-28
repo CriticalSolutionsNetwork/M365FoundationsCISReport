@@ -1,13 +1,14 @@
 function Test-ModernAuthSharePoint {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here
     )
 
     begin {
-        # Initialization code
-
-        $auditResult = [CISAuditResult]::new()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
@@ -15,7 +16,18 @@ function Test-ModernAuthSharePoint {
         $SPOTenant = Get-SPOTenant | Select-Object -Property LegacyAuthProtocolsEnabled
         $modernAuthForSPRequired = -not $SPOTenant.LegacyAuthProtocolsEnabled
 
-        # Populate the auditResult object with the required properties
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $modernAuthForSPRequired) {
+            "Legacy authentication protocols are enabled"
+        }
+        else {
+            "N/A"
+        }
+
+        $details = "LegacyAuthProtocolsEnabled: $($SPOTenant.LegacyAuthProtocolsEnabled)"
+
+        # Create and populate the CISAuditResult object
+        $auditResult = [CISAuditResult]::new()
         $auditResult.CISControlVer = "v8"
         $auditResult.CISControl = "3.10"
         $auditResult.CISDescription = "Encrypt Sensitive Data in Transit"
@@ -27,13 +39,13 @@ function Test-ModernAuthSharePoint {
         $auditResult.IG3 = $true
         $auditResult.RecDescription = "Modern Authentication for SharePoint Applications"
         $auditResult.Result = $modernAuthForSPRequired
-        $auditResult.Details = "LegacyAuthProtocolsEnabled: $($SPOTenant.LegacyAuthProtocolsEnabled)"
-        $auditResult.FailureReason = if (-not $modernAuthForSPRequired) { "Legacy authentication protocols are enabled" } else { "N/A" }
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
         $auditResult.Status = if ($modernAuthForSPRequired) { "Pass" } else { "Fail" }
     }
 
     end {
-        # Return auditResult
+        # Return the audit result
         return $auditResult
     }
 }
