@@ -1,16 +1,19 @@
 function Test-SafeAttachmentsTeams {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
-        # Requires E5 license
+        # 2.1.5 (L2) Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled
+
         # Retrieve the ATP policies for Office 365 and check Safe Attachments settings
         $atpPolicies = Get-AtpPolicyForO365
 
@@ -25,12 +28,19 @@ function Test-SafeAttachmentsTeams {
         $result = $null -ne $atpPolicyResult
         $details = if ($result) {
             "ATP for SharePoint, OneDrive, and Teams is enabled with correct settings."
-        } else {
+        }
+        else {
             "ATP for SharePoint, OneDrive, and Teams is not enabled with correct settings."
         }
-        $failureReason = if ($result) { "N/A" } else { "ATP policy for SharePoint, OneDrive, and Microsoft Teams is not correctly configured." }
 
-        # Create an instance of CISAuditResult and populate it
+        $failureReasons = if ($result) {
+            "N/A"
+        }
+        else {
+            "ATP policy for SharePoint, OneDrive, and Microsoft Teams is not correctly configured."
+        }
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($result) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E5"
@@ -45,13 +55,13 @@ function Test-SafeAttachmentsTeams {
         $auditResult.IG3 = $true
         $auditResult.Result = $result
         $auditResult.Details = $details
-        $auditResult.FailureReason = $failureReason
-
-        $auditResults += $auditResult
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
+
+# Additional helper functions (if any)
