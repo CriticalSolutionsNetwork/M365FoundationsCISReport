@@ -1,22 +1,34 @@
 function Test-RestrictTenantCreation {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
-        # Dot source the class script
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
         # 5.1.2.3 (L1) Ensure 'Restrict non-admin users from creating tenants' is set to 'Yes'
-        # Pass if AllowedToCreateTenants is False. Fail otherwise.
+
+        # Retrieve the tenant creation policy
         $tenantCreationPolicy = (Get-MgPolicyAuthorizationPolicy).DefaultUserRolePermissions | Select-Object AllowedToCreateTenants
         $tenantCreationResult = -not $tenantCreationPolicy.AllowedToCreateTenants
 
-        # Create an instance of CISAuditResult and populate it
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if ($tenantCreationResult) {
+            "N/A"
+        }
+        else {
+            "Non-admin users can create tenants"
+        }
+
+        $details = "AllowedToCreateTenants: $($tenantCreationPolicy.AllowedToCreateTenants)"
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($tenantCreationResult) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E3"
@@ -30,14 +42,14 @@ function Test-RestrictTenantCreation {
         $auditResult.IG2 = $false
         $auditResult.IG3 = $false
         $auditResult.Result = $tenantCreationResult
-        $auditResult.Details = "AllowedToCreateTenants: $($tenantCreationPolicy.AllowedToCreateTenants)"
-        $auditResult.FailureReason = if (-not $tenantCreationResult) { "Non-admin users can create tenants" } else { "N/A" }
-
-        $auditResults += $auditResult
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
+
+# Additional helper functions (if any)
