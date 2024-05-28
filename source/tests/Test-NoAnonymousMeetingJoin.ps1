@@ -1,13 +1,14 @@
 function Test-NoAnonymousMeetingJoin {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be defined here if needed
     )
 
     begin {
-        # Dot source the class script
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
@@ -18,7 +19,17 @@ function Test-NoAnonymousMeetingJoin {
         $teamsMeetingPolicy = Get-CsTeamsMeetingPolicy -Identity Global
         $allowAnonymousUsersToJoinMeeting = $teamsMeetingPolicy.AllowAnonymousUsersToJoinMeeting
 
-        # Create an instance of CISAuditResult and populate it
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if ($allowAnonymousUsersToJoinMeeting) {
+            "Anonymous users are allowed to join meetings"
+        }
+        else {
+            "N/A"
+        }
+
+        $details = "AllowAnonymousUsersToJoinMeeting is set to $allowAnonymousUsersToJoinMeeting"
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.CISControlVer = "v8"
         $auditResult.CISControl = "0.0" # The control is Explicitly Not Mapped as per the image provided
@@ -31,15 +42,13 @@ function Test-NoAnonymousMeetingJoin {
         $auditResult.IG3 = $false # Set based on the CIS Controls image
         $auditResult.RecDescription = "Ensure anonymous users can't join a meeting"
         $auditResult.Result = -not $allowAnonymousUsersToJoinMeeting
-        $auditResult.Details = "AllowAnonymousUsersToJoinMeeting is set to $allowAnonymousUsersToJoinMeeting"
-        $auditResult.FailureReason = if ($allowAnonymousUsersToJoinMeeting) { "Anonymous users are allowed to join meetings" } else { "N/A" }
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
         $auditResult.Status = if (-not $allowAnonymousUsersToJoinMeeting) { "Pass" } else { "Fail" }
-
-        $auditResults += $auditResult
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
