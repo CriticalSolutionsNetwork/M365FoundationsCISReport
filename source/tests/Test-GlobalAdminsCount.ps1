@@ -41,9 +41,6 @@ function Test-GlobalAdminsCount {
             Status         = if ($globalAdminCount -ge 2 -and $globalAdminCount -le 4) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure that between two and four global admins are designated"
-            CISControl     = "5.1"
-            CISDescription = "Establish and Maintain an Inventory of Accounts"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

@@ -37,9 +37,6 @@ function Test-MeetingChatNoAnonymous {
             Status         = if ($chatAnonDisabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure meeting chat does not allow anonymous users"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

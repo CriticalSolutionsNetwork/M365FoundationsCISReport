@@ -40,9 +40,6 @@ function Test-SpamPolicyAdminNotify {
             Status         = if ($areSettingsEnabled) { "Pass" } else { "Fail" }
             Details        = if ($areSettingsEnabled) { "Both BccSuspiciousOutboundMail and NotifyOutboundSpam are enabled." } else { $failureDetails -join ' ' }
             FailureReason  = if (-not $areSettingsEnabled) { "One or both spam policies are not set to notify administrators." } else { "N/A" }
-            RecDescription = "Ensure Exchange Online Spam Policies are set to notify administrators"
-            CISControl     = "17.5"
-            CISDescription = "Assign Key Roles and Responsibilities"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

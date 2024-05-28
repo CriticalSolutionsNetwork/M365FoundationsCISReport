@@ -41,9 +41,6 @@ function Test-ManagedApprovedPublicGroups {
             Status         = if ($null -eq $allGroups -or $allGroups.Count -eq 0) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure that only organizationally managed/approved public groups exist"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

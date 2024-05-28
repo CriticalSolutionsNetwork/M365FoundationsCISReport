@@ -39,9 +39,6 @@ function Test-TeamsExternalFileSharing {
             Status         = if ($isCompliant) { "Pass" } else { "Fail" }
             Details        = if (-not $isCompliant) { "Non-approved providers enabled: $($nonCompliantProviders -join ', ')" } else { "All cloud storage services are approved providers" }
             FailureReason  = if (-not $isCompliant) { "The following non-approved providers are enabled: $($nonCompliantProviders -join ', ')" } else { "N/A" }
-            RecDescription = "Ensure external file sharing in Teams is enabled for only approved cloud storage services"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

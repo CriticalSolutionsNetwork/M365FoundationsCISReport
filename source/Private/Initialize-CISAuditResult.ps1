@@ -13,16 +13,7 @@ function Initialize-CISAuditResult {
         [string]$Details,
 
         [Parameter(Mandatory = $true)]
-        [string]$FailureReason,
-
-        [Parameter(Mandatory = $true)]
-        [string]$RecDescription,
-
-        [Parameter(Mandatory = $true)]
-        [string]$CISControl,
-
-        [Parameter(Mandatory = $true)]
-        [string]$CISDescription
+        [string]$FailureReason
     )
 
     # Import the test definitions CSV file
@@ -40,9 +31,9 @@ function Initialize-CISAuditResult {
     $auditResult.IG1 = [bool]::Parse($testDefinition.IG1)
     $auditResult.IG2 = [bool]::Parse($testDefinition.IG2)
     $auditResult.IG3 = [bool]::Parse($testDefinition.IG3)
-    $auditResult.RecDescription = $RecDescription
-    $auditResult.CISControl = $CISControl
-    $auditResult.CISDescription = $CISDescription
+    $auditResult.RecDescription = $testDefinition.RecDescription
+    $auditResult.CISControl = $testDefinition.CISControl
+    $auditResult.CISDescription = $testDefinition.CISDescription
     $auditResult.Automated = [bool]::Parse($testDefinition.Automated)
     $auditResult.Connection = $testDefinition.Connection
     $auditResult.CISControlVer = 'v8'

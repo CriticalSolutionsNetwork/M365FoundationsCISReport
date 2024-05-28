@@ -35,9 +35,6 @@ function Test-RestrictExternalSharing {
             Status         = if ($isRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure external content sharing is restricted"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

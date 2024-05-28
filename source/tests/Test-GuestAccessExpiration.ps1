@@ -36,9 +36,6 @@ function Test-GuestAccessExpiration {
             Status         = if ($isGuestAccessExpirationConfiguredCorrectly) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure guest access to a site or OneDrive will expire automatically"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

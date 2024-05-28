@@ -72,14 +72,11 @@ function Test-MailboxAuditingE3 {
 
         # Populate the audit result
         $params = @{
-            Rec = "6.1.2"
-            Result = $allFailures.Count -eq 0
-            Status = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
-            Details = $details
+            Rec           = "6.1.2"
+            Result        = $allFailures.Count -eq 0
+            Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+            Details       = $details
             FailureReason = $failureReasons
-            RecDescription = "Ensure mailbox auditing for Office E3 users is Enabled"
-            CISControl = "8.2"
-            CISDescription = "Collect audit logs."
         }
         $auditResult = Initialize-CISAuditResult @params
     }

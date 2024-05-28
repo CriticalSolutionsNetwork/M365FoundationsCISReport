@@ -47,9 +47,6 @@ function Test-SafeAttachmentsTeams {
             Status         = if ($result) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled"
-            CISControl     = "9.7, 10.1"
-            CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections, Deploy and Maintain Anti-Malware Software"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

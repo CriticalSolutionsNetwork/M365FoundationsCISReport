@@ -36,9 +36,6 @@ function Test-PasswordHashSync {
             Status         = if ($hashSyncResult) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure password hash sync is enabled for hybrid deployments"
-            CISControl     = "6.7"
-            CISDescription = "Centralize Access Control"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

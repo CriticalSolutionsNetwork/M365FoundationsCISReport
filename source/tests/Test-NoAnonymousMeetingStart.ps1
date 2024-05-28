@@ -36,9 +36,6 @@ function Test-NoAnonymousMeetingStart {
             Status         = if ($anonymousStartDisabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure anonymous users and dial-in callers can't start a meeting"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

@@ -41,9 +41,6 @@ function Test-DisallowInfectedFilesDownload {
             Status         = if ($isDisallowInfectedFileDownloadEnabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure Office 365 SharePoint infected files are disallowed for download"
-            CISControl     = "10.1"
-            CISDescription = "Deploy and Maintain Anti-Malware Software"
         }
         $auditResult = Initialize-CISAuditResult @params
 

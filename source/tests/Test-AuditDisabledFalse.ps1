@@ -40,9 +40,6 @@ function Test-AuditDisabledFalse {
             Status         = if ($auditNotDisabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure 'AuditDisabled' organizationally is set to 'False'"
-            CISControl     = "8.2"
-            CISDescription = "Collect Audit Logs"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

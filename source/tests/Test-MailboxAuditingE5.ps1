@@ -83,9 +83,6 @@ function Test-MailboxAuditingE5 {
             Status         = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure mailbox auditing for Office E5 users is Enabled"
-            CISControl     = "8.2"
-            CISDescription = "Collect audit logs."
         }
         $auditResult = Initialize-CISAuditResult @params
     }

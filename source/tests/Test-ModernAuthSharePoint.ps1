@@ -33,9 +33,6 @@ function Test-ModernAuthSharePoint {
             Status         = if ($modernAuthForSPRequired) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Modern Authentication for SharePoint Applications"
-            CISControl     = "3.10"
-            CISDescription = "Encrypt Sensitive Data in Transit"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

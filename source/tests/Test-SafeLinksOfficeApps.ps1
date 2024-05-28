@@ -54,9 +54,6 @@ function Test-SafeLinksOfficeApps {
             Status         = if ($result) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure Safe Links for Office Applications is Enabled"
-            CISControl     = "10.1"
-            CISDescription = "Deploy and Maintain Anti-Malware Software"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

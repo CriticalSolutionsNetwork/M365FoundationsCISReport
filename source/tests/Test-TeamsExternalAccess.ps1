@@ -35,9 +35,6 @@ function Test-TeamsExternalAccess {
             Status         = if ($isCompliant) { "Pass" } else { "Fail" }
             Details        = "AllowTeamsConsumer: $($externalAccessConfig.AllowTeamsConsumer); AllowPublicUsers: $($externalAccessConfig.AllowPublicUsers); AllowFederatedUsers: $($externalAccessConfig.AllowFederatedUsers); AllowedDomains limited: $allowedDomainsLimited"
             FailureReason  = if (-not $isCompliant) { "One or more external access configurations are not compliant." } else { "N/A" }
-            RecDescription = "Ensure 'external access' is restricted in the Teams admin center"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

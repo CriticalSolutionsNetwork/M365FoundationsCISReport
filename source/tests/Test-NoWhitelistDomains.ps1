@@ -40,9 +40,6 @@ function Test-NoWhitelistDomains {
             Status         = if ($whitelistedRules) { "Fail" } else { "Pass" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure mail transport rules do not whitelist specific domains"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

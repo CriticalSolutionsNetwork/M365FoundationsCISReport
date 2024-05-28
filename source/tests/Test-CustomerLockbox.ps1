@@ -40,9 +40,6 @@ function Test-CustomerLockbox {
             Status         = if ($customerLockboxEnabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure the customer lockbox feature is enabled"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

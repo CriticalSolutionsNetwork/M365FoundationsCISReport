@@ -35,9 +35,6 @@ function Test-ModernAuthExchangeOnline {
                 Status         = if ($orgConfig.OAuth2ClientProfileEnabled) { "Pass" } else { "Fail" }
                 Details        = $details
                 FailureReason  = $failureReasons
-                RecDescription = "Ensure modern authentication for Exchange Online is enabled (Automated)"
-                CISControl     = "3.10"
-                CISDescription = "Encrypt Sensitive Data in Transit"
             }
             $auditResult = Initialize-CISAuditResult @params
 

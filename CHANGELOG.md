@@ -4,6 +4,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+## [0.1.2] - 2024-04-29
+
 ### Added
 
 - Automated and organized CSV testing and added test 1.1.1.

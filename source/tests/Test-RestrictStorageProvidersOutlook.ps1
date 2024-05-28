@@ -43,9 +43,6 @@ function Test-RestrictStorageProvidersOutlook {
             Status         = if ($allPoliciesRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure additional storage providers are restricted in Outlook on the web"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

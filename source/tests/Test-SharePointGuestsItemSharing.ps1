@@ -25,9 +25,6 @@ function Test-SharePointGuestsItemSharing {
             Status         = if ($isGuestResharingPrevented) { "Pass" } else { "Fail" }
             Details        = "PreventExternalUsersFromResharing: $isGuestResharingPrevented"
             FailureReason  = if (-not $isGuestResharingPrevented) { "Guest users can reshare items they don't own." } else { "N/A" }
-            RecDescription = "Ensure that SharePoint guest users cannot share items they don't own"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

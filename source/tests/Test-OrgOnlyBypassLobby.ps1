@@ -42,9 +42,6 @@ function Test-OrgOnlyBypassLobby {
             Status         = if ($lobbyBypassRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure only people in my org can bypass the lobby"
-            CISControl     = "6.8"
-            CISDescription = "Define and Maintain Role-Based Access Control"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

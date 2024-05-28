@@ -40,9 +40,6 @@ function Test-SafeAttachmentsPolicy {
             Status         = if ($result) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure Safe Attachments policy is enabled"
-            CISControl     = "9.7"
-            CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

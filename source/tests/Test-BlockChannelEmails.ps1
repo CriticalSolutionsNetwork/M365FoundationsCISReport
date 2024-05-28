@@ -40,9 +40,6 @@ function Test-BlockChannelEmails {
             Status         = if (-not $allowEmailIntoChannel) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure users can't send emails to a channel email address"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

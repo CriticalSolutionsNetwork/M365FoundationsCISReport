@@ -40,9 +40,6 @@ function Test-DialInBypassLobby {
             Status         = if ($PSTNBypassDisabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure users dialing in can't bypass the lobby"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

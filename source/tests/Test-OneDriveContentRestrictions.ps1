@@ -40,9 +40,6 @@ function Test-OneDriveContentRestrictions {
             Status         = if ($isOneDriveSharingRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure OneDrive content sharing is restricted"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

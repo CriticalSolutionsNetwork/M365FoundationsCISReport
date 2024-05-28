@@ -24,9 +24,6 @@ function Test-SharePointAADB2B {
             Status         = if ($SPOTenantAzureADB2B.EnableAzureADB2BIntegration) { "Pass" } else { "Fail" }
             Details        = "EnableAzureADB2BIntegration: $($SPOTenantAzureADB2B.EnableAzureADB2BIntegration)"
             FailureReason  = if (-not $SPOTenantAzureADB2B.EnableAzureADB2BIntegration) { "Azure AD B2B integration is not enabled" } else { "N/A" }
-            RecDescription = "Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

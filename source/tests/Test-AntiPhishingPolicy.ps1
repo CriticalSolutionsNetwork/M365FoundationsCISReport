@@ -66,9 +66,6 @@ function Test-AntiPhishingPolicy {
             Status         = if ($isCompliant) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure that an anti-phishing policy has been created"
-            CISControl     = "9.7"
-            CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections"
         }
 
         # Create and populate the CISAuditResult object

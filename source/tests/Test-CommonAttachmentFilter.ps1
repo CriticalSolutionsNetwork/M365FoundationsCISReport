@@ -40,9 +40,6 @@ function Test-CommonAttachmentFilter {
             Status         = if ($result) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure the Common Attachment Types Filter is enabled"
-            CISControl     = "9.6"
-            CISDescription = "Block Unnecessary File Types"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

@@ -50,9 +50,6 @@ function Test-ExternalSharingCalendars {
             Status         = if ($isExternalSharingDisabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure 'External sharing' of calendars is not available"
-            CISControl     = "4.8"
-            CISDescription = "Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

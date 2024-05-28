@@ -36,9 +36,6 @@ function Test-NoAnonymousMeetingJoin {
             Status         = if (-not $allowAnonymousUsersToJoinMeeting) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure anonymous users can't join a meeting"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

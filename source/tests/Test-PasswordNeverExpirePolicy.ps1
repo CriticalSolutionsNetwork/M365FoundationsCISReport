@@ -36,9 +36,6 @@ function Test-PasswordNeverExpirePolicy {
             Status         = if ($passwordPolicy -eq 0) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure the 'Password expiration policy' is set to 'Set passwords to never expire'"
-            CISControl     = "5.2"
-            CISDescription = "Use Unique Passwords"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

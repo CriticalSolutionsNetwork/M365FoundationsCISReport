@@ -41,9 +41,6 @@ function Test-ExternalNoControl {
             Status         = if ($externalControlRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure external participants can't give or request control"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

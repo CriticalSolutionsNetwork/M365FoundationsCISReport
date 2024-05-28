@@ -42,9 +42,6 @@ function Test-OrganizersPresent {
             Status         = if ($presenterRoleRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure only organizers and co-organizers can present"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

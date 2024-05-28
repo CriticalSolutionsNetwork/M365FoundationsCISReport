@@ -71,9 +71,6 @@ function Test-AdministrativeAccountCompliance {
             Status         = $status
             Details        = $details
             FailureReason  = $failureReason
-            RecDescription = "Ensure Administrative accounts are separate and cloud-only"
-            CISControl     = "5.4"
-            CISDescription = "Restrict Administrator Privileges to Dedicated Administrator Accounts"
         }
 
         $auditResult = Initialize-CISAuditResult @params

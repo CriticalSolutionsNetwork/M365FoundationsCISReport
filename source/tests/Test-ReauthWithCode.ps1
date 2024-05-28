@@ -35,9 +35,6 @@ function Test-ReauthWithCode {
             Status         = if ($isReauthenticationRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure reauthentication with verification code is restricted"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

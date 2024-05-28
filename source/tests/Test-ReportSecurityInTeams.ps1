@@ -45,9 +45,6 @@ function Test-ReportSecurityInTeams {
             Status         = if ($securityReportEnabled) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure users can report security concerns in Teams"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

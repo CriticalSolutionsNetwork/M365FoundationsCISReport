@@ -67,9 +67,6 @@ function Test-RestrictOutlookAddins {
             Status         = if ($isCompliant) { "Pass" } else { "Fail" }
             Details        = $detailsString
             FailureReason  = if ($isCompliant) { "N/A" } else { "Unauthorized Outlook add-ins found in custom or default policies." }
-            RecDescription = "Ensure users installing Outlook add-ins is not allowed"
-            CISControl     = "9.4"
-            CISDescription = "Restrict Unnecessary or Unauthorized Browser and Email Client Extensions"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

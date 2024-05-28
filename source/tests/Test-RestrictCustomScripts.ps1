@@ -50,9 +50,6 @@ function Test-RestrictCustomScripts {
             Status         = if ($complianceResult) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure custom script execution is restricted on site collections"
-            CISControl     = "2.7"
-            CISDescription = "Allowlist Authorized Scripts"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

@@ -43,9 +43,6 @@ function Test-GuestUsersBiweeklyReview {
             Status         = if ($guestUsers) { "Fail" } else { "Pass" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure Guest Users are reviewed at least biweekly"
-            CISControl     = "5.1, 5.3"
-            CISDescription = "Establish and Maintain an Inventory of Accounts, Disable Dormant Accounts"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

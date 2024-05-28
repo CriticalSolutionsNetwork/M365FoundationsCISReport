@@ -25,9 +25,6 @@ function Test-SharePointExternalSharingDomains {
             Status         = if ($isDomainRestrictionConfigured) { "Pass" } else { "Fail" }
             Details        = "SharingDomainRestrictionMode: $($SPOTenant.SharingDomainRestrictionMode); SharingAllowedDomainList: $($SPOTenant.SharingAllowedDomainList)"
             FailureReason  = if (-not $isDomainRestrictionConfigured) { "Domain restrictions for SharePoint external sharing are not configured to 'AllowList'. Current setting: $($SPOTenant.SharingDomainRestrictionMode)" } else { "N/A" }
-            RecDescription = "Ensure SharePoint external sharing is managed through domain whitelist/blacklists"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

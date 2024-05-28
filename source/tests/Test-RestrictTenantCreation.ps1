@@ -35,9 +35,6 @@ function Test-RestrictTenantCreation {
             Status         = if ($tenantCreationResult) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure 'Restrict non-admin users from creating tenants' is set to 'Yes'"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

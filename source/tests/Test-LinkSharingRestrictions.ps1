@@ -36,9 +36,6 @@ function Test-LinkSharingRestrictions {
             Status         = if ($isLinkSharingRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure link sharing is restricted in SharePoint and OneDrive"
-            CISControl     = "3.3"
-            CISDescription = "Configure Data Access Control Lists"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

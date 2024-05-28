@@ -40,9 +40,6 @@ function Test-OneDriveSyncRestrictions {
             Status         = if ($isSyncRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure OneDrive sync is restricted for unmanaged devices"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

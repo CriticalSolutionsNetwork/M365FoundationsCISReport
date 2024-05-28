@@ -42,9 +42,6 @@ function Test-BlockSharedMailboxSignIn {
             Status         = if ($allBlocked) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure sign-in to shared mailboxes is blocked"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

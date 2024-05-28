@@ -40,9 +40,6 @@ function Test-AuditLogSearch {
             Status         = if ($auditLogResult) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure Microsoft 365 audit log search is Enabled"
-            CISControl     = "8.2"
-            CISDescription = "Collect Audit Logs"
         }
         $auditResult = Initialize-CISAuditResult @params
 

@@ -41,9 +41,6 @@ function Test-EnableDKIM {
             Status         = if ($dkimResult) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure that DKIM is enabled for all Exchange Online Domains"
-            CISControl     = "9.5"
-            CISDescription = "Implement DMARC"
         }
         $auditResult = Initialize-CISAuditResult @params
     }

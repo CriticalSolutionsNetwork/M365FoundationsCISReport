@@ -41,9 +41,6 @@ function Test-BlockMailForwarding {
             Status         = if ($forwardingBlocked) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
-            RecDescription = "Ensure all forms of mail forwarding are blocked and/or disabled"
-            CISControl     = "0.0"
-            CISDescription = "Explicitly Not Mapped"
         }
         $auditResult = Initialize-CISAuditResult @params
     }
