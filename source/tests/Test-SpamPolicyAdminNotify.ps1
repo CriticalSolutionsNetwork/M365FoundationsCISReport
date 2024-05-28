@@ -1,16 +1,20 @@
 function Test-SpamPolicyAdminNotify {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
 
-        $auditResults = @()
+        $auditResult = [CISAuditResult]::new()
     }
 
     process {
-        # 2.1.6	Ensure Exchange Online Spam Policies are set to notify administrators
+        # 2.1.6 Ensure Exchange Online Spam Policies are set to notify administrators
 
         # Get the default hosted outbound spam filter policy
         $hostedOutboundSpamFilterPolicy = Get-HostedOutboundSpamFilterPolicy | Where-Object { $_.IsDefault -eq $true }
@@ -30,7 +34,6 @@ function Test-SpamPolicyAdminNotify {
         }
 
         # Create an instance of CISAuditResult and populate it
-        $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($areSettingsEnabled) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E3"
         $auditResult.ProfileLevel = "L1"
@@ -45,14 +48,10 @@ function Test-SpamPolicyAdminNotify {
         $auditResult.Result = $areSettingsEnabled
         $auditResult.Details = if ($areSettingsEnabled) { "Both BccSuspiciousOutboundMail and NotifyOutboundSpam are enabled." } else { $failureDetails -join ' ' }
         $auditResult.FailureReason = if (-not $areSettingsEnabled) { "One or both spam policies are not set to notify administrators." } else { "N/A" }
-
-        $auditResults += $auditResult
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return auditResult
+        return $auditResult
     }
 }
-
-
