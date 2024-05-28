@@ -1,5 +1,6 @@
 function Test-AuditDisabledFalse {
     [CmdletBinding()]
+    # Aligned
     param (
         # Parameters can be added if needed
     )

@@ -1,22 +1,39 @@
 function Test-AuditLogSearch {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
-        # Dot source the class script
+        # Dot source the class script if necessary
 
-        $auditResults = @()
+        # Initialization code, if needed
     }
 
     process {
         # 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
-        # Pass if UnifiedAuditLogIngestionEnabled is True. Fail otherwise.
+
+        # Retrieve the audit log configuration
         $auditLogConfig = Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled
         $auditLogResult = $auditLogConfig.UnifiedAuditLogIngestionEnabled
 
-        # Create an instance of CISAuditResult and populate it
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $auditLogResult) {
+            "Audit log search is not enabled"
+        }
+        else {
+            "N/A"
+        }
+
+        $details = if ($auditLogResult) {
+            "UnifiedAuditLogIngestionEnabled: True"
+        }
+        else {
+            "UnifiedAuditLogIngestionEnabled: False"
+        }
+
+        # Create and populate the CISAuditResult object
         $auditResult = [CISAuditResult]::new()
         $auditResult.Status = if ($auditLogResult) { "Pass" } else { "Fail" }
         $auditResult.ELevel = "E3"
@@ -30,14 +47,12 @@ function Test-AuditLogSearch {
         $auditResult.IG2 = $true
         $auditResult.IG3 = $true
         $auditResult.Result = $auditLogResult
-        $auditResult.Details = "UnifiedAuditLogIngestionEnabled: $($auditLogConfig.UnifiedAuditLogIngestionEnabled)"
-        $auditResult.FailureReason = if (-not $auditLogResult) { "Audit log search is not enabled" } else { "N/A" }
-
-        $auditResults += $auditResult
+        $auditResult.Details = $details
+        $auditResult.FailureReason = $failureReasons
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }

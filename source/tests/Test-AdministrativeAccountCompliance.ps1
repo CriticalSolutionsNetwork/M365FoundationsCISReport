@@ -1,6 +1,7 @@
 function Test-AdministrativeAccountCompliance {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
     begin {
