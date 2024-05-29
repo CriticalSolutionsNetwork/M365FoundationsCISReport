@@ -1,45 +1,51 @@
 function Test-DialInBypassLobby {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be defined here if needed
     )
 
     begin {
-        # Dot source the class script
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
         # 8.5.4 (L1) Ensure users dialing in can't bypass the lobby
 
-        # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+        # Retrieve Teams meeting policy for PSTN users
         $CsTeamsMeetingPolicyPSTN = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowPSTNUsersToBypassLobby
         $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
 
-        # Create an instance of CISAuditResult and populate it
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0" # Explicitly Not Mapped as per the image provided
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.Rec = "8.5.4"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false # Set based on the CIS Controls image
-        $auditResult.IG2 = $false # Set based on the CIS Controls image
-        $auditResult.IG3 = $false # Set based on the CIS Controls image
-        $auditResult.RecDescription = "Ensure users dialing in can't bypass the lobby"
-        $auditResult.Result = $PSTNBypassDisabled
-        $auditResult.Details = "AllowPSTNUsersToBypassLobby is set to $($CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby)"
-        $auditResult.FailureReason = if ($PSTNBypassDisabled) { "N/A" } else { "Users dialing in can bypass the lobby" }
-        $auditResult.Status = if ($PSTNBypassDisabled) { "Pass" } else { "Fail" }
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $PSTNBypassDisabled) {
+            "Users dialing in can bypass the lobby"
+        }
+        else {
+            "N/A"
+        }
 
-        $auditResults += $auditResult
+        $details = if ($PSTNBypassDisabled) {
+            "AllowPSTNUsersToBypassLobby is set to False"
+        }
+        else {
+            "AllowPSTNUsersToBypassLobby is set to True"
+        }
+
+        # Create and populate the CISAuditResult object
+        $params = @{
+            Rec            = "8.5.4"
+            Result         = $PSTNBypassDisabled
+            Status         = if ($PSTNBypassDisabled) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }

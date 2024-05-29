@@ -6,6 +6,32 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Array list to store the results of the audit.
+- Arraylist tests and helper template.
+- New testing function.
+- Missing properties to CSV.
+
+### Changed
+
+- Refactored object initialization to source `RecDescription`, `CISControl`, and `CISDescription` properties from the CSV.
+- Added `Automated` and `Connection` properties to the output object.
+- All test functions aligned with the test-template.
+- Initialize-CISAuditResult refactored to use global test definitions.
+
+### Fixed
+
+- Corrected test-template.
+- Details added to pass.
+
+### Docs
+
+- Updated comments and documentation for new functions.
+
+
+## [0.1.2] - 2024-04-29
+
+### Added
+
 - Automated and organized CSV testing and added test 1.1.1.
 - Functions to merge tests into an Excel benchmark.
 - Public function for merging tests.
@@ -24,6 +50,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Updated comments for new functions.
 - Updated help documentation.
+- Updated online link in public function.
 
 ## [0.1.1] - 2024-04-02
 

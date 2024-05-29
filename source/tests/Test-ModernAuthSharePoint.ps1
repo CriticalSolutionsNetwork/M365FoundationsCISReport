@@ -1,13 +1,14 @@
 function Test-ModernAuthSharePoint {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here
     )
 
     begin {
-        # Initialization code
-
-        $auditResult = [CISAuditResult]::new()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
@@ -15,25 +16,29 @@ function Test-ModernAuthSharePoint {
         $SPOTenant = Get-SPOTenant | Select-Object -Property LegacyAuthProtocolsEnabled
         $modernAuthForSPRequired = -not $SPOTenant.LegacyAuthProtocolsEnabled
 
-        # Populate the auditResult object with the required properties
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "3.10"
-        $auditResult.CISDescription = "Encrypt Sensitive Data in Transit"
-        $auditResult.Rec = "7.2.1"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.RecDescription = "Modern Authentication for SharePoint Applications"
-        $auditResult.Result = $modernAuthForSPRequired
-        $auditResult.Details = "LegacyAuthProtocolsEnabled: $($SPOTenant.LegacyAuthProtocolsEnabled)"
-        $auditResult.FailureReason = if (-not $modernAuthForSPRequired) { "Legacy authentication protocols are enabled" } else { "N/A" }
-        $auditResult.Status = if ($modernAuthForSPRequired) { "Pass" } else { "Fail" }
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $modernAuthForSPRequired) {
+            "Legacy authentication protocols are enabled"
+        }
+        else {
+            "N/A"
+        }
+
+        $details = "LegacyAuthProtocolsEnabled: $($SPOTenant.LegacyAuthProtocolsEnabled)"
+
+        # Create and populate the CISAuditResult object
+        $params = @{
+            Rec            = "7.2.1"
+            Result         = $modernAuthForSPRequired
+            Status         = if ($modernAuthForSPRequired) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
-        # Return auditResult
+        # Return the audit result
         return $auditResult
     }
 }

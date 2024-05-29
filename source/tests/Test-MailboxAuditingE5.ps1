@@ -1,23 +1,21 @@
 function Test-MailboxAuditingE5 {
     [CmdletBinding()]
-    param ()
+    param (
+        # Aligned
+        # Create Table for Details
+        # Parameters can be added if needed
+    )
 
     begin {
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
 
+        $e5SkuPartNumbers = @("SPE_E5", "ENTERPRISEPREMIUM", "OFFICEE5")
         $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MailItemsAccessed", "MoveToDeletedItems", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "6.1.3"
-        $auditResult.RecDescription = "Ensure mailbox auditing for Office E5 users is Enabled"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "8.2"
-        $auditResult.CISDescription = "Collect audit logs."
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
+
+
 
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
@@ -31,15 +29,11 @@ function Test-MailboxAuditingE5 {
             }
 
             try {
-                # Define SKU Part Numbers for Office E5 licenses
-                # Define SKU Part Numbers for Office E5 licenses
-                $e5SkuPartNumbers = @("SPE_E5", "ENTERPRISEPREMIUM", "OFFICEE5")
                 $licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
                 $hasOfficeE5 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e5SkuPartNumbers }).Count -gt 0
                 Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E5 license."
                 if ($hasOfficeE5) {
                     $userUPN = $user.UserPrincipalName
-
                     $mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
 
                     $missingActions = @()
@@ -78,13 +72,19 @@ function Test-MailboxAuditingE5 {
             }
         }
 
-        if ($allFailures.Count -eq 0) {
-            Write-Verbose "All evaluated E5 users have correct mailbox audit settings."
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+        $details = if ($allFailures.Count -eq 0) { "All Office E5 users have correct mailbox audit settings." } else { $allFailures -join " | " }
+
+        # Populate the audit result
+        $params = @{
+            Rec            = "6.1.3"
+            Result         = $allFailures.Count -eq 0
+            Status         = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
         }
-        $auditResult.Result = $allFailures.Count -eq 0
-        $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
-        $auditResult.Details = if ($auditResult.Result) { "All Office E5 users have correct mailbox audit settings." } else { $allFailures -join " | " }
-        $auditResult.FailureReason = if (-not $auditResult.Result) { "Audit issues detected." } else { "N/A" }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

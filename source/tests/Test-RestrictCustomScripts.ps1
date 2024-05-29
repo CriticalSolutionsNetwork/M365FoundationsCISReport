@@ -1,21 +1,20 @@
 function Test-RestrictCustomScripts {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here if needed
     )
-#Limit All
-    begin {
-        # .TODO Test behavior in Prod
-        # Dot source the class script
 
-        $auditResults = @()
+    begin {
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
-        # CIS 2.7 Ensure custom script execution is restricted on site collections
-        # Pass if DenyAddAndCustomizePages is set to true (Enabled). Fail otherwise.
+        # 7.3.4 (L1) Ensure custom script execution is restricted on site collections
 
-        # Get all site collections and select necessary properties
+        # Retrieve all site collections and select necessary properties
         $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
 
         # Find sites where custom scripts are allowed (DenyAddAndCustomizePages is not 'Enabled')
@@ -29,42 +28,34 @@ function Test-RestrictCustomScripts {
             "$($_.Title) ($($_.Url)): Custom Script Allowed"
         }
 
-        # Create an instance of CISAuditResult and populate it
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "2.7"
-        $auditResult.CISDescription = "Allowlist Authorized Scripts"
-        $auditResult.Rec = "7.3.4"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $true
-        $auditResult.RecDescription = "Ensure custom script execution is restricted on site collections"
-        $auditResult.Result = $complianceResult
-        $auditResult.Details = if (-not $complianceResult) {
-            $nonCompliantSiteDetails -join "; "
-        } else {
-            "All site collections have custom script execution restricted"
-        }
-        $auditResult.FailureReason = if (-not $complianceResult) {
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $complianceResult) {
             "The following site collections allow custom script execution: " + ($nonCompliantSiteDetails -join "; ")
-        } else {
+        }
+        else {
             "N/A"
         }
-        $auditResult.Status = if ($complianceResult) {
-            "Pass"
-        } else {
-            "Fail"
+
+        $details = if ($complianceResult) {
+            "All site collections have custom script execution restricted"
+        }
+        else {
+            $nonCompliantSiteDetails -join "; "
         }
 
-        $auditResults += $auditResult
+        # Create and populate the CISAuditResult object
+        $params = @{
+            Rec            = "7.3.4"
+            Result         = $complianceResult
+            Status         = if ($complianceResult) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
-
-
     end {
-        # Return auditResults
-        return $auditResults
+        # Return auditResult
+        return $auditResult
     }
 }

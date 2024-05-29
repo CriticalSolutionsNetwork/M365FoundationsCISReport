@@ -1,44 +1,52 @@
 function Test-EnableDKIM {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
-        # Dot source the class script
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
         # 2.1.9 (L1) Ensure DKIM is enabled for all Exchange Online Domains
-        # Pass if Enabled is True for all domains. Fail if any domain has Enabled set to False.
+
+        # Retrieve DKIM configuration for all domains
         $dkimConfig = Get-DkimSigningConfig | Select-Object Domain, Enabled
         $dkimResult = ($dkimConfig | ForEach-Object { $_.Enabled }) -notcontains $false
         $dkimFailedDomains = $dkimConfig | Where-Object { -not $_.Enabled } | ForEach-Object { $_.Domain }
 
-        # Create an instance of CISAuditResult and populate it
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($dkimResult) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "2.1.9"
-        $auditResult.RecDescription = "Ensure that DKIM is enabled for all Exchange Online Domains"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "9.5"
-        $auditResult.CISDescription = "Implement DMARC"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $dkimResult
-        $auditResult.Details = if (-not $dkimResult) { "DKIM not enabled for: $($dkimFailedDomains -join ', ')" } else { "All domains have DKIM enabled" }
-        $auditResult.FailureReason = if (-not $dkimResult) { "DKIM is not enabled for some domains" } else { "N/A" }
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $dkimResult) {
+            "DKIM is not enabled for some domains"
+        }
+        else {
+            "N/A"
+        }
 
-        $auditResults += $auditResult
+        $details = if ($dkimResult) {
+            "All domains have DKIM enabled"
+        }
+        else {
+            "DKIM not enabled for: $($dkimFailedDomains -join ', ')"
+        }
+
+        # Create and populate the CISAuditResult object
+        $params = @{
+            Rec            = "2.1.9"
+            Result         = $dkimResult
+            Status         = if ($dkimResult) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }

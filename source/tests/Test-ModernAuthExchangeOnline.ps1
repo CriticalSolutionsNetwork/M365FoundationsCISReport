@@ -1,40 +1,42 @@
 function Test-ModernAuthExchangeOnline {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here
     )
 
     begin {
-
-        $auditResults = [CISAuditResult]::new()
-        # Initialization code
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
         try {
             # Ensuring the ExchangeOnlineManagement module is available
 
-
             # 6.5.1 (L1) Ensure modern authentication for Exchange Online is enabled
             $orgConfig = Get-OrganizationConfig | Select-Object -Property Name, OAuth2ClientProfileEnabled
 
-            # Create an instance of CISAuditResult and populate it
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $orgConfig.OAuth2ClientProfileEnabled) {
+                "Modern authentication is disabled"
+            }
+            else {
+                "N/A"
+            }
 
-            $auditResults.CISControlVer = "v8"
-            $auditResults.CISControl = "3.10"
-            $auditResults.CISDescription = "Encrypt Sensitive Data in Transit"
-            $auditResults.IG1 = $false # As per CIS Control v8 mapping for IG1
-            $auditResults.IG2 = $true # As per CIS Control v8 mapping for IG2
-            $auditResults.IG3 = $true # As per CIS Control v8 mapping for IG3
-            $auditResults.ELevel = "E3" # Based on your environment (E3, E5, etc.)
-            $auditResults.ProfileLevel = "L1"
-            $auditResults.Rec = "6.5.1"
-            $auditResults.RecDescription = "Ensure modern authentication for Exchange Online is enabled (Automated)"
-            $auditResults.Result = $orgConfig.OAuth2ClientProfileEnabled
-            $auditResults.Details = $auditResults.Details = $orgConfig.Name + " OAuth2ClientProfileEnabled: " + $orgConfig.OAuth2ClientProfileEnabled
-            $auditResults.FailureReason = if (-not $orgConfig.OAuth2ClientProfileEnabled) { "Modern authentication is disabled" } else { "N/A" }
-            $auditResults.Status = if ($orgConfig.OAuth2ClientProfileEnabled) { "Pass" } else { "Fail" }
+            $details = "OAuth2ClientProfileEnabled: $($orgConfig.OAuth2ClientProfileEnabled) for Organization: $($orgConfig.Name)"
 
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec            = "6.5.1"
+                Result         = $orgConfig.OAuth2ClientProfileEnabled
+                Status         = if ($orgConfig.OAuth2ClientProfileEnabled) { "Pass" } else { "Fail" }
+                Details        = $details
+                FailureReason  = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
 
         }
         catch {
@@ -43,12 +45,7 @@ function Test-ModernAuthExchangeOnline {
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }
-
-
-
-
-

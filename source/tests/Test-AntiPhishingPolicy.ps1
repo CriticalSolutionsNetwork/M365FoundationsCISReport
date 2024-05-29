@@ -1,17 +1,19 @@
 function Test-AntiPhishingPolicy {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
-        # Dot source the class script
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
+        #$auditResults = @()
     }
 
     process {
-        # 2.1.7	Ensure that an anti-phishing policy has been created
+        # 2.1.7 Ensure that an anti-phishing policy has been created
 
         # Retrieve and validate the anti-phishing policies
         $antiPhishPolicies = Get-AntiPhishPolicy
@@ -24,37 +26,54 @@ function Test-AntiPhishingPolicy {
         }
 
         # Check if there is at least one policy that meets the requirements
-        $isCompliant = $validatedPolicies.Count -gt 0
+        $nonCompliantItems = $antiPhishPolicies | Where-Object {
+            $_.Enabled -ne $true -or
+            $_.PhishThresholdLevel -lt 2 -or
+            $_.EnableMailboxIntelligenceProtection -ne $true -or
+            $_.EnableMailboxIntelligence -ne $true -or
+            $_.EnableSpoofIntelligence -ne $true
+        }
+        $compliantItems = $validatedPolicies
+        $isCompliant = $compliantItems.Count -gt 0
 
-        # Prepare failure details if policies are not compliant
-        $failureDetails = if (-not $isCompliant) {
-            "No anti-phishing policy is fully compliant with CIS benchmark requirements."
-        } else {
-            "Compliant Anti-Phish Policy Names: " + ($validatedPolicies.Name -join ', ')
+        # Prepare failure reasons for non-compliant items
+        $nonCompliantNames = $nonCompliantItems | ForEach-Object { $_.Name }
+        $failureReasons = if ($nonCompliantNames.Count -gt 0) {
+            "Reason: Does not meet one or more compliance criteria.`nNon-compliant Policies:`n" + ($nonCompliantNames -join "`n")
+        }
+        else {
+            "N/A"
         }
 
-        # Create an instance of CISAuditResult and populate it
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($isCompliant) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "2.1.7"
-        $auditResult.RecDescription = "Ensure that an anti-phishing policy has been created"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "9.7"
-        $auditResult.CISDescription = "Deploy and Maintain Email Server Anti-Malware Protections"
-        $auditResult.IG1 = $false
-        $auditResult.IG2 = $false
-        $auditResult.IG3 = $true
-        $auditResult.Result = $isCompliant
-        $auditResult.Details = $failureDetails
-        $auditResult.FailureReason = if (-not $isCompliant) { "Anti-phishing policies do not meet CIS benchmark requirements." } else { "N/A" }
+        # Prepare details for non-compliant items
+        $nonCompliantDetails = $nonCompliantItems | ForEach-Object {
+            "Policy: $($_.Name)"
+        }
+        $nonCompliantDetails = $nonCompliantDetails -join "`n"
 
-        $auditResults += $auditResult
+        # Prepare details based on compliance
+        $details = if ($nonCompliantItems) {
+            "Non-Compliant Items: $($nonCompliantItems.Count)`nDetails:`n$nonCompliantDetails"
+        }
+        else {
+            "Compliant Items: $($compliantItems.Count)"
+        }
+
+        # Parameter splat for Initialize-CISAuditResult function
+        $params = @{
+            Rec            = "2.1.7"
+            Result         = $nonCompliantItems.Count -eq 0
+            Status         = if ($isCompliant) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+        }
+
+        # Create and populate the CISAuditResult object
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return auditResult
+        return $auditResult
     }
 }

@@ -1,45 +1,52 @@
 function Test-ExternalNoControl {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be defined here if needed
     )
 
     begin {
-        # Dot source the class script
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
 
-        $auditResults = @()
+        # Initialization code, if needed
     }
 
     process {
         # 8.5.7 (L1) Ensure external participants can't give or request control
 
-        # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+        # Retrieve Teams meeting policy for external participant control
         $CsTeamsMeetingPolicyControl = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowExternalParticipantGiveRequestControl
         $externalControlRestricted = -not $CsTeamsMeetingPolicyControl.AllowExternalParticipantGiveRequestControl
 
-        # Create an instance of CISAuditResult and populate it
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "0.0" # Explicitly Not Mapped as per the image provided
-        $auditResult.CISDescription = "Explicitly Not Mapped"
-        $auditResult.Rec = "8.5.7"
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.IG1 = $false # Set based on the CIS Controls image
-        $auditResult.IG2 = $false # Set based on the CIS Controls image
-        $auditResult.IG3 = $false # Set based on the CIS Controls image
-        $auditResult.RecDescription = "Ensure external participants can't give or request control"
-        $auditResult.Result = $externalControlRestricted
-        $auditResult.Details = "AllowExternalParticipantGiveRequestControl is set to $($CsTeamsMeetingPolicyControl.AllowExternalParticipantGiveRequestControl)"
-        $auditResult.FailureReason = if ($externalControlRestricted) { "N/A" } else { "External participants can give or request control" }
-        $auditResult.Status = if ($externalControlRestricted) { "Pass" } else { "Fail" }
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if (-not $externalControlRestricted) {
+            "External participants can give or request control"
+        }
+        else {
+            "N/A"
+        }
 
-        $auditResults += $auditResult
+        $details = if ($externalControlRestricted) {
+            "AllowExternalParticipantGiveRequestControl is set to False"
+        }
+        else {
+            "AllowExternalParticipantGiveRequestControl is set to True"
+        }
+
+        # Create and populate the CISAuditResult object
+        $params = @{
+            Rec            = "8.5.7"
+            Result         = $externalControlRestricted
+            Status         = if ($externalControlRestricted) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }

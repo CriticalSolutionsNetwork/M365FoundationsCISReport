@@ -1,16 +1,19 @@
 function Test-SafeLinksOfficeApps {
     [CmdletBinding()]
     param (
+        # Aligned
         # Define your parameters here if needed
     )
 
     begin {
-        # Initialization code
-
-        $auditResults = @()
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
+        # Initialization code, if needed
     }
 
     process {
+        # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
+
         # Retrieve all Safe Links policies
         $policies = Get-SafeLinksPolicy
 
@@ -42,29 +45,21 @@ function Test-SafeLinksOfficeApps {
         # Prepare the final result
         $result = $misconfiguredDetails.Count -eq 0
         $details = if ($result) { "All Safe Links policies are correctly configured." } else { $misconfiguredDetails -join ' | ' }
+        $failureReasons = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
 
-        # Create the audit result object
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($result) { "Pass" } else { "Fail" }
-        $auditResult.ELevel = "E5"
-        $auditResult.ProfileLevel = "L2"
-        $auditResult.Rec = "2.1.1"
-        $auditResult.RecDescription = "Ensure Safe Links for Office Applications is Enabled"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "10.1"
-        $auditResult.CISDescription = "Deploy and Maintain Anti-Malware Software"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $result
-        $auditResult.Details = $details
-        $auditResult.FailureReason = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
-
-        $auditResults += $auditResult
+        # Create and populate the CISAuditResult object
+        $params = @{
+            Rec            = "2.1.1"
+            Result         = $result
+            Status         = if ($result) { "Pass" } else { "Fail" }
+            Details        = $details
+            FailureReason  = $failureReasons
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
-        # Return auditResults
-        return $auditResults
+        # Return the audit result
+        return $auditResult
     }
 }

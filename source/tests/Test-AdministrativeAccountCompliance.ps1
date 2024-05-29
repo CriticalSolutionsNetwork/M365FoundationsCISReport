@@ -1,12 +1,15 @@
 function Test-AdministrativeAccountCompliance {
     [CmdletBinding()]
     param (
+        # Aligned
         # Parameters can be added if needed
     )
+
     begin {
-        #. C:\Temp\CISAuditResult.ps1
+        #. .\source\Classes\CISAuditResult.ps1
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
     }
+
     process {
         $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
         $adminRoleUsers = @()
@@ -50,22 +53,27 @@ function Test-AdministrativeAccountCompliance {
             "$($_.UserName)|$($_.Roles)|$accountType|Missing: $($missingLicenses -join ',')"
         }
         $failureReasons = $failureReasons -join "`n"
+        $details = if ($nonCompliantUsers) {
+            "Non-Compliant Accounts: $($nonCompliantUsers.Count)`nDetails:`n" + ($nonCompliantUsers | ForEach-Object { $_.UserName }) -join "`n"
+        }
+        else {
+            "Compliant Accounts: $($uniqueAdminRoleUsers.Count)"
+        }
 
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.Status = if ($nonCompliantUsers) { 'Fail' } else { 'Pass' }
-        $auditResult.ELevel = 'E3'
-        $auditResult.ProfileLevel = 'L1'
-        $auditResult.Rec = '1.1.1'
-        $auditResult.RecDescription = "Ensure Administrative accounts are separate and cloud-only"
-        $auditResult.CISControlVer = 'v8'
-        $auditResult.CISControl = "5.4"
-        $auditResult.CISDescription = "Restrict Administrator Privileges to Dedicated Administrator Accounts"
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
-        $auditResult.Result = $nonCompliantUsers.Count -eq 0
-        $auditResult.Details = "Compliant Accounts: $($uniqueAdminRoleUsers.Count - $nonCompliantUsers.Count); Non-Compliant Accounts: $($nonCompliantUsers.Count)"
-        $auditResult.FailureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons" } else { "N/A" }
+        $result = $nonCompliantUsers.Count -eq 0
+        $status = if ($result) { 'Pass' } else { 'Fail' }
+        $failureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons" } else { "N/A" }
+
+        # Create the parameter splat
+        $params = @{
+            Rec            = "1.1.1"
+            Result         = $result
+            Status         = $status
+            Details        = $details
+            FailureReason  = $failureReason
+        }
+
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

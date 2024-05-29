@@ -57,7 +57,7 @@
         - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
         - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
     .LINK
-    Online Version: https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport
+    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
 
 function Invoke-M365SecurityAudit {
@@ -161,7 +161,8 @@ function Invoke-M365SecurityAudit {
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
-
+        # Load the Test Definitions into the script scope for use in other functions
+        $script:TestDefinitionsObject = $testDefinitions
         # Apply filters based on parameter sets
         switch ($PSCmdlet.ParameterSetName) {
             'ELevelFilter' {
@@ -209,7 +210,7 @@ function Invoke-M365SecurityAudit {
     } # End Begin
 
     Process {
-        $allAuditResults = @()  # Initialize a collection to hold all results
+        $allAuditResults = [System.Collections.ArrayList]::new() #@()  # Initialize a collection to hold all results
 
         # Dynamically dot-source the test scripts
         $testsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "tests"
@@ -242,7 +243,7 @@ function Invoke-M365SecurityAudit {
                 Write-Host "Running $functionName..."
                 $result = & $functionName @paramList
                 # Assuming each function returns an array of CISAuditResult or a single CISAuditResult
-                $allAuditResults += $result
+                [void]($allAuditResults.add($Result))
             }
         }
     }
@@ -253,7 +254,7 @@ function Invoke-M365SecurityAudit {
             Disconnect-M365Suite
         }
         # Return all collected audit results
-        return $allAuditResults
+        return $allAuditResults.ToArray()
         # Check if the Disconnect switch is present
     }
 }

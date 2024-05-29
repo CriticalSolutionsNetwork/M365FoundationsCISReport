@@ -1,26 +1,20 @@
 function Test-MailboxAuditingE3 {
     [CmdletBinding()]
     param (
+        # Aligned
+        # Create Table for Details
         # Parameters can be added if needed
     )
 
     begin {
+        # Dot source the class script if necessary
+        #. .\source\Classes\CISAuditResult.ps1
 
         $e3SkuPartNumbers = @("ENTERPRISEPACK", "OFFICESUBSCRIPTION")
         $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MoveToDeletedItems", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
-        $auditResult = [CISAuditResult]::new()
-        $auditResult.ELevel = "E3"
-        $auditResult.ProfileLevel = "L1"
-        $auditResult.Rec = "6.1.2"
-        $auditResult.RecDescription = "Ensure mailbox auditing for Office E3 users is Enabled"
-        $auditResult.CISControlVer = "v8"
-        $auditResult.CISControl = "8.2"
-        $auditResult.CISDescription = "Collect audit logs."
-        $auditResult.IG1 = $true
-        $auditResult.IG2 = $true
-        $auditResult.IG3 = $true
+
 
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
@@ -72,10 +66,19 @@ function Test-MailboxAuditingE3 {
             }
         }
 
-        $auditResult.Result = $allFailures.Count -eq 0
-        $auditResult.Status = if ($auditResult.Result) { "Pass" } else { "Fail" }
-        $auditResult.Details = if ($auditResult.Result) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
-        $auditResult.FailureReason = if (-not $auditResult.Result) { "Audit issues detected." } else { "N/A" }
+        # Prepare failure reasons and details based on compliance
+        $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+        $details = if ($allFailures.Count -eq 0) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
+
+        # Populate the audit result
+        $params = @{
+            Rec           = "6.1.2"
+            Result        = $allFailures.Count -eq 0
+            Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+            Details       = $details
+            FailureReason = $failureReasons
+        }
+        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {
