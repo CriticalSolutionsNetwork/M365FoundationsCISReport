@@ -4,6 +4,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+## [0.1.3] - 2024-05-28
+
 ### Added
 
 - Array list to store the results of the audit.
@@ -26,7 +28,6 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Docs
 
 - Updated comments and documentation for new functions.
-
 
 ## [0.1.2] - 2024-04-29
 
