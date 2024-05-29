@@ -57,7 +57,7 @@
         - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
         - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
     .LINK
-    Online Version: https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport
+    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
 
 function Invoke-M365SecurityAudit {
