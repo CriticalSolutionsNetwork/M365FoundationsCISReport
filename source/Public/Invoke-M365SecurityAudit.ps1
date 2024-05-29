@@ -161,7 +161,8 @@ function Invoke-M365SecurityAudit {
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
-
+        # Load the Test Definitions into the script scope for use in other functions
+        $script:TestDefinitionsObject = $testDefinitions
         # Apply filters based on parameter sets
         switch ($PSCmdlet.ParameterSetName) {
             'ELevelFilter' {

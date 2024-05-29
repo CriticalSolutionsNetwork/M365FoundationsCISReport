@@ -17,8 +17,7 @@ function Initialize-CISAuditResult {
     )
 
     # Import the test definitions CSV file
-    $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper/TestDefinitions.csv"
-    $testDefinitions = Import-Csv -Path $testDefinitionsPath
+    $testDefinitions = $script:TestDefinitionsObject
 
     # Find the row that matches the provided recommendation (Rec)
     $testDefinition = $testDefinitions | Where-Object { $_.Rec -eq $Rec }
