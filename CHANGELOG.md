@@ -4,9 +4,15 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Test definitions filter function.
+- Logging function for future use.
+
 ### Changed
 
 - Updated sync function to include connection info.
+- Refactored connect/disconnect functions to evaluate needed connections.
 
 ## [0.1.3] - 2024-05-28
 
