@@ -71,28 +71,28 @@ function Invoke-M365SecurityAudit {
         [string]$DomainName,
 
         # E-Level with optional ProfileLevel selection
-        [Parameter(ParameterSetName = 'ELevelFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
         [ValidateSet('E3', 'E5')]
         [string]$ELevel,
 
-        [Parameter(ParameterSetName = 'ELevelFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
         [ValidateSet('L1', 'L2')]
         [string]$ProfileLevel,
 
         # IG Filters, one at a time
-        [Parameter(ParameterSetName = 'IG1Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG1Filter')]
         [switch]$IncludeIG1,
 
-        [Parameter(ParameterSetName = 'IG2Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG2Filter')]
         [switch]$IncludeIG2,
 
-        [Parameter(ParameterSetName = 'IG3Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG3Filter')]
         [switch]$IncludeIG3,
 
         # Inclusion of specific recommendation numbers
-        [Parameter(ParameterSetName = 'RecFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter')]
         [ValidateSet(
-            '1.1.1','1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
+            '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
                 '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
                 '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
                 '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
@@ -103,9 +103,9 @@ function Invoke-M365SecurityAudit {
         [string[]]$IncludeRecommendation,
 
         # Exclusion of specific recommendation numbers
-        [Parameter(ParameterSetName = 'SkipRecFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter')]
         [ValidateSet(
-            '1.1.1','1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
+            '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
                 '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
                 '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
                 '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
@@ -164,40 +164,15 @@ function Invoke-M365SecurityAudit {
         # Load the Test Definitions into the script scope for use in other functions
         $script:TestDefinitionsObject = $testDefinitions
         # Apply filters based on parameter sets
-        switch ($PSCmdlet.ParameterSetName) {
-            'ELevelFilter' {
-                if ($null -ne $ELevel -and $null -ne $ProfileLevel) {
-                    $testDefinitions = $testDefinitions | Where-Object {
-                        $_.ELevel -eq $ELevel -and $_.ProfileLevel -eq $ProfileLevel
-                    }
-                }
-                elseif ($null -ne $ELevel) {
-                    $testDefinitions = $testDefinitions | Where-Object {
-                        $_.ELevel -eq $ELevel
-                    }
-                }
-                elseif ($null -ne $ProfileLevel) {
-                    $testDefinitions = $testDefinitions | Where-Object {
-                        $_.ProfileLevel -eq $ProfileLevel
-                    }
-                }
-            }
-            'IG1Filter' {
-                $testDefinitions = $testDefinitions | Where-Object { $_.IG1 -eq 'TRUE' }
-            }
-            'IG2Filter' {
-                $testDefinitions = $testDefinitions | Where-Object { $_.IG2 -eq 'TRUE' }
-            }
-            'IG3Filter' {
-                $testDefinitions = $testDefinitions | Where-Object { $_.IG3 -eq 'TRUE' }
-            }
-            'RecFilter' {
-                $testDefinitions = $testDefinitions | Where-Object { $IncludeRecommendation -contains $_.Rec }
-            }
-            'SkipRecFilter' {
-                $testDefinitions = $testDefinitions | Where-Object { $SkipRecommendation -notcontains $_.Rec }
-            }
+        $params = @{
+            TestDefinitions       = $testDefinitions
+            ParameterSetName      = $PSCmdlet.ParameterSetName
+            ELevel                = $ELevel
+            ProfileLevel          = $ProfileLevel
+            IncludeRecommendation = $IncludeRecommendation
+            SkipRecommendation    = $SkipRecommendation
         }
+        $testDefinitions = Get-TestDefinitionsObject @params
         # End switch ($PSCmdlet.ParameterSetName)
 
         # Determine which test files to load based on filtering
