@@ -228,6 +228,18 @@ function Invoke-M365SecurityAudit {
             # Clean up sessions
             Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
+        # Calculate the total number of tests
+        $totalTests = $allAuditResults.Count
+
+        # Calculate the number of passed tests
+        $passedTests = $allAuditResults.ToArray() | Where-Object { $_.Result -eq $true } | Measure-Object | Select-Object -ExpandProperty Count
+
+        # Calculate the pass percentage
+        $passPercentage = if ($totalTests -eq 0) { 0 } else { [math]::Round(($passedTests / $totalTests) * 100, 2) }
+
+        # Display the pass percentage to the user
+        Write-Host "Audit completed. $passedTests out of $totalTests tests passed." -ForegroundColor Cyan
+        Write-Host "Your passing percentage is $passPercentage%."
         # Return all collected audit results
         return $allAuditResults.ToArray()
         # Check if the Disconnect switch is present

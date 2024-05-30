@@ -8,6 +8,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Test definitions filter function.
 - Logging function for future use.
+- Test grade written to console.
 
 ### Changed
 
