@@ -4,6 +4,10 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Changed
+
+- Updated sync function to include connection info.
+
 ## [0.1.3] - 2024-05-28
 
 ### Added
