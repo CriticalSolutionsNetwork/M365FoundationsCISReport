@@ -59,7 +59,6 @@
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
-
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
@@ -71,28 +70,28 @@ function Invoke-M365SecurityAudit {
         [string]$DomainName,
 
         # E-Level with optional ProfileLevel selection
-        [Parameter(ParameterSetName = 'ELevelFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
         [ValidateSet('E3', 'E5')]
         [string]$ELevel,
 
-        [Parameter(ParameterSetName = 'ELevelFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
         [ValidateSet('L1', 'L2')]
         [string]$ProfileLevel,
 
         # IG Filters, one at a time
-        [Parameter(ParameterSetName = 'IG1Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG1Filter')]
         [switch]$IncludeIG1,
 
-        [Parameter(ParameterSetName = 'IG2Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG2Filter')]
         [switch]$IncludeIG2,
 
-        [Parameter(ParameterSetName = 'IG3Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG3Filter')]
         [switch]$IncludeIG3,
 
         # Inclusion of specific recommendation numbers
-        [Parameter(ParameterSetName = 'RecFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter')]
         [ValidateSet(
-            '1.1.1','1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
+            '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
                 '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
                 '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
                 '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
@@ -103,9 +102,9 @@ function Invoke-M365SecurityAudit {
         [string[]]$IncludeRecommendation,
 
         # Exclusion of specific recommendation numbers
-        [Parameter(ParameterSetName = 'SkipRecFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter')]
         [ValidateSet(
-            '1.1.1','1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
+            '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
                 '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
                 '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
                 '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
@@ -152,11 +151,6 @@ function Invoke-M365SecurityAudit {
         # Loop through each required module and assert its availability
 
         # Establishing connections
-        #if (!($DoNotConnect -or $DoNotTest)) {
-        # Establishing connections
-        if (!($DoNotConnect)) {
-            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl
-        }
 
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
@@ -164,42 +158,23 @@ function Invoke-M365SecurityAudit {
         # Load the Test Definitions into the script scope for use in other functions
         $script:TestDefinitionsObject = $testDefinitions
         # Apply filters based on parameter sets
-        switch ($PSCmdlet.ParameterSetName) {
-            'ELevelFilter' {
-                if ($null -ne $ELevel -and $null -ne $ProfileLevel) {
-                    $testDefinitions = $testDefinitions | Where-Object {
-                        $_.ELevel -eq $ELevel -and $_.ProfileLevel -eq $ProfileLevel
-                    }
-                }
-                elseif ($null -ne $ELevel) {
-                    $testDefinitions = $testDefinitions | Where-Object {
-                        $_.ELevel -eq $ELevel
-                    }
-                }
-                elseif ($null -ne $ProfileLevel) {
-                    $testDefinitions = $testDefinitions | Where-Object {
-                        $_.ProfileLevel -eq $ProfileLevel
-                    }
-                }
-            }
-            'IG1Filter' {
-                $testDefinitions = $testDefinitions | Where-Object { $_.IG1 -eq 'TRUE' }
-            }
-            'IG2Filter' {
-                $testDefinitions = $testDefinitions | Where-Object { $_.IG2 -eq 'TRUE' }
-            }
-            'IG3Filter' {
-                $testDefinitions = $testDefinitions | Where-Object { $_.IG3 -eq 'TRUE' }
-            }
-            'RecFilter' {
-                $testDefinitions = $testDefinitions | Where-Object { $IncludeRecommendation -contains $_.Rec }
-            }
-            'SkipRecFilter' {
-                $testDefinitions = $testDefinitions | Where-Object { $SkipRecommendation -notcontains $_.Rec }
-            }
+        $params = @{
+            TestDefinitions       = $testDefinitions
+            ParameterSetName      = $PSCmdlet.ParameterSetName
+            ELevel                = $ELevel
+            ProfileLevel          = $ProfileLevel
+            IncludeRecommendation = $IncludeRecommendation
+            SkipRecommendation    = $SkipRecommendation
         }
+        $testDefinitions = Get-TestDefinitionsObject @params
         # End switch ($PSCmdlet.ParameterSetName)
+        # Extract unique connections needed
+        $requiredConnections = $testDefinitions.Connection | Sort-Object -Unique
 
+        # Establishing connections if required
+        if (!($DoNotConnect)) {
+            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
+        }
         # Determine which test files to load based on filtering
         $testsToLoad = $testDefinitions.TestFileName | ForEach-Object { $_ -replace '.ps1$', '' }
 
@@ -251,8 +226,20 @@ function Invoke-M365SecurityAudit {
     End {
         if (!($DoNotDisconnect)) {
             # Clean up sessions
-            Disconnect-M365Suite
+            Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
+        # Calculate the total number of tests
+        $totalTests = $allAuditResults.Count
+
+        # Calculate the number of passed tests
+        $passedTests = $allAuditResults.ToArray() | Where-Object { $_.Result -eq $true } | Measure-Object | Select-Object -ExpandProperty Count
+
+        # Calculate the pass percentage
+        $passPercentage = if ($totalTests -eq 0) { 0 } else { [math]::Round(($passedTests / $totalTests) * 100, 2) }
+
+        # Display the pass percentage to the user
+        Write-Host "Audit completed. $passedTests out of $totalTests tests passed." -ForegroundColor Cyan
+        Write-Host "Your passing percentage is $passPercentage%."
         # Return all collected audit results
         return $allAuditResults.ToArray()
         # Check if the Disconnect switch is present

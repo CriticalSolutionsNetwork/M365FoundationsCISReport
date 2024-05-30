@@ -23,11 +23,10 @@ function Merge-CISExcelAndCsvData {
             foreach ($property in $excelItem.PSObject.Properties) {
                 $newObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
             }
-
+            $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Connection' -Value $csvRow.Connection
             $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Status' -Value $csvRow.Status
             $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Details' -Value $csvRow.Details
             $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_FailureReason' -Value $csvRow.FailureReason
-
             return $newObject
         }
 
@@ -37,7 +36,7 @@ function Merge-CISExcelAndCsvData {
             if ($csvRow) {
                 CreateMergedObject -excelItem $item -csvRow $csvRow
             } else {
-                CreateMergedObject -excelItem $item -csvRow ([PSCustomObject]@{Status=$null; Details=$null; FailureReason=$null})
+                CreateMergedObject -excelItem $item -csvRow ([PSCustomObject]@{Connection=$null;Status=$null; Details=$null; FailureReason=$null })
             }
         }
 
