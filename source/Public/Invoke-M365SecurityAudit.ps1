@@ -59,7 +59,6 @@
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
-
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
@@ -152,11 +151,6 @@ function Invoke-M365SecurityAudit {
         # Loop through each required module and assert its availability
 
         # Establishing connections
-        #if (!($DoNotConnect -or $DoNotTest)) {
-        # Establishing connections
-        if (!($DoNotConnect)) {
-            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl
-        }
 
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
@@ -174,7 +168,13 @@ function Invoke-M365SecurityAudit {
         }
         $testDefinitions = Get-TestDefinitionsObject @params
         # End switch ($PSCmdlet.ParameterSetName)
+        # Extract unique connections needed
+        $requiredConnections = $testDefinitions.Connection | Sort-Object -Unique
 
+        # Establishing connections if required
+        if (!($DoNotConnect)) {
+            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
+        }
         # Determine which test files to load based on filtering
         $testsToLoad = $testDefinitions.TestFileName | ForEach-Object { $_ -replace '.ps1$', '' }
 
@@ -226,7 +226,7 @@ function Invoke-M365SecurityAudit {
     End {
         if (!($DoNotDisconnect)) {
             # Clean up sessions
-            Disconnect-M365Suite
+            Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
         # Return all collected audit results
         return $allAuditResults.ToArray()
