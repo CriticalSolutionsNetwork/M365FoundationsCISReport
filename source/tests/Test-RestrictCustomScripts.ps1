@@ -9,49 +9,58 @@ function Test-RestrictCustomScripts {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "7.3.4"
     }
 
     process {
-        # 7.3.4 (L1) Ensure custom script execution is restricted on site collections
+        try {
+            # 7.3.4 (L1) Ensure custom script execution is restricted on site collections
 
-        # Retrieve all site collections and select necessary properties
-        $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
+            # Retrieve all site collections and select necessary properties
+            $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
 
-        # Find sites where custom scripts are allowed (DenyAddAndCustomizePages is not 'Enabled')
-        $customScriptAllowedSites = $SPOSitesCustomScript | Where-Object { $_.DenyAddAndCustomizePages -ne 'Enabled' }
+            # Find sites where custom scripts are allowed (DenyAddAndCustomizePages is not 'Enabled')
+            $customScriptAllowedSites = $SPOSitesCustomScript | Where-Object { $_.DenyAddAndCustomizePages -ne 'Enabled' }
 
-        # Compliance is true if no sites allow custom scripts
-        $complianceResult = $customScriptAllowedSites.Count -eq 0
+            # Compliance is true if no sites allow custom scripts
+            $complianceResult = $customScriptAllowedSites.Count -eq 0
 
-        # Gather details for non-compliant sites (where custom scripts are allowed)
-        $nonCompliantSiteDetails = $customScriptAllowedSites | ForEach-Object {
-            "$($_.Title) ($($_.Url)): Custom Script Allowed"
+            # Gather details for non-compliant sites (where custom scripts are allowed)
+            $nonCompliantSiteDetails = $customScriptAllowedSites | ForEach-Object {
+                "$($_.Title) ($($_.Url)): Custom Script Allowed"
+            }
+
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $complianceResult) {
+                "The following site collections allow custom script execution: " + ($nonCompliantSiteDetails -join "; ")
+            }
+            else {
+                "N/A"
+            }
+
+            $details = if ($complianceResult) {
+                "All site collections have custom script execution restricted"
+            }
+            else {
+                $nonCompliantSiteDetails -join "; "
+            }
+
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $complianceResult
+                Status        = if ($complianceResult) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
+        catch {
+            Write-Error "An error occurred during the test: $_"
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not $complianceResult) {
-            "The following site collections allow custom script execution: " + ($nonCompliantSiteDetails -join "; ")
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
-        else {
-            "N/A"
-        }
-
-        $details = if ($complianceResult) {
-            "All site collections have custom script execution restricted"
-        }
-        else {
-            $nonCompliantSiteDetails -join "; "
-        }
-
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "7.3.4"
-            Result         = $complianceResult
-            Status         = if ($complianceResult) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
-        }
-        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

@@ -9,6 +9,7 @@ function Test-ModernAuthExchangeOnline {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "6.5.1"
     }
 
     process {
@@ -30,18 +31,22 @@ function Test-ModernAuthExchangeOnline {
 
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec            = "6.5.1"
-                Result         = $orgConfig.OAuth2ClientProfileEnabled
-                Status         = if ($orgConfig.OAuth2ClientProfileEnabled) { "Pass" } else { "Fail" }
-                Details        = $details
-                FailureReason  = $failureReasons
+                Rec           = $recnum
+                Result        = $orgConfig.OAuth2ClientProfileEnabled
+                Status        = if ($orgConfig.OAuth2ClientProfileEnabled) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
             }
             $auditResult = Initialize-CISAuditResult @params
 
         }
         catch {
-            Write-Error "An error occurred while testing modern authentication for Exchange Online: $_"
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
+
     }
 
     end {

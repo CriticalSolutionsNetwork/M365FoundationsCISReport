@@ -11,40 +11,49 @@ function Test-MailTipsEnabled {
         # Initialization code, if needed
 
         $auditResult = [CISAuditResult]::new()
+        $recnum = "6.5.2"
     }
 
     process {
-        # 6.5.2 (L2) Ensure MailTips are enabled for end users
+        try {
+            # 6.5.2 (L2) Ensure MailTips are enabled for end users
 
-        # Retrieve organization configuration for MailTips settings
-        $orgConfig = Get-OrganizationConfig | Select-Object MailTipsAllTipsEnabled, MailTipsExternalRecipientsTipsEnabled, MailTipsGroupMetricsEnabled, MailTipsLargeAudienceThreshold
-        $allTipsEnabled = $orgConfig.MailTipsAllTipsEnabled -and $orgConfig.MailTipsGroupMetricsEnabled -and $orgConfig.MailTipsLargeAudienceThreshold -eq 25
-        $externalRecipientsTipsEnabled = $orgConfig.MailTipsExternalRecipientsTipsEnabled
+            # Retrieve organization configuration for MailTips settings
+            $orgConfig = Get-OrganizationConfig | Select-Object MailTipsAllTipsEnabled, MailTipsExternalRecipientsTipsEnabled, MailTipsGroupMetricsEnabled, MailTipsLargeAudienceThreshold
+            $allTipsEnabled = $orgConfig.MailTipsAllTipsEnabled -and $orgConfig.MailTipsGroupMetricsEnabled -and $orgConfig.MailTipsLargeAudienceThreshold -eq 25
+            $externalRecipientsTipsEnabled = $orgConfig.MailTipsExternalRecipientsTipsEnabled
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not ($allTipsEnabled -and $externalRecipientsTipsEnabled)) {
-            "One or more MailTips settings are not configured as required."
-        }
-        else {
-            "N/A"
-        }
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not ($allTipsEnabled -and $externalRecipientsTipsEnabled)) {
+                "One or more MailTips settings are not configured as required."
+            }
+            else {
+                "N/A"
+            }
 
-        $details = if ($allTipsEnabled -and $externalRecipientsTipsEnabled) {
-            "MailTipsAllTipsEnabled: $($orgConfig.MailTipsAllTipsEnabled); MailTipsExternalRecipientsTipsEnabled: $($orgConfig.MailTipsExternalRecipientsTipsEnabled); MailTipsGroupMetricsEnabled: $($orgConfig.MailTipsGroupMetricsEnabled); MailTipsLargeAudienceThreshold: $($orgConfig.MailTipsLargeAudienceThreshold)"
-        }
-        else {
-            "One or more MailTips settings are not configured as required."
-        }
+            $details = if ($allTipsEnabled -and $externalRecipientsTipsEnabled) {
+                "MailTipsAllTipsEnabled: $($orgConfig.MailTipsAllTipsEnabled); MailTipsExternalRecipientsTipsEnabled: $($orgConfig.MailTipsExternalRecipientsTipsEnabled); MailTipsGroupMetricsEnabled: $($orgConfig.MailTipsGroupMetricsEnabled); MailTipsLargeAudienceThreshold: $($orgConfig.MailTipsLargeAudienceThreshold)"
+            }
+            else {
+                "One or more MailTips settings are not configured as required."
+            }
 
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "6.5.2"
-            Result         = $allTipsEnabled -and $externalRecipientsTipsEnabled
-            Status         = if ($allTipsEnabled -and $externalRecipientsTipsEnabled) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $allTipsEnabled -and $externalRecipientsTipsEnabled
+                Status        = if ($allTipsEnabled -and $externalRecipientsTipsEnabled) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
-        $auditResult = Initialize-CISAuditResult @params
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

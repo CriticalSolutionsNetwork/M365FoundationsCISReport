@@ -9,40 +9,49 @@ function Test-AuditLogSearch {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "3.1.1"
     }
 
     process {
-        # 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
 
-        # Retrieve the audit log configuration
-        $auditLogConfig = Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled
-        $auditLogResult = $auditLogConfig.UnifiedAuditLogIngestionEnabled
+        try {
+            # 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not $auditLogResult) {
-            "Audit log search is not enabled"
-        }
-        else {
-            "N/A"
-        }
+            # Retrieve the audit log configuration
+            $auditLogConfig = Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled
+            $auditLogResult = $auditLogConfig.UnifiedAuditLogIngestionEnabled
 
-        $details = if ($auditLogResult) {
-            "UnifiedAuditLogIngestionEnabled: True"
-        }
-        else {
-            "UnifiedAuditLogIngestionEnabled: False"
-        }
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $auditLogResult) {
+                "Audit log search is not enabled"
+            }
+            else {
+                "N/A"
+            }
 
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "3.1.1"
-            Result         = $auditLogResult
-            Status         = if ($auditLogResult) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
-        }
-        $auditResult = Initialize-CISAuditResult @params
+            $details = if ($auditLogResult) {
+                "UnifiedAuditLogIngestionEnabled: True"
+            }
+            else {
+                "UnifiedAuditLogIngestionEnabled: False"
+            }
 
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $auditLogResult
+                Status        = if ($auditLogResult) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
+        }
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

@@ -11,37 +11,46 @@ function Test-SpamPolicyAdminNotify {
         # Initialization code, if needed
 
         $auditResult = [CISAuditResult]::new()
+        $recnum = "2.1.6"
     }
 
     process {
-        # 2.1.6 Ensure Exchange Online Spam Policies are set to notify administrators
+        try {
+            # 2.1.6 Ensure Exchange Online Spam Policies are set to notify administrators
 
-        # Get the default hosted outbound spam filter policy
-        $hostedOutboundSpamFilterPolicy = Get-HostedOutboundSpamFilterPolicy | Where-Object { $_.IsDefault -eq $true }
+            # Get the default hosted outbound spam filter policy
+            $hostedOutboundSpamFilterPolicy = Get-HostedOutboundSpamFilterPolicy | Where-Object { $_.IsDefault -eq $true }
 
-        # Check if both settings are enabled
-        $bccSuspiciousOutboundMailEnabled = $hostedOutboundSpamFilterPolicy.BccSuspiciousOutboundMail
-        $notifyOutboundSpamEnabled = $hostedOutboundSpamFilterPolicy.NotifyOutboundSpam
-        $areSettingsEnabled = $bccSuspiciousOutboundMailEnabled -and $notifyOutboundSpamEnabled
+            # Check if both settings are enabled
+            $bccSuspiciousOutboundMailEnabled = $hostedOutboundSpamFilterPolicy.BccSuspiciousOutboundMail
+            $notifyOutboundSpamEnabled = $hostedOutboundSpamFilterPolicy.NotifyOutboundSpam
+            $areSettingsEnabled = $bccSuspiciousOutboundMailEnabled -and $notifyOutboundSpamEnabled
 
-        # Prepare failure details if any setting is not enabled
-        $failureDetails = @()
-        if (-not $bccSuspiciousOutboundMailEnabled) {
-            $failureDetails += "BccSuspiciousOutboundMail is not enabled."
+            # Prepare failure details if any setting is not enabled
+            $failureDetails = @()
+            if (-not $bccSuspiciousOutboundMailEnabled) {
+                $failureDetails += "BccSuspiciousOutboundMail is not enabled."
+            }
+            if (-not $notifyOutboundSpamEnabled) {
+                $failureDetails += "NotifyOutboundSpam is not enabled."
+            }
+
+            # Create an instance of CISAuditResult and populate it
+            $params = @{
+                Rec           = $recnum
+                Result        = $areSettingsEnabled
+                Status        = if ($areSettingsEnabled) { "Pass" } else { "Fail" }
+                Details       = if ($areSettingsEnabled) { "Both BccSuspiciousOutboundMail and NotifyOutboundSpam are enabled." } else { $failureDetails -join ' ' }
+                FailureReason = if (-not $areSettingsEnabled) { "One or both spam policies are not set to notify administrators." } else { "N/A" }
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
-        if (-not $notifyOutboundSpamEnabled) {
-            $failureDetails += "NotifyOutboundSpam is not enabled."
-        }
+        catch {
+            Write-Error "An error occurred during the test: $_"
 
-        # Create an instance of CISAuditResult and populate it
-        $params = @{
-            Rec            = "2.1.6"
-            Result         = $areSettingsEnabled
-            Status         = if ($areSettingsEnabled) { "Pass" } else { "Fail" }
-            Details        = if ($areSettingsEnabled) { "Both BccSuspiciousOutboundMail and NotifyOutboundSpam are enabled." } else { $failureDetails -join ' ' }
-            FailureReason  = if (-not $areSettingsEnabled) { "One or both spam policies are not set to notify administrators." } else { "N/A" }
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
-        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

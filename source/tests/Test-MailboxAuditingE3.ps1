@@ -19,15 +19,17 @@ function Test-MailboxAuditingE3 {
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
         $processedUsers = @{}  # Dictionary to track processed users
+        $recnum = "6.1.2"
     }
 
     process {
-        foreach ($user in $allUsers) {
-            if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
-                Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
-                continue
-            }
-            try {
+        try {
+            foreach ($user in $allUsers) {
+                if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
+                    Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
+                    continue
+                }
+
                 $licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
                 $hasOfficeE3 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e3SkuPartNumbers }).Count -gt 0
                 Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E3 license."
@@ -61,24 +63,28 @@ function Test-MailboxAuditingE3 {
                     $processedUsers[$user.UserPrincipalName] = $true
                 }
             }
-            catch {
-                Write-Warning "Could not retrieve license details for user $($user.UserPrincipalName): $_"
+
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+            $details = if ($allFailures.Count -eq 0) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
+
+            # Populate the audit result
+            $params = @{
+                Rec           = $recnum
+                Result        = $allFailures.Count -eq 0
+                Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
             }
-        }
+            $auditResult = Initialize-CISAuditResult @params
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
-        $details = if ($allFailures.Count -eq 0) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
-
-        # Populate the audit result
-        $params = @{
-            Rec           = "6.1.2"
-            Result        = $allFailures.Count -eq 0
-            Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
-            Details       = $details
-            FailureReason = $failureReasons
         }
-        $auditResult = Initialize-CISAuditResult @params
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

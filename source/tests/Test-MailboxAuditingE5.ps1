@@ -20,15 +20,17 @@ function Test-MailboxAuditingE5 {
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
         $processedUsers = @{}  # Dictionary to track processed users
+        $recnum = "6.1.3"
     }
 
     process {
+        try {
         foreach ($user in $allUsers) {
             if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
                 continue
             }
 
-            try {
+
                 $licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
                 $hasOfficeE5 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e5SkuPartNumbers }).Count -gt 0
                 Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E5 license."
@@ -66,10 +68,7 @@ function Test-MailboxAuditingE5 {
                     # Adding verbose output to indicate the user does not have an E5 license
                     Write-Verbose "User $($user.UserPrincipalName) does not have an Office E5 license."
                 }
-            }
-            catch {
-                Write-Warning "Could not retrieve license details for user $($user.UserPrincipalName): $_"
-            }
+
         }
 
         # Prepare failure reasons and details based on compliance
@@ -78,13 +77,20 @@ function Test-MailboxAuditingE5 {
 
         # Populate the audit result
         $params = @{
-            Rec            = "6.1.3"
+            Rec            = $recnum
             Result         = $allFailures.Count -eq 0
             Status         = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
         }
         $auditResult = Initialize-CISAuditResult @params
+    }
+    catch {
+        Write-Error "An error occurred during the test: $_"
+
+        # Call Initialize-CISAuditResult with error parameters
+        $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+    }
     }
 
     end {

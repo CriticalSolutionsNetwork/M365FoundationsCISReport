@@ -10,40 +10,49 @@ function Test-DisallowInfectedFilesDownload {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
+        $recnum = "7.3.1"
     }
 
     process {
-        # 7.3.1 (L2) Ensure Office 365 SharePoint infected files are disallowed for download
 
-        # Retrieve the SharePoint tenant configuration
-        $SPOTenantDisallowInfectedFileDownload = Get-SPOTenant | Select-Object DisallowInfectedFileDownload
-        $isDisallowInfectedFileDownloadEnabled = $SPOTenantDisallowInfectedFileDownload.DisallowInfectedFileDownload
+        try {
+            # 7.3.1 (L2) Ensure Office 365 SharePoint infected files are disallowed for download
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not $isDisallowInfectedFileDownloadEnabled) {
-            "Downloading infected files is not disallowed."
-        }
-        else {
-            "N/A"
-        }
+            # Retrieve the SharePoint tenant configuration
+            $SPOTenantDisallowInfectedFileDownload = Get-SPOTenant | Select-Object DisallowInfectedFileDownload
+            $isDisallowInfectedFileDownloadEnabled = $SPOTenantDisallowInfectedFileDownload.DisallowInfectedFileDownload
 
-        $details = if ($isDisallowInfectedFileDownloadEnabled) {
-            "DisallowInfectedFileDownload: True"
-        }
-        else {
-            "DisallowInfectedFileDownload: False"
-        }
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $isDisallowInfectedFileDownloadEnabled) {
+                "Downloading infected files is not disallowed."
+            }
+            else {
+                "N/A"
+            }
 
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "7.3.1"
-            Result         = $isDisallowInfectedFileDownloadEnabled
-            Status         = if ($isDisallowInfectedFileDownloadEnabled) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
-        }
-        $auditResult = Initialize-CISAuditResult @params
+            $details = if ($isDisallowInfectedFileDownloadEnabled) {
+                "DisallowInfectedFileDownload: True"
+            }
+            else {
+                "DisallowInfectedFileDownload: False"
+            }
 
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $isDisallowInfectedFileDownloadEnabled
+                Status        = if ($isDisallowInfectedFileDownloadEnabled) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
+        }
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

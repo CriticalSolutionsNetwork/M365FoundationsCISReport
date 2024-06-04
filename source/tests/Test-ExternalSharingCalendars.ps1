@@ -10,48 +10,58 @@ function Test-ExternalSharingCalendars {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
+        $recnum = "1.3.3"
     }
 
     process {
-        # 1.3.3 (L2) Ensure 'External sharing' of calendars is not available (Automated)
 
-        # Retrieve sharing policies related to calendar sharing
-        $sharingPolicies = Get-SharingPolicy | Where-Object { $_.Domains -like '*CalendarSharing*' }
+        try {
+            # 1.3.3 (L2) Ensure 'External sharing' of calendars is not available (Automated)
 
-        # Check if calendar sharing is disabled in all applicable policies
-        $isExternalSharingDisabled = $true
-        $sharingPolicyDetails = @()
-        foreach ($policy in $sharingPolicies) {
-            if ($policy.Enabled -eq $true) {
-                $isExternalSharingDisabled = $false
-                $sharingPolicyDetails += "$($policy.Name): Enabled"
+            # Retrieve sharing policies related to calendar sharing
+            $sharingPolicies = Get-SharingPolicy | Where-Object { $_.Domains -like '*CalendarSharing*' }
+
+            # Check if calendar sharing is disabled in all applicable policies
+            $isExternalSharingDisabled = $true
+            $sharingPolicyDetails = @()
+            foreach ($policy in $sharingPolicies) {
+                if ($policy.Enabled -eq $true) {
+                    $isExternalSharingDisabled = $false
+                    $sharingPolicyDetails += "$($policy.Name): Enabled"
+                }
             }
-        }
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not $isExternalSharingDisabled) {
-            "Calendar sharing with external users is enabled in one or more policies."
-        }
-        else {
-            "N/A"
-        }
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $isExternalSharingDisabled) {
+                "Calendar sharing with external users is enabled in one or more policies."
+            }
+            else {
+                "N/A"
+            }
 
-        $details = if ($isExternalSharingDisabled) {
-            "Calendar sharing with external users is disabled."
-        }
-        else {
-            "Enabled Sharing Policies: $($sharingPolicyDetails -join ', ')"
-        }
+            $details = if ($isExternalSharingDisabled) {
+                "Calendar sharing with external users is disabled."
+            }
+            else {
+                "Enabled Sharing Policies: $($sharingPolicyDetails -join ', ')"
+            }
 
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "1.3.3"
-            Result         = $isExternalSharingDisabled
-            Status         = if ($isExternalSharingDisabled) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $isExternalSharingDisabled
+                Status        = if ($isExternalSharingDisabled) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
-        $auditResult = Initialize-CISAuditResult @params
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

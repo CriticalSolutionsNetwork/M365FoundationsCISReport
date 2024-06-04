@@ -9,9 +9,11 @@ function Test-OrganizersPresent {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "8.5.6"
     }
 
     process {
+        try {
         # 8.5.6 (L2) Ensure only organizers and co-organizers can present
 
         # Connect to Teams PowerShell using Connect-MicrosoftTeams
@@ -37,13 +39,20 @@ function Test-OrganizersPresent {
 
         # Create and populate the CISAuditResult object
         $params = @{
-            Rec            = "8.5.6"
+            Rec            = $recnum
             Result         = $presenterRoleRestricted
             Status         = if ($presenterRoleRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
         }
         $auditResult = Initialize-CISAuditResult @params
+    }
+    catch {
+        Write-Error "An error occurred during the test: $_"
+
+        # Call Initialize-CISAuditResult with error parameters
+        $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+    }
     }
 
     end {

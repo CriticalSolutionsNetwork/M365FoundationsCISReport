@@ -9,9 +9,12 @@ function Test-BlockChannelEmails {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "8.1.2"
     }
 
     process {
+
+        try {
         # 8.1.2 (L1) Ensure users can't send emails to a channel email address
 
         # Retrieve Teams client configuration
@@ -35,13 +38,20 @@ function Test-BlockChannelEmails {
 
         # Create and populate the CISAuditResult object
         $params = @{
-            Rec            = "8.1.2"
+            Rec            = $recnum
             Result         = -not $allowEmailIntoChannel
             Status         = if (-not $allowEmailIntoChannel) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
         }
         $auditResult = Initialize-CISAuditResult @params
+        }
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

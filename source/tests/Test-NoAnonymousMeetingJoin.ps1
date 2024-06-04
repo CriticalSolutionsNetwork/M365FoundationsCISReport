@@ -9,9 +9,11 @@ function Test-NoAnonymousMeetingJoin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "8.5.1"
     }
 
     process {
+        try {
         # 8.5.1 (L2) Ensure anonymous users can't join a meeting
 
         # Connect to Teams PowerShell using Connect-MicrosoftTeams
@@ -31,13 +33,20 @@ function Test-NoAnonymousMeetingJoin {
 
         # Create and populate the CISAuditResult object
         $params = @{
-            Rec            = "8.5.1"
+            Rec            = $recnum
             Result         = -not $allowAnonymousUsersToJoinMeeting
             Status         = if (-not $allowAnonymousUsersToJoinMeeting) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
         }
         $auditResult = Initialize-CISAuditResult @params
+    }
+    catch {
+        Write-Error "An error occurred during the test: $_"
+
+        # Call Initialize-CISAuditResult with error parameters
+        $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+    }
     }
 
     end {

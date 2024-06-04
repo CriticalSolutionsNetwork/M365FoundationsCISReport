@@ -10,9 +10,12 @@ function Test-GuestAccessExpiration {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
+        $recnum = "7.2.9"
     }
 
     process {
+
+        try {
         # 7.2.9 (L1) Ensure guest access to a site or OneDrive will expire automatically
 
         # Retrieve SharePoint tenant settings related to guest access expiration
@@ -31,13 +34,20 @@ function Test-GuestAccessExpiration {
 
         # Create and populate the CISAuditResult object
         $params = @{
-            Rec            = "7.2.9"
+            Rec            = $recnum
             Result         = $isGuestAccessExpirationConfiguredCorrectly
             Status         = if ($isGuestAccessExpirationConfiguredCorrectly) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
         }
         $auditResult = Initialize-CISAuditResult @params
+        }
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {
