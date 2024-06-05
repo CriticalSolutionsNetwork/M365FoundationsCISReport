@@ -9,6 +9,7 @@ function Test-BlockMailForwarding {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "6.2.1"
     }
 
     process {
@@ -37,7 +38,7 @@ function Test-BlockMailForwarding {
             }
 
             $params = @{
-                Rec           = "6.2.1"
+                Rec           = $recnum
                 Result        = $forwardingBlocked
                 Status        = if ($forwardingBlocked) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -49,7 +50,7 @@ function Test-BlockMailForwarding {
             Write-Error "An error occurred during the test: $_"
 
             # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec "6.2.1" -Failure
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
     }
 

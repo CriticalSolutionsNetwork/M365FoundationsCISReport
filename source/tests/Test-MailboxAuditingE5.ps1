@@ -25,10 +25,10 @@ function Test-MailboxAuditingE5 {
 
     process {
         try {
-        foreach ($user in $allUsers) {
-            if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
-                continue
-            }
+            foreach ($user in $allUsers) {
+                if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
+                    continue
+                }
 
 
                 $licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
@@ -69,28 +69,28 @@ function Test-MailboxAuditingE5 {
                     Write-Verbose "User $($user.UserPrincipalName) does not have an Office E5 license."
                 }
 
+            }
+
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+            $details = if ($allFailures.Count -eq 0) { "All Office E5 users have correct mailbox audit settings." } else { $allFailures -join " | " }
+
+            # Populate the audit result
+            $params = @{
+                Rec           = $recnum
+                Result        = $allFailures.Count -eq 0
+                Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
+        catch {
+            Write-Error "An error occurred during the test: $_"
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
-        $details = if ($allFailures.Count -eq 0) { "All Office E5 users have correct mailbox audit settings." } else { $allFailures -join " | " }
-
-        # Populate the audit result
-        $params = @{
-            Rec            = $recnum
-            Result         = $allFailures.Count -eq 0
-            Status         = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
-        $auditResult = Initialize-CISAuditResult @params
-    }
-    catch {
-        Write-Error "An error occurred during the test: $_"
-
-        # Call Initialize-CISAuditResult with error parameters
-        $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
-    }
     }
 
     end {
