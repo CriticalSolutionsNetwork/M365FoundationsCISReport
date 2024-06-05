@@ -6,6 +6,17 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Updated test definitions for CIS Microsoft 365 Foundations Benchmark for better error handling and object output when errors occur.
+- Added a parameter to the `Initialize-CISAuditResult` function to allow for a static failed object to be created when an error occurs.
+
+### Fixed
+
+
+
+## [0.1.4] - 2024-05-30
+
+### Added
+
 - Test definitions filter function.
 - Logging function for future use.
 - Test grade written to console.
