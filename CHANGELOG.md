@@ -8,10 +8,13 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Updated test definitions for CIS Microsoft 365 Foundations Benchmark for better error handling and object output when errors occur.
 - Added a parameter to the `Initialize-CISAuditResult` function to allow for a static failed object to be created when an error occurs.
+- Refactored `Invoke-M365SecurityAudit` to include a new private function `Invoke-TestFunction` for executing test functions and handling errors.
+- Added a new private function `Measure-AuditResult` to calculate and display audit results.
+- Enhanced error logging to capture failed test details and display them at the end of the audit.
 
 ### Fixed
 
-
+- Ensured the `Invoke-TestFunction` returns a `CISAuditResult` object, which is then managed in the `Invoke-M365SecurityAudit` function.
 
 ## [0.1.4] - 2024-05-30
 
