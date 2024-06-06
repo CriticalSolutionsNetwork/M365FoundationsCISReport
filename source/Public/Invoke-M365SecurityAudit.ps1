@@ -65,24 +65,11 @@ function Invoke-M365SecurityAudit {
         }
         # Ensure required modules are installed
         if (!($NoModuleCheck)) {
-            $requiredModules = @(
-                @{ ModuleName = "ExchangeOnlineManagement"; RequiredVersion = "3.3.0" },
-                @{ ModuleName = "AzureAD"; RequiredVersion = "2.0.2.182" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Authentication" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Users" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Groups" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "DirectoryObjects" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Domains" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Reports" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Mail" },
-                @{ ModuleName = "Microsoft.Online.SharePoint.PowerShell"; RequiredVersion = "16.0.24009.12000" },
-                @{ ModuleName = "MicrosoftTeams"; RequiredVersion = "5.5.0" }
-            )
+            $requiredModules = Get-RequiredModule
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
             }
         }
-
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
@@ -99,39 +86,33 @@ function Invoke-M365SecurityAudit {
             SkipRecommendation    = $SkipRecommendation
         }
         $testDefinitions = Get-TestDefinitionsObject @params
-
         # Extract unique connections needed
         $requiredConnections = $testDefinitions.Connection | Sort-Object -Unique
-
         # Establishing connections if required
         if (!($DoNotConnect)) {
             Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
         }
-
         # Determine which test files to load based on filtering
         $testsToLoad = $testDefinitions.TestFileName | ForEach-Object { $_ -replace '.ps1$', '' }
-
         Write-Verbose "The $(($testsToLoad).count) test/s that would be loaded based on filter criteria:"
         $testsToLoad | ForEach-Object { Write-Verbose " $_" }
-
         # Initialize a collection to hold failed test details
         $script:FailedTests = [System.Collections.ArrayList]::new()
     } # End Begin
-
     Process {
         $allAuditResults = [System.Collections.ArrayList]::new() # Initialize a collection to hold all results
-
         # Dynamically dot-source the test scripts
         $testsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "tests"
         $testFiles = Get-ChildItem -Path $testsFolderPath -Filter "Test-*.ps1" |
         Where-Object { $testsToLoad -contains $_.BaseName }
-
         # Import the test functions
         $testFiles | ForEach-Object {
             Try {
+                # Dot source the test function
                 . $_.FullName
             }
             Catch {
+                # Log the error and add the test to the failed tests collection
                 Write-Error "Failed to load test function $($_.Name): $_"
                 $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
             }
@@ -142,6 +123,7 @@ function Invoke-M365SecurityAudit {
             $functionName = $testFunction.BaseName
             if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
                 $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName
+                # Add the result to the collection
                 [void]$allAuditResults.Add($auditResult)
             }
         }
@@ -152,10 +134,8 @@ function Invoke-M365SecurityAudit {
             # Clean up sessions
             Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
-
         # Call the private function to calculate and display results
         Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
-
         # Return all collected audit results
         return $allAuditResults.ToArray()
     }
