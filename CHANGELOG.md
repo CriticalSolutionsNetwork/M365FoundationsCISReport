@@ -11,6 +11,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Refactored `Invoke-M365SecurityAudit` to include a new private function `Invoke-TestFunction` for executing test functions and handling errors.
 - Added a new private function `Measure-AuditResult` to calculate and display audit results.
 - Enhanced error logging to capture failed test details and display them at the end of the audit.
+- Added a private function `Get-RequiredModule` to initialize the `$requiredModules` variable for better code organization in the main script.
 
 ### Fixed
 
