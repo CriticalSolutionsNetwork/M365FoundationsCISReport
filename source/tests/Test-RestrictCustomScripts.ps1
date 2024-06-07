@@ -6,49 +6,62 @@ function Test-RestrictCustomScripts {
 
     begin {
         # Dot source the class script if necessary
-        #. .\source\Classes\CISAuditResult.ps1
+        # . .\source\Classes\CISAuditResult.ps1
+
         # Initialization code, if needed
         $recnum = "7.3.4"
     }
 
     process {
+
         try {
             # 7.3.4 (L1) Ensure custom script execution is restricted on site collections
 
             # Retrieve all site collections and select necessary properties
             $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
 
-            # Find sites where custom scripts are allowed (DenyAddAndCustomizePages is not 'Enabled')
-            $customScriptAllowedSites = $SPOSitesCustomScript | Where-Object { $_.DenyAddAndCustomizePages -ne 'Enabled' }
+            # Replace 'sharepoint.com' with '<sptld>'
+            $processedUrls = $SPOSitesCustomScript | ForEach-Object {
+                $_.Url = $_.Url -replace 'sharepoint\.com', '<sptld>'
+                $_
+            }
+
+            # Extract hostnames and find the most used one
+            $hostnames = $processedUrls.Url | ForEach-Object { $_ -match '^https://([^\.]+)\.' | Out-Null; $matches[1] }
+            $mostUsedHostname = $hostnames | Group-Object | Sort-Object Count -Descending | Select-Object -First 1 -ExpandProperty Name
 
             # Compliance is true if no sites allow custom scripts
+            $customScriptAllowedSites = $processedUrls | Where-Object { $_.DenyAddAndCustomizePages -ne 'Enabled' }
             $complianceResult = $customScriptAllowedSites.Count -eq 0
 
+            # Gather details for non-compliant sites (where custom scripts are allowed)
+            $nonCompliantSiteDetails = $customScriptAllowedSites | ForEach-Object {
+                $url = $_.Url -replace [regex]::Escape($mostUsedHostname), "<corp>"
+                "$(if ($_.Title) {$_.Title} else {"NoTitle"})|$url|$true"
+            }
+
             # Prepare failure reasons and details based on compliance
-            $failureReasons = if ($complianceResult) {
+            $failureReasons = if (-not $complianceResult) {
+                "Title|Url|CustomScriptAllowed`n" + ($nonCompliantSiteDetails -join "`n")
+            }
+            else {
                 "N/A"
-            } else {
-                "The following site collections allow custom script execution:"
             }
 
             $details = if ($complianceResult) {
                 "All site collections have custom script execution restricted"
-            } else {
-                # Create pipe-separated table for non-compliant sites
-                $nonCompliantSiteDetails = $customScriptAllowedSites | ForEach-Object {
-                    $title = if ($_.Title) { $_.Title } else { "No Title" }
-                    "$title|$($_.Url)|True"
-                }
-                "Title|Url|CustomScriptAllowed`n" + ($nonCompliantSiteDetails -join "`n")
+            }
+            else {
+                "Some site collections are not restricting custom script execution. Review FailureReason property for sites that are not aligned with the benchmark."
             }
 
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
-                Result        = $complianceResult
-                Status        = if ($complianceResult) { "Pass" } else { "Fail" }
-                Details       = $details
-                FailureReason = $failureReasons
+                Rec            = $recnum
+                Result         = $complianceResult
+                Status         = if ($complianceResult) { "Pass" } else { "Fail" }
+                Details        = $details
+                FailureReason  = $failureReasons
             }
             $auditResult = Initialize-CISAuditResult @params
         }
