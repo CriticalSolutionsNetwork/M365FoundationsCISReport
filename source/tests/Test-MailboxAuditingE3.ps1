@@ -1,8 +1,6 @@
 function Test-MailboxAuditingE3 {
     [CmdletBinding()]
     param (
-        # Aligned
-        # Create Table for Details
         # Parameters can be added if needed
     )
 
@@ -14,7 +12,6 @@ function Test-MailboxAuditingE3 {
         $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MoveToDeletedItems", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
-
 
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
@@ -51,13 +48,13 @@ function Test-MailboxAuditingE3 {
                         }
                     }
                     else {
-                        $allFailures += "$userUPN`: AuditEnabled - False"
+                        $allFailures += "$userUPN|False|||"
                         continue
                     }
 
                     if ($missingActions) {
-                        $formattedActions = Format-MissingActions $missingActions
-                        $allFailures += "$userUPN`: AuditEnabled - True; $formattedActions"
+                        $formattedActions = Format-MissingActions -missingActions $missingActions
+                        $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
                     }
                     # Mark the user as processed
                     $processedUsers[$user.UserPrincipalName] = $true
@@ -66,7 +63,12 @@ function Test-MailboxAuditingE3 {
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
-            $details = if ($allFailures.Count -eq 0) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
+            $details = if ($allFailures.Count -eq 0) {
+                "All Office E3 users have correct mailbox audit settings."
+            }
+            else {
+                "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n")
+            }
 
             # Populate the audit result
             $params = @{
@@ -77,7 +79,6 @@ function Test-MailboxAuditingE3 {
                 FailureReason = $failureReasons
             }
             $auditResult = Initialize-CISAuditResult @params
-
         }
         catch {
             Write-Error "An error occurred during the test: $_"

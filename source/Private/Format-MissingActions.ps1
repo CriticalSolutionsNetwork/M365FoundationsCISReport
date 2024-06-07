@@ -15,12 +15,11 @@ function Format-MissingActions {
         }
     }
 
-    $formattedResults = @()
-    foreach ($type in $actionGroups.Keys) {
-        if ($actionGroups[$type].Count -gt 0) {
-            $formattedResults += "$($type) actions missing: $($actionGroups[$type] -join ', ')"
-        }
+    $formattedResults = @{
+        Admin    = $actionGroups["Admin"] -join ', '
+        Delegate = $actionGroups["Delegate"] -join ', '
+        Owner    = $actionGroups["Owner"] -join ', '
     }
 
-    return $formattedResults -join '; '
+    return $formattedResults
 }

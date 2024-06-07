@@ -1,8 +1,6 @@
 function Test-MailboxAuditingE5 {
     [CmdletBinding()]
     param (
-        # Aligned
-        # Create Table for Details
         # Parameters can be added if needed
     )
 
@@ -14,8 +12,6 @@ function Test-MailboxAuditingE5 {
         $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MailItemsAccessed", "MoveToDeletedItems", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
-
-
 
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
@@ -30,10 +26,10 @@ function Test-MailboxAuditingE5 {
                     continue
                 }
 
-
                 $licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
                 $hasOfficeE5 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e5SkuPartNumbers }).Count -gt 0
                 Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E5 license."
+
                 if ($hasOfficeE5) {
                     $userUPN = $user.UserPrincipalName
                     $mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
@@ -51,13 +47,13 @@ function Test-MailboxAuditingE5 {
                         }
                     }
                     else {
-                        $allFailures += "$userUPN`: AuditEnabled - False"
+                        $allFailures += "$userUPN|False|||"
                         continue
                     }
 
                     if ($missingActions) {
-                        $formattedActions = Format-MissingActions $missingActions
-                        $allFailures += "$userUPN`: AuditEnabled - True; $formattedActions"
+                        $formattedActions = Format-MissingActions -missingActions $missingActions
+                        $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
                     }
                     else {
                         Write-Verbose "User $($user.UserPrincipalName) passed the mailbox audit checks."
@@ -68,12 +64,15 @@ function Test-MailboxAuditingE5 {
                     # Adding verbose output to indicate the user does not have an E5 license
                     Write-Verbose "User $($user.UserPrincipalName) does not have an Office E5 license."
                 }
-
             }
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
-            $details = if ($allFailures.Count -eq 0) { "All Office E5 users have correct mailbox audit settings." } else { $allFailures -join " | " }
+            $details = if ($allFailures.Count -eq 0) {
+                "All Office E5 users have correct mailbox audit settings."
+            } else {
+                "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n")
+            }
 
             # Populate the audit result
             $params = @{
