@@ -46,16 +46,16 @@ function Test-MailboxAuditingE3 {
                         foreach ($action in $OwnerActions) {
                             if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" }
                         }
+
+                        if ($missingActions.Count -gt 0) {
+                            $formattedActions = Format-MissingActions -missingActions $missingActions
+                            $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
+                        }
                     }
                     else {
                         $allFailures += "$userUPN|False|||"
-                        continue
                     }
 
-                    if ($missingActions) {
-                        $formattedActions = Format-MissingActions -missingActions $missingActions
-                        $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
-                    }
                     # Mark the user as processed
                     $processedUsers[$user.UserPrincipalName] = $true
                 }
