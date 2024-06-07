@@ -1,7 +1,6 @@
 function Test-BlockMailForwarding {
     [CmdletBinding()]
     param (
-        # Aligned Compare
         # Parameters can be added if needed
     )
 
@@ -30,7 +29,7 @@ function Test-BlockMailForwarding {
 
             $details = if ($transportRules.Count -gt 0) {
                 $transportRules | ForEach-Object {
-                    "$($_.Name) redirects to $($_.RedirectMessageTo)"
+                    "$($_.Name) redirects to $($_.RedirectMessageTo -join ', ')"
                 } -join " | "
             }
             else {
