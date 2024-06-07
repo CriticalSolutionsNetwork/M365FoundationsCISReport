@@ -1,7 +1,6 @@
 function Test-RestrictCustomScripts {
     [CmdletBinding()]
     param (
-        # Aligned
         # Define your parameters here if needed
     )
 
@@ -25,24 +24,22 @@ function Test-RestrictCustomScripts {
             # Compliance is true if no sites allow custom scripts
             $complianceResult = $customScriptAllowedSites.Count -eq 0
 
-            # Gather details for non-compliant sites (where custom scripts are allowed)
-            $nonCompliantSiteDetails = $customScriptAllowedSites | ForEach-Object {
-                "$($_.Title) ($($_.Url)): Custom Script Allowed"
-            }
-
             # Prepare failure reasons and details based on compliance
-            $failureReasons = if (-not $complianceResult) {
-                "The following site collections allow custom script execution: " + ($nonCompliantSiteDetails -join "; ")
-            }
-            else {
+            $failureReasons = if ($complianceResult) {
                 "N/A"
+            } else {
+                "The following site collections allow custom script execution:"
             }
 
             $details = if ($complianceResult) {
                 "All site collections have custom script execution restricted"
-            }
-            else {
-                $nonCompliantSiteDetails -join "; "
+            } else {
+                # Create pipe-separated table for non-compliant sites
+                $nonCompliantSiteDetails = $customScriptAllowedSites | ForEach-Object {
+                    $title = if ($_.Title) { $_.Title } else { "No Title" }
+                    "$title|$($_.Url)|True"
+                }
+                "Title|Url|CustomScriptAllowed`n" + ($nonCompliantSiteDetails -join "`n")
             }
 
             # Create and populate the CISAuditResult object
