@@ -137,6 +137,6 @@ function Invoke-M365SecurityAudit {
         # Call the private function to calculate and display results
         Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
         # Return all collected audit results
-        return $allAuditResults.ToArray()
+        return $allAuditResults.ToArray() | Sort-Object -Property Rec
     }
 }
