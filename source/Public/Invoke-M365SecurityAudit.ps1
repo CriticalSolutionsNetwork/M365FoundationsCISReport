@@ -213,9 +213,11 @@ function Invoke-M365SecurityAudit {
             # Clean up sessions
             Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
-        # Call the private function to calculate and display results
+        if ($PSCmdlet.ShouldProcess("Measure and display audit results")) {
+                    # Call the private function to calculate and display results
         Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
         # Return all collected audit results
         return $allAuditResults.ToArray() | Sort-Object -Property Rec
+        }
     }
 }
