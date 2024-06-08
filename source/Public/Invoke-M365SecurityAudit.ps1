@@ -123,7 +123,7 @@ function Invoke-M365SecurityAudit {
             $script:MaximumFunctionCount = 8192
         }
         # Ensure required modules are installed
-        if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules")) {
+        if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules", "Check")) {
             $requiredModules = Get-RequiredModule -AuditFunction
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
@@ -175,7 +175,7 @@ function Invoke-M365SecurityAudit {
         $currentTestIndex = 0
 
         # Establishing connections if required
-        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services")) {
+        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services", "Connect")) {
             Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
         }
 
@@ -209,15 +209,15 @@ function Invoke-M365SecurityAudit {
     }
 
     End {
-        if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services")) {
+        if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services", "Disconnect")) {
             # Clean up sessions
             Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
-        if ($PSCmdlet.ShouldProcess("Measure and display audit results")) {
-                    # Call the private function to calculate and display results
-        Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
-        # Return all collected audit results
-        return $allAuditResults.ToArray() | Sort-Object -Property Rec
+        if ($PSCmdlet.ShouldProcess("Measure and display audit results", "Measure")) {
+            # Call the private function to calculate and display results
+            Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
+            # Return all collected audit results
+            return $allAuditResults.ToArray() | Sort-Object -Property Rec
         }
     }
 }
