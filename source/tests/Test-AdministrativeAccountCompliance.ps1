@@ -1,27 +1,43 @@
 function Test-AdministrativeAccountCompliance {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Parameters can be added if needed
     )
 
     begin {
-        # Initialize the valid licenses
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
         $recnum = "1.1.1"
     }
 
     process {
         try {
+            # Retrieve all necessary data outside the loops
             $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
+            $roleAssignments = Get-MgRoleManagementDirectoryRoleAssignment
+            $principalIds = $roleAssignments.PrincipalId | Select-Object -Unique
+
+            # Fetch user details using filter
+            $userDetailsList = @{}
+            $licensesList = @{}
+
+            $userDetails = Get-MgUser -Filter "id in ('$($principalIds -join "','")')" -Property "DisplayName, UserPrincipalName, Id, OnPremisesSyncEnabled" -ErrorAction SilentlyContinue
+            foreach ($user in $userDetails) {
+                $userDetailsList[$user.Id] = $user
+            }
+
+            # Fetch user licenses for each unique principal ID
+            foreach ($principalId in $principalIds) {
+                $licensesList[$principalId] = Get-MgUserLicenseDetail -UserId $principalId -ErrorAction SilentlyContinue
+            }
+
             $adminRoleUsers = @()
 
             foreach ($role in $adminRoles) {
-                $roleAssignments = Get-MgRoleManagementDirectoryRoleAssignment -Filter "roleDefinitionId eq '$($role.Id)'"
-
-                foreach ($assignment in $roleAssignments) {
-                    $userDetails = Get-MgUser -UserId $assignment.PrincipalId -Property "DisplayName, UserPrincipalName, Id, OnPremisesSyncEnabled" -ErrorAction SilentlyContinue
+                foreach ($assignment in $roleAssignments | Where-Object { $_.RoleDefinitionId -eq $role.Id }) {
+                    $userDetails = $userDetailsList[$assignment.PrincipalId]
                     if ($userDetails) {
-                        $licenses = Get-MgUserLicenseDetail -UserId $assignment.PrincipalId -ErrorAction SilentlyContinue
+                        $licenses = $licensesList[$assignment.PrincipalId]
                         $licenseString = if ($licenses) { ($licenses.SkuPartNumber -join '|') } else { "No Licenses Found" }
 
                         $adminRoleUsers += [PSCustomObject]@{
@@ -51,21 +67,25 @@ function Test-AdministrativeAccountCompliance {
             $failureReasons = $nonCompliantUsers | ForEach-Object {
                 $accountType = if ($_.HybridUser) { "Hybrid" } else { "Cloud-Only" }
                 $missingLicenses = $validLicenses | Where-Object { $_ -notin ($_.Licenses -split '\|') }
-                "$($_.UserName)|$($_.Roles)|$accountType|Missing: $($missingLicenses -join ',')"
+                "$($_.UserName)|$($_.Roles)|$accountType|$($missingLicenses -join ',')"
             }
             $failureReasons = $failureReasons -join "`n"
+
             $details = if ($nonCompliantUsers) {
-                "Non-Compliant Accounts: $($nonCompliantUsers.Count)`nDetails:`n" + ($nonCompliantUsers | ForEach-Object { $_.UserName }) -join "`n"
-            }
-            else {
+                "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons"
+            } else {
                 "Compliant Accounts: $($uniqueAdminRoleUsers.Count)"
+            }
+
+            $failureReason = if ($nonCompliantUsers) {
+                "Non-Compliant Accounts: $($nonCompliantUsers.Count)`nDetails:`n" + ($nonCompliantUsers | ForEach-Object { $_.UserName }) -join "`n"
+            } else {
+                "N/A"
             }
 
             $result = $nonCompliantUsers.Count -eq 0
             $status = if ($result) { 'Pass' } else { 'Fail' }
-            $failureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons" } else { "N/A" }
 
-            # Create the parameter splat
             $params = @{
                 Rec           = $recnum
                 Result        = $result
@@ -79,13 +99,11 @@ function Test-AdministrativeAccountCompliance {
         catch {
             Write-Error "An error occurred during the test: $_"
 
-            # Retrieve the description from the test definitions
             $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
             $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
 
             $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
 
-            # Call Initialize-CISAuditResult with error parameters
             $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
     }
