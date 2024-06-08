@@ -1,7 +1,7 @@
 function Connect-M365Suite {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory=$false)]
         [string]$TenantAdminUrl,
 
         [Parameter(Mandatory)]
