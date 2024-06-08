@@ -3,7 +3,7 @@ function Invoke-TestFunction {
         [Parameter(Mandatory = $true)]
         [PSObject]$FunctionFile,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$DomainName
     )
 
