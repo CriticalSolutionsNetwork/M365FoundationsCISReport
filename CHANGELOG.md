@@ -14,11 +14,14 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Added a private function `Get-RequiredModule` to initialize the `$requiredModules` variable for better code organization in the main script.
 - Updated `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` functions to use `Format-MissingActions` for structuring missing actions into a pipe-separated table format.
 - Added more verbose logging to `Test-BlockMailForwarding` and improved error handling for better troubleshooting.
+- Improved `Test-RestrictCustomScripts` to handle long URL lengths better by extracting and replacing common hostnames, and provided detailed output.
 
 ### Fixed
 
 - Ensured the `Invoke-TestFunction` returns a `CISAuditResult` object, which is then managed in the `Invoke-M365SecurityAudit` function.
 - Corrected the usage of the join operation within `$details` in `Test-BlockMailForwarding` to handle arrays properly.
+- Fixed the logic in `Test-RestrictCustomScripts` to accurately replace and manage URLs, ensuring compliance checks are correctly performed.
+- Updated the `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` functions to handle the `$allFailures` variable correctly, ensuring accurate pass/fail results.
 
 ## [0.1.4] - 2024-05-30
 
