@@ -166,8 +166,14 @@ function Invoke-M365SecurityAudit {
         $testsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "tests"
         $testFiles = Get-ChildItem -Path $testsFolderPath -Filter "Test-*.ps1" |
         Where-Object { $testsToLoad -contains $_.BaseName }
+
+        $totalTests = $testFiles.Count
+        $currentTestIndex = 0
+
         # Import the test functions
         $testFiles | ForEach-Object {
+            $currentTestIndex++
+            Write-Progress -Activity "Loading Test Scripts" -Status "Loading $($currentTestIndex) of $($totalTests): $($_.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
             Try {
                 # Dot source the test function
                 . $_.FullName
@@ -179,8 +185,11 @@ function Invoke-M365SecurityAudit {
             }
         }
 
+        $currentTestIndex = 0
         # Execute each test function from the prepared list
         foreach ($testFunction in $testFiles) {
+            $currentTestIndex++
+            Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
             $functionName = $testFunction.BaseName
             if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
                 $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName
@@ -201,3 +210,4 @@ function Invoke-M365SecurityAudit {
         return $allAuditResults.ToArray() | Sort-Object -Property Rec
     }
 }
+

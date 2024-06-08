@@ -17,7 +17,7 @@ function Invoke-TestFunction {
     }
 
     # Use splatting to pass parameters
-    Write-Host "Running $functionName..."
+    Write-Verbose "Running $functionName..."
     try {
         $result = & $functionName @paramList
         # Assuming each function returns an array of CISAuditResult or a single CISAuditResult
