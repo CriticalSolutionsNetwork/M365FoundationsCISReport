@@ -15,6 +15,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Updated `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` functions to use `Format-MissingActions` for structuring missing actions into a pipe-separated table format.
 - Added more verbose logging to `Test-BlockMailForwarding` and improved error handling for better troubleshooting.
 - Improved `Test-RestrictCustomScripts` to handle long URL lengths better by extracting and replacing common hostnames, and provided detailed output.
+- Added sorting to output.
+- Created new functions for improved modularity.
 
 ### Fixed
 
@@ -22,6 +24,13 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Corrected the usage of the join operation within `$details` in `Test-BlockMailForwarding` to handle arrays properly.
 - Fixed the logic in `Test-RestrictCustomScripts` to accurately replace and manage URLs, ensuring compliance checks are correctly performed.
 - Updated the `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` functions to handle the `$allFailures` variable correctly, ensuring accurate pass/fail results.
+- Fixed the connections in helper CSV and connect function.
+- Removed verbose preference from `Test-RestrictCustomScripts`.
+- Ensured that the output in `Test-BlockMailForwarding` does not include extra spaces between table headers and data.
+- Fixed output in `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` to correctly align with the new table format.
+- Added step 1 and step 2 in `Test-BlockMailForwarding` details to ensure comprehensive compliance checks.
+- Fixed the issue with the output in `Test-RestrictCustomScripts` to ensure no extra spaces between table headers and data.
+
 
 ## [0.1.4] - 2024-05-30
 
