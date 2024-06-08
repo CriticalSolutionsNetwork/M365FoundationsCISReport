@@ -1,6 +1,6 @@
 function Get-RequiredModule {
     [CmdletBinding(DefaultParameterSetName = 'AuditFunction')]
-    [OutputType([PSCustomObject])]
+    [OutputType([System.Object[]])]
     param (
         [Parameter(Mandatory = $true, ParameterSetName = 'AuditFunction')]
         [switch]$AuditFunction,
