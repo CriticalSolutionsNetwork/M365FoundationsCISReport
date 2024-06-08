@@ -11,13 +11,13 @@ function Connect-M365Suite {
     $VerbosePreference = "SilentlyContinue"
 
     try {
-        if ($RequiredConnections -contains "AzureAD" -or $RequiredConnections -contains "AzureAD | EXO") {
+        if ($RequiredConnections -contains "AzureAD" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "AzureAD | EXO | Microsoft Graph") {
             Write-Host "Connecting to Azure Active Directory..." -ForegroundColor Cyan
             Connect-AzureAD | Out-Null
             Write-Host "Successfully connected to Azure Active Directory." -ForegroundColor Green
         }
 
-        if ($RequiredConnections -contains "Microsoft Graph") {
+        if ($RequiredConnections -contains "Microsoft Graph" -or $RequiredConnections -contains "AzureAD | EXO | Microsoft Graph") {
             Write-Host "Connecting to Microsoft Graph with scopes: Directory.Read.All, Domain.Read.All, Policy.Read.All, Organization.Read.All" -ForegroundColor Cyan
             try {
                 Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome | Out-Null
@@ -30,7 +30,7 @@ function Connect-M365Suite {
             }
         }
 
-        if ($RequiredConnections -contains "EXO" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "Microsoft Teams | EXO") {
+        if ($RequiredConnections -contains "EXO" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "Microsoft Teams | EXO" -or $RequiredConnections -contains "AzureAD | EXO | Microsoft Graph") {
             Write-Host "Connecting to Exchange Online..." -ForegroundColor Cyan
             Connect-ExchangeOnline | Out-Null
             Write-Host "Successfully connected to Exchange Online." -ForegroundColor Green

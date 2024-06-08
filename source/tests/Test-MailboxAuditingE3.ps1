@@ -1,8 +1,7 @@
 function Test-MailboxAuditingE3 {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
-        # Aligned
-        # Create Table for Details
         # Parameters can be added if needed
     )
 
@@ -15,19 +14,20 @@ function Test-MailboxAuditingE3 {
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MoveToDeletedItems", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
 
-
         $allFailures = @()
         $allUsers = Get-AzureADUser -All $true
         $processedUsers = @{}  # Dictionary to track processed users
+        $recnum = "6.1.2"
     }
 
     process {
-        foreach ($user in $allUsers) {
-            if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
-                Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
-                continue
-            }
-            try {
+        try {
+            foreach ($user in $allUsers) {
+                if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
+                    Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
+                    continue
+                }
+
                 $licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
                 $hasOfficeE3 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e3SkuPartNumbers }).Count -gt 0
                 Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E3 license."
@@ -47,68 +47,63 @@ function Test-MailboxAuditingE3 {
                         foreach ($action in $OwnerActions) {
                             if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" }
                         }
+
+                        if ($missingActions.Count -gt 0) {
+                            $formattedActions = Format-MissingAction -missingActions $missingActions
+                            $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
+                        }
                     }
                     else {
-                        $allFailures += "$userUPN`: AuditEnabled - False"
-                        continue
+                        $allFailures += "$userUPN|False|||"
                     }
 
-                    if ($missingActions) {
-                        $formattedActions = Format-MissingActions $missingActions
-                        $allFailures += "$userUPN`: AuditEnabled - True; $formattedActions"
-                    }
                     # Mark the user as processed
                     $processedUsers[$user.UserPrincipalName] = $true
                 }
             }
-            catch {
-                Write-Warning "Could not retrieve license details for user $($user.UserPrincipalName): $_"
+
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+            $details = if ($allFailures.Count -eq 0) {
+                "All Office E3 users have correct mailbox audit settings."
             }
-        }
+            else {
+                "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n")
+            }
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
-        $details = if ($allFailures.Count -eq 0) { "All Office E3 users have correct mailbox audit settings." } else { $allFailures -join " | " }
-
-        # Populate the audit result
-        $params = @{
-            Rec           = "6.1.2"
-            Result        = $allFailures.Count -eq 0
-            Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
-            Details       = $details
-            FailureReason = $failureReasons
+            # Populate the audit result
+            $params = @{
+                Rec           = $recnum
+                Result        = $allFailures.Count -eq 0
+                Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
-        $auditResult = Initialize-CISAuditResult @params
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Retrieve the description from the test definitions
+            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
+
+            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {
+        #$verbosePreference = 'Continue'
+        $detailsLength = $details.Length
+        Write-Verbose "Character count of the details: $detailsLength"
+
+        if ($detailsLength -gt 32767) {
+            Write-Verbose "Warning: The character count exceeds the limit for Excel cells."
+        }
+        #$verbosePreference = 'SilentlyContinue'
         return $auditResult
     }
-}
-
-function Format-MissingActions {
-    param ([array]$missingActions)
-
-    $actionGroups = @{
-        "Admin"    = @()
-        "Delegate" = @()
-        "Owner"    = @()
-    }
-
-    foreach ($action in $missingActions) {
-        if ($action -match "(Admin|Delegate|Owner) action '([^']+)' missing") {
-            $type = $matches[1]
-            $actionName = $matches[2]
-            $actionGroups[$type] += $actionName
-        }
-    }
-
-    $formattedResults = @()
-    foreach ($type in $actionGroups.Keys) {
-        if ($actionGroups[$type].Count -gt 0) {
-            $formattedResults += "$($type) actions missing: $($actionGroups[$type] -join ', ')"
-        }
-    }
-
-    return $formattedResults -join '; '
 }

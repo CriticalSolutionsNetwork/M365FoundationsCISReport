@@ -1,5 +1,6 @@
 function Test-IdentifyExternalEmail {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be defined here if needed
@@ -10,34 +11,50 @@ function Test-IdentifyExternalEmail {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
+        $recnum = "6.2.3"
     }
 
     process {
-        # 6.2.3 (L1) Ensure email from external senders is identified
 
-        # Retrieve external sender tagging configuration
-        $externalInOutlook = Get-ExternalInOutlook
-        $externalTaggingEnabled = ($externalInOutlook | ForEach-Object { $_.Enabled }) -contains $true
+        try {
+            # 6.2.3 (L1) Ensure email from external senders is identified
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not $externalTaggingEnabled) {
-            "External sender tagging is disabled"
+            # Retrieve external sender tagging configuration
+            $externalInOutlook = Get-ExternalInOutlook
+            $externalTaggingEnabled = ($externalInOutlook | ForEach-Object { $_.Enabled }) -contains $true
+
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $externalTaggingEnabled) {
+                "External sender tagging is disabled"
+            }
+            else {
+                "N/A"
+            }
+
+            $details = "Enabled: $($externalTaggingEnabled); AllowList: $($externalInOutlook.AllowList)"
+
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $externalTaggingEnabled
+                Status        = if ($externalTaggingEnabled) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
-        else {
-            "N/A"
-        }
+        catch {
+            Write-Error "An error occurred during the test: $_"
 
-        $details = "Enabled: $($externalTaggingEnabled); AllowList: $($externalInOutlook.AllowList)"
+            # Retrieve the description from the test definitions
+            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
 
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "6.2.3"
-            Result         = $externalTaggingEnabled
-            Status         = if ($externalTaggingEnabled) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
+            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
-        $auditResult = Initialize-CISAuditResult @params
     }
 
     end {

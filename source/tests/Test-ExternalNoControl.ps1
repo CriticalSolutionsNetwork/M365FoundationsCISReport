@@ -1,5 +1,6 @@
 function Test-ExternalNoControl {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be defined here if needed
@@ -10,9 +11,12 @@ function Test-ExternalNoControl {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
+        $recnum = "8.5.7"
     }
 
     process {
+
+        try {
         # 8.5.7 (L1) Ensure external participants can't give or request control
 
         # Retrieve Teams meeting policy for external participant control
@@ -36,13 +40,26 @@ function Test-ExternalNoControl {
 
         # Create and populate the CISAuditResult object
         $params = @{
-            Rec            = "8.5.7"
+            Rec            = $recnum
             Result         = $externalControlRestricted
             Status         = if ($externalControlRestricted) { "Pass" } else { "Fail" }
             Details        = $details
             FailureReason  = $failureReasons
         }
         $auditResult = Initialize-CISAuditResult @params
+        }
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Retrieve the description from the test definitions
+            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
+
+            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

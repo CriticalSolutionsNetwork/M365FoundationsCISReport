@@ -1,5 +1,6 @@
 function Test-DialInBypassLobby {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be defined here if needed
@@ -9,39 +10,55 @@ function Test-DialInBypassLobby {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "8.5.4"
     }
 
     process {
-        # 8.5.4 (L1) Ensure users dialing in can't bypass the lobby
 
-        # Retrieve Teams meeting policy for PSTN users
-        $CsTeamsMeetingPolicyPSTN = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowPSTNUsersToBypassLobby
-        $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
+        try {
+            # 8.5.4 (L1) Ensure users dialing in can't bypass the lobby
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not $PSTNBypassDisabled) {
-            "Users dialing in can bypass the lobby"
-        }
-        else {
-            "N/A"
-        }
+            # Retrieve Teams meeting policy for PSTN users
+            $CsTeamsMeetingPolicyPSTN = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowPSTNUsersToBypassLobby
+            $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
 
-        $details = if ($PSTNBypassDisabled) {
-            "AllowPSTNUsersToBypassLobby is set to False"
-        }
-        else {
-            "AllowPSTNUsersToBypassLobby is set to True"
-        }
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $PSTNBypassDisabled) {
+                "Users dialing in can bypass the lobby"
+            }
+            else {
+                "N/A"
+            }
 
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "8.5.4"
-            Result         = $PSTNBypassDisabled
-            Status         = if ($PSTNBypassDisabled) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
+            $details = if ($PSTNBypassDisabled) {
+                "AllowPSTNUsersToBypassLobby is set to False"
+            }
+            else {
+                "AllowPSTNUsersToBypassLobby is set to True"
+            }
+
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $PSTNBypassDisabled
+                Status        = if ($PSTNBypassDisabled) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
-        $auditResult = Initialize-CISAuditResult @params
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Retrieve the description from the test definitions
+            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
+
+            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

@@ -1,5 +1,6 @@
 function Test-OrganizersPresent {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be defined here if needed
@@ -9,41 +10,56 @@ function Test-OrganizersPresent {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
+        $recnum = "8.5.6"
     }
 
     process {
-        # 8.5.6 (L2) Ensure only organizers and co-organizers can present
+        try {
+            # 8.5.6 (L2) Ensure only organizers and co-organizers can present
 
-        # Connect to Teams PowerShell using Connect-MicrosoftTeams
+            # Connect to Teams PowerShell using Connect-MicrosoftTeams
 
-        # Retrieve the Teams meeting policy for presenters
-        $CsTeamsMeetingPolicyPresenters = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property DesignatedPresenterRoleMode
-        $presenterRoleRestricted = $CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode -eq 'OrganizerOnlyUserOverride'
+            # Retrieve the Teams meeting policy for presenters
+            $CsTeamsMeetingPolicyPresenters = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property DesignatedPresenterRoleMode
+            $presenterRoleRestricted = $CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode -eq 'OrganizerOnlyUserOverride'
 
-        # Prepare failure reasons and details based on compliance
-        $failureReasons = if (-not $presenterRoleRestricted) {
-            "Others besides organizers and co-organizers can present"
-        }
-        else {
-            "N/A"
-        }
+            # Prepare failure reasons and details based on compliance
+            $failureReasons = if (-not $presenterRoleRestricted) {
+                "Others besides organizers and co-organizers can present"
+            }
+            else {
+                "N/A"
+            }
 
-        $details = if ($presenterRoleRestricted) {
-            "Only organizers and co-organizers can present."
-        }
-        else {
-            "DesignatedPresenterRoleMode is set to $($CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode)"
-        }
+            $details = if ($presenterRoleRestricted) {
+                "Only organizers and co-organizers can present."
+            }
+            else {
+                "DesignatedPresenterRoleMode is set to $($CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode)"
+            }
 
-        # Create and populate the CISAuditResult object
-        $params = @{
-            Rec            = "8.5.6"
-            Result         = $presenterRoleRestricted
-            Status         = if ($presenterRoleRestricted) { "Pass" } else { "Fail" }
-            Details        = $details
-            FailureReason  = $failureReasons
+            # Create and populate the CISAuditResult object
+            $params = @{
+                Rec           = $recnum
+                Result        = $presenterRoleRestricted
+                Status        = if ($presenterRoleRestricted) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
+            }
+            $auditResult = Initialize-CISAuditResult @params
         }
-        $auditResult = Initialize-CISAuditResult @params
+        catch {
+            Write-Error "An error occurred during the test: $_"
+
+            # Retrieve the description from the test definitions
+            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
+
+            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+            # Call Initialize-CISAuditResult with error parameters
+            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+        }
     }
 
     end {

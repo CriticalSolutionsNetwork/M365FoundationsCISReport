@@ -63,10 +63,12 @@ function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, HelpMessage = "The SharePoint tenant admin URL, which should end with '-admin.sharepoint.com'.")]
+        [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
         [string]$TenantAdminUrl,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, HelpMessage = "The domain name of your organization, e.g., 'example.com'.")]
+        [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
         [string]$DomainName,
 
         # E-Level with optional ProfileLevel selection
@@ -92,12 +94,12 @@ function Invoke-M365SecurityAudit {
         [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter')]
         [ValidateSet(
             '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
-                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
-                '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
-                '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
-                '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
-                '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
-                '8.5.7', '8.6.1'
+            '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
+            '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
+            '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
+            '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
+            '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
+            '8.5.7', '8.6.1'
         )]
         [string[]]$IncludeRecommendation,
 
@@ -105,12 +107,12 @@ function Invoke-M365SecurityAudit {
         [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter')]
         [ValidateSet(
             '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
-                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
-                '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
-                '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
-                '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
-                '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
-                '8.5.7', '8.6.1'
+            '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
+            '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
+            '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
+            '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
+            '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
+            '8.5.7', '8.6.1'
         )]
         [string[]]$SkipRecommendation,
 
@@ -120,43 +122,23 @@ function Invoke-M365SecurityAudit {
         [switch]$NoModuleCheck
     )
 
-
-
     Begin {
         if ($script:MaximumFunctionCount -lt 8192) {
             $script:MaximumFunctionCount = 8192
         }
         # Ensure required modules are installed
-        # Define the required modules and versions in a hashtable
         if (!($NoModuleCheck)) {
-            $requiredModules = @(
-                @{ ModuleName = "ExchangeOnlineManagement"; RequiredVersion = "3.3.0" },
-                @{ ModuleName = "AzureAD"; RequiredVersion = "2.0.2.182" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Authentication" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Users" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Groups" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "DirectoryObjects" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Domains" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Reports" },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModuleName = "Mail" },
-                @{ ModuleName = "Microsoft.Online.SharePoint.PowerShell"; RequiredVersion = "16.0.24009.12000" },
-                @{ ModuleName = "MicrosoftTeams"; RequiredVersion = "5.5.0" }
-            )
+            $requiredModules = Get-RequiredModule -AuditFunction
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
             }
         }
-
-
-        # Loop through each required module and assert its availability
-
-        # Establishing connections
-
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
         # Load the Test Definitions into the script scope for use in other functions
         $script:TestDefinitionsObject = $testDefinitions
+
         # Apply filters based on parameter sets
         $params = @{
             TestDefinitions       = $testDefinitions
@@ -167,58 +149,54 @@ function Invoke-M365SecurityAudit {
             SkipRecommendation    = $SkipRecommendation
         }
         $testDefinitions = Get-TestDefinitionsObject @params
-        # End switch ($PSCmdlet.ParameterSetName)
         # Extract unique connections needed
         $requiredConnections = $testDefinitions.Connection | Sort-Object -Unique
-
         # Establishing connections if required
         if (!($DoNotConnect)) {
             Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
         }
         # Determine which test files to load based on filtering
         $testsToLoad = $testDefinitions.TestFileName | ForEach-Object { $_ -replace '.ps1$', '' }
-
-        # Display the tests that would be loaded if the function is called with -WhatIf
-
         Write-Verbose "The $(($testsToLoad).count) test/s that would be loaded based on filter criteria:"
         $testsToLoad | ForEach-Object { Write-Verbose " $_" }
+        # Initialize a collection to hold failed test details
+        $script:FailedTests = [System.Collections.ArrayList]::new()
     } # End Begin
-
     Process {
-        $allAuditResults = [System.Collections.ArrayList]::new() #@()  # Initialize a collection to hold all results
-
+        $allAuditResults = [System.Collections.ArrayList]::new() # Initialize a collection to hold all results
         # Dynamically dot-source the test scripts
         $testsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "tests"
         $testFiles = Get-ChildItem -Path $testsFolderPath -Filter "Test-*.ps1" |
         Where-Object { $testsToLoad -contains $_.BaseName }
 
+        $totalTests = $testFiles.Count
+        $currentTestIndex = 0
+
         # Import the test functions
         $testFiles | ForEach-Object {
+            $currentTestIndex++
+            Write-Progress -Activity "Loading Test Scripts" -Status "Loading $($currentTestIndex) of $($totalTests): $($_.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
             Try {
+                # Dot source the test function
                 . $_.FullName
             }
             Catch {
+                # Log the error and add the test to the failed tests collection
                 Write-Error "Failed to load test function $($_.Name): $_"
+                $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
             }
         }
 
+        $currentTestIndex = 0
         # Execute each test function from the prepared list
         foreach ($testFunction in $testFiles) {
+            $currentTestIndex++
+            Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
             $functionName = $testFunction.BaseName
-            $functionCmd = Get-Command -Name $functionName
-
-            # Check if the test function needs DomainName parameter
-            $paramList = @{}
-            if ('DomainName' -in $functionCmd.Parameters.Keys) {
-                $paramList.DomainName = $DomainName
-            }
-
-            # Use splatting to pass parameters
             if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                Write-Host "Running $functionName..."
-                $result = & $functionName @paramList
-                # Assuming each function returns an array of CISAuditResult or a single CISAuditResult
-                [void]($allAuditResults.add($Result))
+                $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName
+                # Add the result to the collection
+                [void]$allAuditResults.Add($auditResult)
             }
         }
     }
@@ -228,20 +206,10 @@ function Invoke-M365SecurityAudit {
             # Clean up sessions
             Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
-        # Calculate the total number of tests
-        $totalTests = $allAuditResults.Count
-
-        # Calculate the number of passed tests
-        $passedTests = $allAuditResults.ToArray() | Where-Object { $_.Result -eq $true } | Measure-Object | Select-Object -ExpandProperty Count
-
-        # Calculate the pass percentage
-        $passPercentage = if ($totalTests -eq 0) { 0 } else { [math]::Round(($passedTests / $totalTests) * 100, 2) }
-
-        # Display the pass percentage to the user
-        Write-Host "Audit completed. $passedTests out of $totalTests tests passed." -ForegroundColor Cyan
-        Write-Host "Your passing percentage is $passPercentage%."
+        # Call the private function to calculate and display results
+        Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
         # Return all collected audit results
-        return $allAuditResults.ToArray()
-        # Check if the Disconnect switch is present
+        return $allAuditResults.ToArray() | Sort-Object -Property Rec
     }
 }
+

@@ -60,7 +60,7 @@ function Test-MailboxAuditingE5_6.1.3_E5L1_IG1_IG2_IG3 {
                     }
 
                     if ($missingActions) {
-                        $formattedActions = Format-MissingActions $missingActions
+                        $formattedActions = Format-MissingAction $missingActions
                         $allFailures += "$userUPN`: AuditEnabled - True; $formattedActions"
                     }
                     else {
@@ -92,7 +92,7 @@ function Test-MailboxAuditingE5_6.1.3_E5L1_IG1_IG2_IG3 {
     }
 }
 
-function Format-MissingActions {
+function Format-MissingAction {
     param ([array]$missingActions)
 
     $actionGroups = @{

@@ -6,6 +6,38 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Updated test definitions for CIS Microsoft 365 Foundations Benchmark for better error handling and object output when errors occur.
+- Added a parameter to the `Initialize-CISAuditResult` function to allow for a static failed object to be created when an error occurs.
+- Refactored `Invoke-M365SecurityAudit` to include a new private function `Invoke-TestFunction` for executing test functions and handling errors.
+- Added a new private function `Measure-AuditResult` to calculate and display audit results.
+- Enhanced error logging to capture failed test details and display them at the end of the audit.
+- Added a private function `Get-RequiredModule` to initialize the `$requiredModules` variable for better code organization in the main script.
+- Updated `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` functions to use `Format-MissingAction` for structuring missing actions into a pipe-separated table format.
+- Added more verbose logging to `Test-BlockMailForwarding` and improved error handling for better troubleshooting.
+- Improved `Test-RestrictCustomScripts` to handle long URL lengths better by extracting and replacing common hostnames, and provided detailed output.
+- Added sorting to output.
+- Created new functions for improved modularity.
+- Parameter validation for excel and csv path in sync function
+- Added Output type to tests.
+
+### Fixed
+
+- Ensured the `Invoke-TestFunction` returns a `CISAuditResult` object, which is then managed in the `Invoke-M365SecurityAudit` function.
+- Corrected the usage of the join operation within `$details` in `Test-BlockMailForwarding` to handle arrays properly.
+- Fixed the logic in `Test-RestrictCustomScripts` to accurately replace and manage URLs, ensuring compliance checks are correctly performed.
+- Updated the `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` functions to handle the `$allFailures` variable correctly, ensuring accurate pass/fail results.
+- Fixed the connections in helper CSV and connect function.
+- Removed verbose preference from `Test-RestrictCustomScripts`.
+- Ensured that the output in `Test-BlockMailForwarding` does not include extra spaces between table headers and data.
+- Fixed output in `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` to correctly align with the new table format.
+- Added step 1 and step 2 in `Test-BlockMailForwarding` details to ensure comprehensive compliance checks.
+- Fixed the issue with the output in `Test-RestrictCustomScripts` to ensure no extra spaces between table headers and data.
+
+
+## [0.1.4] - 2024-05-30
+
+### Added
+
 - Test definitions filter function.
 - Logging function for future use.
 - Test grade written to console.
