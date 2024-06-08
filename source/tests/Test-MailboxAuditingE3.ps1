@@ -95,6 +95,14 @@ function Test-MailboxAuditingE3 {
     }
 
     end {
+        #$verbosePreference = 'Continue'
+        $detailsLength = $details.Length
+        Write-Verbose "Character count of the details: $detailsLength"
+
+        if ($detailsLength -gt 32767) {
+            Write-Verbose "Warning: The character count exceeds the limit for Excel cells."
+        }
+        #$verbosePreference = 'SilentlyContinue'
         return $auditResult
     }
 }

@@ -28,20 +28,27 @@ function Test-RestrictCustomScripts {
 
             # Find sites where custom scripts are allowed
             $customScriptAllowedSites = $processedUrls | Where-Object { $_.DenyAddAndCustomizePages -ne 'Enabled' }
+            $verbosePreference = 'Continue'
+            # Check the total length of URLs
+            $totalUrlLength = ($customScriptAllowedSites.Url -join '').Length
+            Write-Verbose "Total length of URLs: $totalUrlLength"
 
-            # Extract hostnames from allowed sites
-            Write-Verbose "Extracting hostnames from URLs..."
-            $hostnames = $customScriptAllowedSites.Url | ForEach-Object {
-                if ($_ -match '^https://([^\.]+)\.') {
-                    $matches[1]
+            # Extract hostnames from allowed sites if the total length exceeds the limit
+            $mostUsedHostname = $null
+            if ($totalUrlLength -gt 20000) {
+                Write-Verbose "Extracting hostnames from URLs..."
+                $hostnames = $customScriptAllowedSites.Url | ForEach-Object {
+                    if ($_ -match '^https://([^\.]+)\.') {
+                        $matches[1]
+                    }
                 }
+                Write-Verbose "Extracted hostnames: $($hostnames -join ', ')"
+
+                # Find the most used hostname using the Get-MostCommonWord function
+                $mostUsedHostname = Get-MostCommonWord -InputStrings $hostnames
+                Write-Verbose "Most used hostname: $mostUsedHostname"
             }
-            Write-Verbose "Extracted hostnames: $($hostnames -join ', ')"
-
-            # Find the most used hostname using the Get-MostCommonWord function
-            $mostUsedHostname = Get-MostCommonWord -InputStrings $hostnames
-            Write-Verbose "Most used hostname: $mostUsedHostname"
-
+            $verbosePreference = 'SilentlyContinue'
             # Compliance is true if no sites allow custom scripts
             $complianceResult = $customScriptAllowedSites.Count -eq 0
 

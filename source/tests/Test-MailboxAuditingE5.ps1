@@ -23,6 +23,7 @@ function Test-MailboxAuditingE5 {
         try {
             foreach ($user in $allUsers) {
                 if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
+                    Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
                     continue
                 }
 
@@ -45,24 +46,18 @@ function Test-MailboxAuditingE5 {
                         foreach ($action in $OwnerActions) {
                             if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" }
                         }
+
+                        if ($missingActions.Count -gt 0) {
+                            $formattedActions = Format-MissingActions -missingActions $missingActions
+                            $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
+                        }
                     }
                     else {
                         $allFailures += "$userUPN|False|||"
-                        continue
                     }
 
-                    if ($missingActions) {
-                        $formattedActions = Format-MissingActions -missingActions $missingActions
-                        $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
-                    }
-                    else {
-                        Write-Verbose "User $($user.UserPrincipalName) passed the mailbox audit checks."
-                    }
+                    # Mark the user as processed
                     $processedUsers[$user.UserPrincipalName] = $true
-                }
-                else {
-                    # Adding verbose output to indicate the user does not have an E5 license
-                    Write-Verbose "User $($user.UserPrincipalName) does not have an Office E5 license."
                 }
             }
 
@@ -70,7 +65,8 @@ function Test-MailboxAuditingE5 {
             $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
             $details = if ($allFailures.Count -eq 0) {
                 "All Office E5 users have correct mailbox audit settings."
-            } else {
+            }
+            else {
                 "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n")
             }
 
@@ -99,6 +95,14 @@ function Test-MailboxAuditingE5 {
     }
 
     end {
+        #$verbosePreference = 'Continue'
+        $detailsLength = $details.Length
+        Write-Verbose "Character count of the details: $detailsLength"
+
+        if ($detailsLength -gt 32767) {
+            Write-Verbose "Warning: The character count exceeds the limit for Excel cells."
+        }
+        #$verbosePreference = 'SilentlyContinue'
         return $auditResult
     }
 }
