@@ -123,7 +123,7 @@ function Invoke-M365SecurityAudit {
             $script:MaximumFunctionCount = 8192
         }
         # Ensure required modules are installed
-        if (!($NoModuleCheck)) {
+        if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules")) {
             $requiredModules = Get-RequiredModule -AuditFunction
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
