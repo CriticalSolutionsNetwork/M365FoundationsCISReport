@@ -39,8 +39,6 @@
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
 #>
-
-
 function Sync-CISExcelAndCsvData {
     [CmdletBinding(DefaultParameterSetName = 'CsvInput')]
     param (
