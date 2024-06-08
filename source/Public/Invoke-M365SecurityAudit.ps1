@@ -63,10 +63,12 @@ function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, HelpMessage = "The SharePoint tenant admin URL, which should end with '-admin.sharepoint.com'.")]
+        [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
         [string]$TenantAdminUrl,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, HelpMessage = "The domain name of your organization, e.g., 'example.com'.")]
+        [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
         [string]$DomainName,
 
         # E-Level with optional ProfileLevel selection
