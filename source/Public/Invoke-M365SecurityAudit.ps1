@@ -152,6 +152,9 @@ function Invoke-M365SecurityAudit {
             if (-not $TenantAdminUrl) {
                 $requiredConnections = $requiredConnections | Where-Object { $_ -ne 'SPO' }
                 $testDefinitions = $testDefinitions | Where-Object { $_.Connection -ne 'SPO' }
+                if ($null -eq $testDefinitions) {
+                    throw "No tests to run as no SharePoint Online tests are available."
+                }
             }
         }
         # Establishing connections if required
