@@ -17,6 +17,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Improved `Test-RestrictCustomScripts` to handle long URL lengths better by extracting and replacing common hostnames, and provided detailed output.
 - Added sorting to output.
 - Created new functions for improved modularity.
+- Parameter validation for excel and csv path in sync function
 
 ### Fixed
 
