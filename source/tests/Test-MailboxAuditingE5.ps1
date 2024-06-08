@@ -49,7 +49,7 @@ function Test-MailboxAuditingE5 {
                         }
 
                         if ($missingActions.Count -gt 0) {
-                            $formattedActions = Format-MissingActions -missingActions $missingActions
+                            $formattedActions = Format-MissingAction -missingActions $missingActions
                             $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
                         }
                     }

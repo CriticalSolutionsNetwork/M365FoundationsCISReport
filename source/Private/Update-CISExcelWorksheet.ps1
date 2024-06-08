@@ -25,7 +25,7 @@ function Update-CISExcelWorksheet {
 
 
         # Update the worksheet with the provided data
-        Update-WorksheetCells -Worksheet $worksheet -Data $Data -StartingRowIndex $StartingRowIndex
+        Update-WorksheetCell -Worksheet $worksheet -Data $Data -StartingRowIndex $StartingRowIndex
 
         # Save and close the Excel package
         Close-ExcelPackage $excelPackage

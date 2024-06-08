@@ -1,4 +1,4 @@
-        function Update-WorksheetCells {
+        function Update-WorksheetCell {
             param (
                 $Worksheet,
                 $Data,

@@ -1,4 +1,4 @@
-function Format-MissingActions {
+function Format-MissingAction {
     param ([array]$missingActions)
 
     $actionGroups = @{

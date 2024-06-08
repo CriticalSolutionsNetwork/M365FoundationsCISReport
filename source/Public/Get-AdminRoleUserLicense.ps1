@@ -25,6 +25,8 @@
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Get-AdminRoleUserLicense
 #>
 function Get-AdminRoleUserLicense {
+    # Set output type to System.Collections.ArrayList
+    [OutputType([System.Collections.ArrayList])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
