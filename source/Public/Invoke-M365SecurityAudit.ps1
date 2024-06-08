@@ -1,3 +1,64 @@
+<#
+    .SYNOPSIS
+    Invokes a security audit for Microsoft 365 environments.
+    .DESCRIPTION
+    The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters. It allows auditing of various configurations and settings within a Microsoft 365 environment, such as compliance with CIS benchmarks.
+    .PARAMETER TenantAdminUrl
+    The URL of the tenant admin. This parameter is mandatory.
+    .PARAMETER DomainName
+    The domain name of the Microsoft 365 environment. This parameter is mandatory.
+    .PARAMETER ELevel
+    Specifies the E-Level (E3 or E5) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter.
+    .PARAMETER ProfileLevel
+    Specifies the profile level (L1 or L2) for the audit. This parameter is optional and can be combined with the ELevel parameter.
+    .PARAMETER IncludeIG1
+    If specified, includes tests where IG1 is true.
+    .PARAMETER IncludeIG2
+    If specified, includes tests where IG2 is true.
+    .PARAMETER IncludeIG3
+    If specified, includes tests where IG3 is true.
+    .PARAMETER IncludeRecommendation
+    Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.
+    .PARAMETER SkipRecommendation
+    Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
+    .PARAMETER DoNotConnect
+    If specified, the cmdlet will not establish a connection to Microsoft 365 services.
+    .PARAMETER DoNotDisconnect
+    If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
+    .PARAMETER NoModuleCheck
+    If specified, the cmdlet will not check for the presence of required modules.
+    .EXAMPLE
+    PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ELevel "E5" -ProfileLevel "L1"
+
+    Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
+    .EXAMPLE
+    PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -IncludeIG1
+
+    Performs an audit including all tests where IG1 is true.
+    .EXAMPLE
+    PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
+
+    Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
+    .EXAMPLE
+    PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
+    PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
+
+    Captures the audit results into a variable and exports them to a CSV file.
+    .INPUTS
+    None. You cannot pipe objects to Invoke-M365SecurityAudit.
+    .OUTPUTS
+    CISAuditResult[]
+    The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
+    .NOTES
+        - This module is based on CIS benchmarks.
+        - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+        - Commercial use is not permitted. This module cannot be sold or used for commercial purposes.
+        - Modifications and sharing are allowed under the same license.
+        - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
+        - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
+    .LINK
+    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
+#>
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
