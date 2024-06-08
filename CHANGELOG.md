@@ -8,6 +8,13 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Added pipeline support to `Sync-CISExcelAndCsvData` function for `[CISAuditResult[]]` input.
 
+### Changed
+
+- Updated `Connect-M365Suite` to make `TenantAdminUrl` an optional parameter.
+- Updated `Invoke-M365SecurityAudit` to make `TenantAdminUrl` an optional parameter.
+- Improved connection handling and error messaging in `Connect-M365Suite`.
+- Enhanced `Invoke-M365SecurityAudit` to allow flexible inclusion and exclusion of specific recommendations, IG filters, and profile levels.
+
 ## [0.1.5] - 2024-06-08
 
 ### Added
