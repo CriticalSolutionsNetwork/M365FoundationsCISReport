@@ -5,8 +5,8 @@
     The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters. It allows auditing of various configurations and settings within a Microsoft 365 environment, such as compliance with CIS benchmarks.
     .PARAMETER TenantAdminUrl
     The URL of the tenant admin. This parameter is mandatory.
-    .PARAMETER DomainName
-    The domain name of the Microsoft 365 environment. This parameter is mandatory.
+    .PARAMETER M365DomainForPWPolicyTest
+    The domain name of the Microsoft 365 environment to test. This parameter is not mandatory and by default it will pass/fail all found domains as a group if a specific domain is not specified.
     .PARAMETER ELevel
     Specifies the E-Level (E3 or E5) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter.
     .PARAMETER ProfileLevel
@@ -67,9 +67,9 @@ function Invoke-M365SecurityAudit {
         [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
         [string]$TenantAdminUrl,
 
-        [Parameter(Mandatory = $true, HelpMessage = "The domain name of your organization, e.g., 'example.com'.")]
+        [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration policy when '1.3.1' is included in the tests to be run. The domain name of your organization, e.g., 'example.com'.")]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
-        [string]$DomainName,
+        [string]$M365DomainForPWPolicyTest,
 
         # E-Level with optional ProfileLevel selection
         [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
@@ -194,7 +194,7 @@ function Invoke-M365SecurityAudit {
             Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
             $functionName = $testFunction.BaseName
             if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName
+                $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $M365DomainForPWPolicyTest
                 # Add the result to the collection
                 [void]$allAuditResults.Add($auditResult)
             }
