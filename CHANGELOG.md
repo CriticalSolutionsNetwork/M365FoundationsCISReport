@@ -18,6 +18,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Added sorting to output.
 - Created new functions for improved modularity.
 - Parameter validation for excel and csv path in sync function
+- Added Output type to tests.
 
 ### Fixed
 
