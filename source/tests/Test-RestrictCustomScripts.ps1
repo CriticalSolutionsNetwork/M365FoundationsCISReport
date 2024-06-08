@@ -20,9 +20,9 @@ function Test-RestrictCustomScripts {
             # Retrieve all site collections and select necessary properties
             $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
 
-            # Replace 'sharepoint.com' with '<SPtld>'
+            # Replace 'sharepoint.com' with '<SPUrl>'
             $processedUrls = $SPOSitesCustomScript | ForEach-Object {
-                $_.Url = $_.Url -replace 'sharepoint\.com', '<SPtld>'
+                $_.Url = $_.Url -replace 'sharepoint\.com', '<SPUrl>'
                 $_
             }
 
@@ -55,8 +55,8 @@ function Test-RestrictCustomScripts {
             # Gather details for non-compliant sites (where custom scripts are allowed)
             $nonCompliantSiteDetails = $customScriptAllowedSites | ForEach-Object {
                 $url = $_.Url
-                if ($null -ne $mostUsedHostname -and $url -match "^https://$mostUsedHostname\.<SPtld>") {
-                    $url = $url -replace "^https://$mostUsedHostname\.<SPtld>", "https://<corp>.<SPtld>"
+                if ($null -ne $mostUsedHostname -and $url -match "^https://$mostUsedHostname\.<SPUrl>") {
+                    $url = $url -replace "^https://$mostUsedHostname\.<SPUrl>", "https://<corp>.<SPUrl>"
                 }
                 "$(if ($_.Title) {$_.Title} else {"NoTitle"})|$url"
             }
@@ -74,6 +74,16 @@ function Test-RestrictCustomScripts {
             }
             else {
                 "Title|Url`n" + ($nonCompliantSiteDetails -join "`n")
+            }
+
+            # Convert details to PSObject and check length
+            $detailsPSObject = $details | ConvertFrom-Csv -Delimiter '|'
+            $detailsLength = ($detailsPSObject | ForEach-Object { $_.Url }).Length
+
+            if ($detailsLength -gt 32767) {
+                # Create a preview of the first 10 results
+                $preview = $detailsPSObject | Select-Object -First 10 | ForEach-Object { "$($_.Title)|$($_.Url)" }
+                $details = "The output is too large. Here is a preview of the first 10 results:`n`n" + ($preview -join "`n") + "`n`nPlease run the test with the following commands to get the full details:`n`nGet-SPOSite -Limit All | Where-Object { `$.DenyAddAndCustomizePages -ne 'Enabled' } | Select-Object Title, Url"
             }
 
             # Create and populate the CISAuditResult object
