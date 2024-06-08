@@ -49,6 +49,12 @@ function Sync-CISExcelAndCsvData {
     )
 
     process {
+        # Verify ImportExcel module is available
+        $requiredModules = Get-RequiredModule -SyncFunction
+        foreach ($module in $requiredModules) {
+            Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
+        }
+
         # Merge Excel and CSV data
         $mergedData = Merge-CISExcelAndCsvData -ExcelPath $ExcelPath -WorksheetName $WorksheetName -CsvPath $CsvPath
 
@@ -61,3 +67,4 @@ function Sync-CISExcelAndCsvData {
         }
     }
 }
+

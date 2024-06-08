@@ -65,7 +65,7 @@ function Invoke-M365SecurityAudit {
         }
         # Ensure required modules are installed
         if (!($NoModuleCheck)) {
-            $requiredModules = Get-RequiredModule
+            $requiredModules = Get-RequiredModule -AuditFunction
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
             }
