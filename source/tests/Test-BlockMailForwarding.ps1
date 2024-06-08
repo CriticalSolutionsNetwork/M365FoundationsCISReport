@@ -15,27 +15,50 @@ function Test-BlockMailForwarding {
         try {
             # 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
 
-            # Retrieve the transport rules that redirect messages
+            # Step 1: Retrieve the transport rules that redirect messages
             $transportRules = Get-TransportRule | Where-Object { $null -ne $_.RedirectMessageTo }
-            $forwardingBlocked = $transportRules.Count -eq 0
+            $transportForwardingBlocked = $transportRules.Count -eq 0
+
+            # Step 2: Check all anti-spam outbound policies
+            $outboundSpamPolicies = Get-HostedOutboundSpamFilterPolicy
+            $nonCompliantSpamPolicies = $outboundSpamPolicies | Where-Object { $_.AutoForwardingMode -ne 'Off' }
+            $nonCompliantSpamPoliciesArray = @($nonCompliantSpamPolicies)
+            $spamForwardingBlocked = $nonCompliantSpamPoliciesArray.Count -eq 0
+
+            # Determine overall compliance
+            $forwardingBlocked = $transportForwardingBlocked -and $spamForwardingBlocked
 
             # Prepare failure reasons and details based on compliance
-            $failureReasons = if ($transportRules.Count -gt 0) {
-                "Mail forwarding rules found: $($transportRules.Name -join ', ')"
-            }
-            else {
-                "N/A"
+            $failureReasons = @()
+            $details = @()
+
+            if ($transportRules.Count -gt 0) {
+                $failureReasons += "Mail forwarding rules found: $($transportRules.Name -join ', ')"
+                $details += "Transport Rules Details:`nRule Name|Redirects To"
+                $details += $transportRules | ForEach-Object {
+                    "$($_.Name)|$($_.RedirectMessageTo -join ', ')"
+                }
+                $details += "`n"
             }
 
-            $details = if ($transportRules.Count -gt 0) {
-                $transportRules | ForEach-Object {
-                    "$($_.Name) redirects to $($_.RedirectMessageTo -join ', ')"
-                } -join " | "
-            }
-            else {
-                "Step 1: No forwarding rules found. Please proceed with Step 2 described in CIS Benchmark."
+            if ($nonCompliantSpamPoliciesArray.Count -gt 0) {
+                $failureReasons += "Outbound spam policies allowing automatic forwarding found."
+                $details += "Outbound Spam Policies Details:`nPolicy|AutoForwardingMode"
+                $details += $nonCompliantSpamPoliciesArray | ForEach-Object {
+                    "$($_.Name)|$($_.AutoForwardingMode)"
+                }
             }
 
+            if ($failureReasons.Count -eq 0) {
+                $failureReasons = "N/A"
+                $details = "Both transport rules and outbound spam policies are configured correctly to block forwarding."
+            }
+            else {
+                $failureReasons = $failureReasons -join " | "
+                $details = $details -join "`n"
+            }
+
+            # Populate the audit result
             $params = @{
                 Rec           = $recnum
                 Result        = $forwardingBlocked
