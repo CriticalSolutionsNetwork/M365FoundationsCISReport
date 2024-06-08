@@ -55,7 +55,6 @@
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
-
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
@@ -64,7 +63,7 @@ function Invoke-M365SecurityAudit {
         [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
         [string]$TenantAdminUrl,
 
-        [Parameter(Mandatory = $false, HelpMessage = "All domains tested unless you Specify this to test only the selected domain for password expiration policy when '1.3.1' is included in the tests to be run. The domain name of your organization, e.g., 'example.com'.")]
+        [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration policy when '1.3.1' is included in the tests to be run. The domain name of your organization, e.g., 'example.com'.")]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
         [string]$M365DomainForPWPolicyTest,
 
@@ -157,10 +156,6 @@ function Invoke-M365SecurityAudit {
                 }
             }
         }
-        # Establishing connections if required
-        if (!($DoNotConnect)) {
-            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
-        }
         # Determine which test files to load based on filtering
         $testsToLoad = $testDefinitions.TestFileName | ForEach-Object { $_ -replace '.ps1$', '' }
         Write-Verbose "The $(($testsToLoad).count) test/s that would be loaded based on filter criteria:"
@@ -168,6 +163,7 @@ function Invoke-M365SecurityAudit {
         # Initialize a collection to hold failed test details
         $script:FailedTests = [System.Collections.ArrayList]::new()
     } # End Begin
+
     Process {
         $allAuditResults = [System.Collections.ArrayList]::new() # Initialize a collection to hold all results
         # Dynamically dot-source the test scripts
@@ -177,6 +173,11 @@ function Invoke-M365SecurityAudit {
 
         $totalTests = $testFiles.Count
         $currentTestIndex = 0
+
+        # Establishing connections if required
+        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services")) {
+            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
+        }
 
         # Import the test functions
         $testFiles | ForEach-Object {
@@ -218,4 +219,3 @@ function Invoke-M365SecurityAudit {
         return $allAuditResults.ToArray() | Sort-Object -Property Rec
     }
 }
-
