@@ -6,6 +6,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Added pipeline support to `Sync-CISExcelAndCsvData` function for `[CISAuditResult[]]` input.
+
+## [0.1.5] - 2024-06-08
+
+### Added
+
 - Updated test definitions for CIS Microsoft 365 Foundations Benchmark for better error handling and object output when errors occur.
 - Added a parameter to the `Initialize-CISAuditResult` function to allow for a static failed object to be created when an error occurs.
 - Refactored `Invoke-M365SecurityAudit` to include a new private function `Invoke-TestFunction` for executing test functions and handling errors.
@@ -33,8 +39,6 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Fixed output in `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` to correctly align with the new table format.
 - Added step 1 and step 2 in `Test-BlockMailForwarding` details to ensure comprehensive compliance checks.
 - Fixed the issue with the output in `Test-RestrictCustomScripts` to ensure no extra spaces between table headers and data.
-
-
 
 ## [0.1.4] - 2024-05-30
 
