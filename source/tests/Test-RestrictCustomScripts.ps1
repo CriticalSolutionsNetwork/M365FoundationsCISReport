@@ -28,7 +28,7 @@ function Test-RestrictCustomScripts {
 
             # Find sites where custom scripts are allowed
             $customScriptAllowedSites = $processedUrls | Where-Object { $_.DenyAddAndCustomizePages -ne 'Enabled' }
-            $verbosePreference = 'Continue'
+            #$verbosePreference = 'Continue'
             # Check the total length of URLs
             $totalUrlLength = ($customScriptAllowedSites.Url -join '').Length
             Write-Verbose "Total length of URLs: $totalUrlLength"
@@ -48,7 +48,7 @@ function Test-RestrictCustomScripts {
                 $mostUsedHostname = Get-MostCommonWord -InputStrings $hostnames
                 Write-Verbose "Most used hostname: $mostUsedHostname"
             }
-            $verbosePreference = 'SilentlyContinue'
+            #$verbosePreference = 'SilentlyContinue'
             # Compliance is true if no sites allow custom scripts
             $complianceResult = $customScriptAllowedSites.Count -eq 0
 
@@ -102,14 +102,14 @@ function Test-RestrictCustomScripts {
 
     end {
         # Measure the character count of the details
-        $verbosePreference = 'Continue'
+        #$verbosePreference = 'Continue'
         $detailsLength = $details.Length
         Write-Verbose "Character count of the details: $detailsLength"
 
         if ($detailsLength -gt 32767) {
             Write-Verbose "Warning: The character count exceeds the limit for Excel cells."
         }
-        $verbosePreference = 'SilentlyContinue'
+        #$verbosePreference = 'SilentlyContinue'
         # Return auditResult
         return $auditResult
     }
