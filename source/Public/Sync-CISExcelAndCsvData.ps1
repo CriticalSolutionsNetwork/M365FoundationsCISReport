@@ -34,12 +34,14 @@ function Sync-CISExcelAndCsvData {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path $_ })]
         [string]$ExcelPath,
 
         [Parameter(Mandatory = $true)]
         [string]$WorksheetName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path $_ })]
         [string]$CsvPath,
 
         [Parameter(Mandatory = $false)]
