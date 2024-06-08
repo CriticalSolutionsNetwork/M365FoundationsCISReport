@@ -15,15 +15,16 @@ function Test-GlobalAdminsCount {
     }
 
     process {
-
         try {
             # 1.1.3 (L1) Ensure that between two and four global admins are designated
 
             # Retrieve global admin role and members
             $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
             $globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id
-            $globalAdminCount = $globalAdmins.AdditionalProperties.Count
-            $globalAdminUsernames = ($globalAdmins | ForEach-Object { $_.AdditionalProperties["displayName"] }) -join ', '
+            $globalAdminCount = $globalAdmins.Count
+            $globalAdminUsernames = ($globalAdmins | ForEach-Object {
+                "$($_.AdditionalProperties["displayName"]) ($($_.AdditionalProperties["userPrincipalName"]))"
+            }) -join ', '
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($globalAdminCount -lt 2) {
