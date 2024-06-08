@@ -1,5 +1,6 @@
 function Test-RestrictOutlookAddins {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters could include credentials or other necessary data

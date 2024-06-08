@@ -1,5 +1,6 @@
 function Test-TeamsExternalFileSharing {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be added here if needed

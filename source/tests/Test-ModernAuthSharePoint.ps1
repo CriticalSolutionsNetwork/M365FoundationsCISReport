@@ -1,5 +1,6 @@
 function Test-ModernAuthSharePoint {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Define your parameters here

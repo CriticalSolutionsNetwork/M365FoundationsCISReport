@@ -1,5 +1,6 @@
 function Test-OneDriveContentRestrictions {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Define your parameters here
