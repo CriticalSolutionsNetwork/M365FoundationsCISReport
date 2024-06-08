@@ -1,5 +1,6 @@
 function Test-MailboxAuditingE3 {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Parameters can be added if needed
     )

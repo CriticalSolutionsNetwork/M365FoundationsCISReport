@@ -1,5 +1,6 @@
 function Test-CustomerLockbox {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Define your parameters here if needed

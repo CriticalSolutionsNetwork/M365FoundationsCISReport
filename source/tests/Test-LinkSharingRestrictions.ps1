@@ -1,5 +1,6 @@
 function Test-LinkSharingRestrictions {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Define your parameters here

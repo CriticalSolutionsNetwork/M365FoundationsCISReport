@@ -1,6 +1,7 @@
 function Test-AdministrativeAccountCompliance {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
+    [OutputType([CISAuditResult])]
     param (
         # Parameters can be added if needed
     )

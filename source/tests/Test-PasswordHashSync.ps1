@@ -1,5 +1,6 @@
 function Test-PasswordHashSync {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be added if needed

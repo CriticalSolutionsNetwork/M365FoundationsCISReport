@@ -1,5 +1,6 @@
 function Test-AuditDisabledFalse {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     # Aligned
     param (
         # Parameters can be added if needed
