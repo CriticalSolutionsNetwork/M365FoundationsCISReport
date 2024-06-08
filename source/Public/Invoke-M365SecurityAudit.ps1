@@ -209,7 +209,7 @@ function Invoke-M365SecurityAudit {
     }
 
     End {
-        if (!($DoNotDisconnect)) {
+        if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services")) {
             # Clean up sessions
             Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
