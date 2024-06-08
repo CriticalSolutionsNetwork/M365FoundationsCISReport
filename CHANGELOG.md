@@ -17,8 +17,9 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Improved `Test-RestrictCustomScripts` to handle long URL lengths better by extracting and replacing common hostnames, and provided detailed output.
 - Added sorting to output.
 - Created new functions for improved modularity.
-- Parameter validation for excel and csv path in sync function
+- Parameter validation for Excel and CSV path in sync function.
 - Added Output type to tests.
+- Added `M365DomainForPWPolicyTest` parameter to `Invoke-M365SecurityAudit` to specify testing only the default domain for password expiration policy when '1.3.1' is included in the tests.
 
 ### Fixed
 
@@ -32,6 +33,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Fixed output in `Test-MailboxAuditingE3` and `Test-MailboxAuditingE5` to correctly align with the new table format.
 - Added step 1 and step 2 in `Test-BlockMailForwarding` details to ensure comprehensive compliance checks.
 - Fixed the issue with the output in `Test-RestrictCustomScripts` to ensure no extra spaces between table headers and data.
+
 
 
 ## [0.1.4] - 2024-05-30
