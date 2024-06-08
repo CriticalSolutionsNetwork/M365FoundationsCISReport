@@ -1,6 +1,5 @@
 function Test-PasswordNeverExpirePolicy {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Aligned
         [Parameter(Mandatory)]

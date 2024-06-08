@@ -1,6 +1,5 @@
 function Test-RestrictCustomScripts {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Define your parameters here if needed
     )

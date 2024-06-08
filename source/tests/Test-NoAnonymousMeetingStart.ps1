@@ -1,6 +1,5 @@
 function Test-NoAnonymousMeetingStart {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be defined here if needed

@@ -1,6 +1,5 @@
 function Test-BlockMailForwarding {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Parameters can be added if needed
     )

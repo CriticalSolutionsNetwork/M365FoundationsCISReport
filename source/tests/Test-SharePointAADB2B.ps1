@@ -1,6 +1,5 @@
 function Test-SharePointAADB2B {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Define your parameters here

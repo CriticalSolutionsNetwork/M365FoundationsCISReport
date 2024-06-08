@@ -1,6 +1,5 @@
 function Test-RestrictExternalSharing {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Define your parameters here

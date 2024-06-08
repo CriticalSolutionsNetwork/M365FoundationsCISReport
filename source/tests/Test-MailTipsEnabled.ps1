@@ -1,6 +1,5 @@
 function Test-MailTipsEnabled {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be added if needed

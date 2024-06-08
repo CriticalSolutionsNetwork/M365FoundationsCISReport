@@ -1,6 +1,5 @@
 function Test-RestrictStorageProvidersOutlook {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Parameters can be added here if needed

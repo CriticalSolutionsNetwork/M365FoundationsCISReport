@@ -1,6 +1,5 @@
 function Test-OneDriveSyncRestrictions {
     [CmdletBinding()]
-    [OutputType([CISAuditResult])]
     param (
         # Aligned
         # Define your parameters here
