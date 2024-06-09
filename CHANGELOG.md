@@ -4,6 +4,10 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Added output type to functions.
+
 ### Fixed
 
 - Whatif support for `Invoke-M365SecurityAudit`.
