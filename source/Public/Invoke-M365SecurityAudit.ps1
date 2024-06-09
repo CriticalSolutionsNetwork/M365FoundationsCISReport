@@ -114,7 +114,6 @@
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
-
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
@@ -150,12 +149,12 @@ function Invoke-M365SecurityAudit {
         [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter')]
         [ValidateSet(
             '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
-            '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
-            '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
-            '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
-            '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
-            '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
-            '8.5.7', '8.6.1'
+                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
+                '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
+                '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
+                '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
+                '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
+                '8.5.7', '8.6.1'
         )]
         [string[]]$IncludeRecommendation,
 
@@ -163,12 +162,12 @@ function Invoke-M365SecurityAudit {
         [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter')]
         [ValidateSet(
             '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
-            '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
-            '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
-            '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
-            '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
-            '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
-            '8.5.7', '8.6.1'
+                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
+                '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
+                '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
+                '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
+                '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
+                '8.5.7', '8.6.1'
         )]
         [string[]]$SkipRecommendation,
 
@@ -183,12 +182,18 @@ function Invoke-M365SecurityAudit {
             $script:MaximumFunctionCount = 8192
         }
         # Ensure required modules are installed
-        if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules", "Check")) {
-            $requiredModules = Get-RequiredModule -AuditFunction
+        $requiredModules = Get-RequiredModule -AuditFunction
+
+        # Format the required modules list
+        $requiredModulesFormatted = Format-RequiredModuleList -RequiredModules $requiredModules
+
+        # Check and install required modules if necessary
+        if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules: $requiredModulesFormatted", "Check")) {
             foreach ($module in $requiredModules) {
-                Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
+                Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
             }
         }
+
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
@@ -207,7 +212,7 @@ function Invoke-M365SecurityAudit {
         $testDefinitions = Get-TestDefinitionsObject @params
         # Extract unique connections needed
         $requiredConnections = $testDefinitions.Connection | Sort-Object -Unique
-        if ($requiredConnections -contains 'SPO'){
+        if ($requiredConnections -contains 'SPO') {
             if (-not $TenantAdminUrl) {
                 $requiredConnections = $requiredConnections | Where-Object { $_ -ne 'SPO' }
                 $testDefinitions = $testDefinitions | Where-Object { $_.Connection -ne 'SPO' }
@@ -235,10 +240,14 @@ function Invoke-M365SecurityAudit {
         $currentTestIndex = 0
 
         # Establishing connections if required
-        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services", "Connect")) {
+        $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
+        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
+            Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
             Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
         }
 
+
+        Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue
         # Import the test functions
         $testFiles | ForEach-Object {
             $currentTestIndex++
@@ -269,11 +278,11 @@ function Invoke-M365SecurityAudit {
     }
 
     End {
-        if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services", "Disconnect")) {
+        if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Disconnect")) {
             # Clean up sessions
             Disconnect-M365Suite -RequiredConnections $requiredConnections
         }
-        if ($PSCmdlet.ShouldProcess("Measure and display audit results", "Measure")) {
+        if ($PSCmdlet.ShouldProcess("Measure and display audit results for $($totalTests) tests", "Measure")) {
             # Call the private function to calculate and display results
             Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
             # Return all collected audit results
@@ -281,3 +290,4 @@ function Invoke-M365SecurityAudit {
         }
     }
 }
+

@@ -1,4 +1,5 @@
 function Connect-M365Suite {
+    [OutputType([void])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$false)]

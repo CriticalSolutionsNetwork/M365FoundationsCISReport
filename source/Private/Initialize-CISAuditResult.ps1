@@ -1,5 +1,6 @@
 function Initialize-CISAuditResult {
     [CmdletBinding()]
+    [OutputType([CISAuditResult])]
     param (
         [Parameter(Mandatory = $true)]
         [string]$Rec,

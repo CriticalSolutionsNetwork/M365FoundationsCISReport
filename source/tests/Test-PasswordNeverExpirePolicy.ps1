@@ -42,7 +42,7 @@ function Test-PasswordNeverExpirePolicy {
                 $failureReasons = if ($isCompliant) {
                     "N/A"
                 } else {
-                    "Password expiration is not set to never expire for domain $domainName. Run the following command to remediate: `nUpdate-MgDomain -DomainId $domainName -PasswordValidityPeriodInDays 2147483647 -PasswordNotificationWindowInDays 30"
+                    "Password expiration is not set to never expire for domain $domainName. Run the following command to remediate: `nUpdate-MgDomain -DomainId $domainName -PasswordValidityPeriodInDays 2147483647 -PasswordNotificationWindowInDays 30`n"
                 }
 
                 $details = "$domainName|$passwordPolicy days|$isDefault"

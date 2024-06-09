@@ -1,4 +1,6 @@
 function New-MergedObject {
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     param (
         [Parameter(Mandatory = $true)]
         [psobject]$ExcelItem,

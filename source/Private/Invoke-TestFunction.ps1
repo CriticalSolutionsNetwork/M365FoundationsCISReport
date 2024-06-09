@@ -1,4 +1,5 @@
 function Invoke-TestFunction {
+    [OutputType([CISAuditResult[]])]
     param (
         [Parameter(Mandatory = $true)]
         [PSObject]$FunctionFile,

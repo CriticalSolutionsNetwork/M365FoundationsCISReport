@@ -44,6 +44,7 @@ If the SkipUpdate switch is used, the function returns an array of custom object
 https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
 #>
 function Sync-CISExcelAndCsvData {
+    [OutputType([void], [PSCustomObject[]])]
     [CmdletBinding(DefaultParameterSetName = 'CsvInput')]
     param (
         [Parameter(Mandatory = $true)]

@@ -1,4 +1,5 @@
 function Update-CISExcelWorksheet {
+    [OutputType([void])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
