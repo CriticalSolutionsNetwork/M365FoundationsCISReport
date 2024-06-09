@@ -114,7 +114,6 @@
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
-
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
     [OutputType([CISAuditResult[]])]
@@ -186,8 +185,9 @@ function Invoke-M365SecurityAudit {
         $requiredModules = Get-RequiredModule -AuditFunction
         $requiredModulesFormatted = ""
         foreach ($module in $requiredModules) {
-            if ($module.SubModuleName) {
-                $requiredModulesFormatted += "$($module.ModuleName) - SubModule: $($module.SubModuleName), "
+            if ($module.SubModules -and $module.SubModules.Count -gt 0) {
+                $subModulesFormatted = $module.SubModules -join ', '
+                $requiredModulesFormatted += "$($module.ModuleName) (SubModules: $subModulesFormatted), "
             }
             else {
                 $requiredModulesFormatted += "$($module.ModuleName), "
@@ -197,9 +197,10 @@ function Invoke-M365SecurityAudit {
 
         if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules: $requiredModulesFormatted", "Check")) {
             foreach ($module in $requiredModules) {
-                Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
+                Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
             }
         }
+
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
@@ -248,6 +249,7 @@ function Invoke-M365SecurityAudit {
         # Establishing connections if required
         $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
         if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
+            Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
             Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
         }
 
@@ -295,3 +297,4 @@ function Invoke-M365SecurityAudit {
         }
     }
 }
+
