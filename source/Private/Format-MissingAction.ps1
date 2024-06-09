@@ -1,5 +1,9 @@
 function Format-MissingAction {
-    param ([array]$missingActions)
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param (
+        [array]$missingActions
+    )
 
     $actionGroups = @{
         "Admin"    = @()

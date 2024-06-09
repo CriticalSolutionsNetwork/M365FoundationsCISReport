@@ -183,18 +183,11 @@ function Invoke-M365SecurityAudit {
         }
         # Ensure required modules are installed
         $requiredModules = Get-RequiredModule -AuditFunction
-        $requiredModulesFormatted = ""
-        foreach ($module in $requiredModules) {
-            if ($module.SubModules -and $module.SubModules.Count -gt 0) {
-                $subModulesFormatted = $module.SubModules -join ', '
-                $requiredModulesFormatted += "$($module.ModuleName) (SubModules: $subModulesFormatted), "
-            }
-            else {
-                $requiredModulesFormatted += "$($module.ModuleName), "
-            }
-        }
-        $requiredModulesFormatted = $requiredModulesFormatted.TrimEnd(", ")
 
+        # Format the required modules list
+        $requiredModulesFormatted = Format-RequiredModuleList -RequiredModules $requiredModules
+
+        # Check and install required modules if necessary
         if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules: $requiredModulesFormatted", "Check")) {
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
@@ -254,7 +247,7 @@ function Invoke-M365SecurityAudit {
         }
 
 
-
+        Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue
         # Import the test functions
         $testFiles | ForEach-Object {
             $currentTestIndex++

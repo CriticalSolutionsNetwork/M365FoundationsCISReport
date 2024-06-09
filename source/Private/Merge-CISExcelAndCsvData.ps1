@@ -1,5 +1,6 @@
 function Merge-CISExcelAndCsvData {
     [CmdletBinding(DefaultParameterSetName = 'CsvInput')]
+    [OutputType([PSCustomObject[]])]
     param (
         [Parameter(Mandatory = $true)]
         [string]$ExcelPath,

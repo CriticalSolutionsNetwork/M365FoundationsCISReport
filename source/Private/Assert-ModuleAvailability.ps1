@@ -1,4 +1,5 @@
 function Assert-ModuleAvailability {
+    [OutputType([void]) ]
     param(
         [string]$ModuleName,
         [string]$RequiredVersion,

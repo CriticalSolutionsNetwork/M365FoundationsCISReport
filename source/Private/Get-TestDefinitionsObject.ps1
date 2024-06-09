@@ -1,4 +1,6 @@
 function Get-TestDefinitionsObject {
+    [CmdletBinding()]
+    [OutputType([object[]])]
     param (
         [Parameter(Mandatory = $true)]
         [object[]]$TestDefinitions,

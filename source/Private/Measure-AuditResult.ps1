@@ -1,4 +1,5 @@
 function Measure-AuditResult {
+    [OutputType([void])]
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.ArrayList]$AllAuditResults,

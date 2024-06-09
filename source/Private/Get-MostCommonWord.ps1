@@ -1,4 +1,6 @@
 function Get-MostCommonWord {
+    [CmdletBinding()]
+    [OutputType([string])]
     param (
         [Parameter(Mandatory = $true)]
         [string[]]$InputStrings

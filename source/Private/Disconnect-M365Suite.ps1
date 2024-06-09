@@ -1,4 +1,5 @@
 function Disconnect-M365Suite {
+    [OutputType([void])]
     param (
         [Parameter(Mandatory)]
         [string[]]$RequiredConnections
