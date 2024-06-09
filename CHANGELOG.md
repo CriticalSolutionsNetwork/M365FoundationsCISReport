@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Docs
+
+- Updated helper csv formatting for one cis control.
+
+## [0.1.8] - 2024-06-09
+
 ### Added
 
 - Added output type to functions.
