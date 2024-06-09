@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Whatif support for `Invoke-M365SecurityAudit`.
+
+## [0.1.7] - 2024-06-08
+
 ### Added
 
 - Added pipeline support to `Sync-CISExcelAndCsvData` function for `[CISAuditResult[]]` input.
