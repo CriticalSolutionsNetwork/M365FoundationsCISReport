@@ -4,6 +4,10 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed bug in 1.1.1 that caused the test to fail/pass incorrectly. Added verbose output.
+
 ### Docs
 
 - Updated helper csv formatting for one cis control.
