@@ -6,7 +6,11 @@ function Test-AdministrativeAccountCompliance {
     )
 
     begin {
-        #. .\source\Classes\CISAuditResult.ps1
+        # The following conditions are checked:
+        # Condition A: The administrative account is cloud-only (not synced).
+        # Condition B: The account is assigned only valid licenses (e.g., Microsoft Entra ID P1 or P2).
+        # Condition C: The administrative account does not have application assignments (only valid licenses are allowed).
+
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
         $recnum = "1.1.1"
     }
@@ -29,13 +33,23 @@ function Test-AdministrativeAccountCompliance {
                         $licenses = Get-MgUserLicenseDetail -UserId $assignment.PrincipalId -ErrorAction SilentlyContinue
                         $licenseString = if ($licenses) { ($licenses.SkuPartNumber -join '|') } else { "No Licenses Found" }
 
+                        # Condition A: Check if the account is cloud-only
+                        $cloudOnlyStatus = if ($userDetails.OnPremisesSyncEnabled) { "Fail" } else { "Pass" }
+
+                        # Condition B and C: Check if the account has only valid licenses
+                        $hasOnlyValidLicenses = ($licenses.SkuPartNumber | ForEach-Object { $validLicenses -contains $_ }) -and (($licenses.SkuPartNumber | ForEach-Object { $validLicenses -notcontains $_ }).Count -eq 0)
+                        $validLicensesStatus = if ($hasOnlyValidLicenses) { "Pass" } else { "Fail" }
+
                         # Collect user information
                         $adminRoleUsers += [PSCustomObject]@{
-                            UserName   = $userDetails.UserPrincipalName
-                            RoleName   = $role.DisplayName
-                            UserId     = $userDetails.Id
-                            HybridUser = $userDetails.OnPremisesSyncEnabled
-                            Licenses   = $licenseString
+                            UserName                    = $userDetails.UserPrincipalName
+                            RoleName                    = $role.DisplayName
+                            UserId                      = $userDetails.Id
+                            HybridUser                  = $userDetails.OnPremisesSyncEnabled
+                            Licenses                    = $licenseString
+                            CloudOnlyStatus             = $cloudOnlyStatus
+                            ValidLicensesStatus         = $validLicensesStatus
+                            ApplicationAssignmentStatus = $validLicensesStatus # Using the same status as ValidLicensesStatus for now
                         }
                     }
                 }
@@ -47,33 +61,29 @@ function Test-AdministrativeAccountCompliance {
                 $roles = ($_.Group.RoleName -join ', ')
                 $licenses = (($_.Group | Select-Object -ExpandProperty Licenses) -join ',').Split(',') | Select-Object -Unique
 
-                $first | Select-Object UserName, UserId, HybridUser, @{Name = 'Roles'; Expression = { $roles } }, @{Name = 'Licenses'; Expression = { $licenses -join '|' } }
+                $first | Select-Object UserName, UserId, HybridUser, @{Name = 'Roles'; Expression = { $roles } }, @{Name = 'Licenses'; Expression = { $licenses -join '|' } }, CloudOnlyStatus, ValidLicensesStatus, ApplicationAssignmentStatus
             }
 
-            # Identify non-compliant users
+            # Identify non-compliant users based on conditions A and B
             $nonCompliantUsers = $uniqueAdminRoleUsers | Where-Object {
-                # Condition A: The administrative account is not cloud-only (it is synced).
-                $_.HybridUser -or
-                # Condition B: The account is assigned a license associated with applications.
-                -not ($_.Licenses -split '\|' | Where-Object { $validLicenses -contains $_ })
+                $_.HybridUser -or # Fails Condition A
+                $_.ValidLicensesStatus -eq "Fail" # Fails Condition B
             }
 
             # Generate failure reasons
             $failureReasons = $nonCompliantUsers | ForEach-Object {
-                $accountType = if ($_.HybridUser) { "Hybrid" } else { "Cloud-Only" }
-                $missingLicenses = $validLicenses | Where-Object { $_ -notin ($_.Licenses -split '\|') }
-                "$($_.UserName)|$($_.Roles)|$accountType|Missing: $($missingLicenses -join ',')"
+                "$($_.UserName)|$($_.Roles)|$($_.CloudOnlyStatus)|$($_.ValidLicensesStatus)|$($_.ApplicationAssignmentStatus)"
             }
             $failureReasons = $failureReasons -join "`n"
             $details = if ($nonCompliantUsers) {
-                "Non-Compliant Accounts: $($nonCompliantUsers.Count)`nDetails:`n" + ($nonCompliantUsers | ForEach-Object { $_.UserName }) -join "`n"
+                "Non-Compliant Accounts: $($nonCompliantUsers.Count)`nDetails:`n" + $failureReasons
             } else {
                 "Compliant Accounts: $($uniqueAdminRoleUsers.Count)"
             }
 
             $result = $nonCompliantUsers.Count -eq 0
             $status = if ($result) { 'Pass' } else { 'Fail' }
-            $failureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | HybridStatus | Missing Licence`n$failureReasons" } else { "N/A" }
+            $failureReason = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | Cloud-Only Status | Valid Licenses Status | Application Assignment Status`n$failureReasons" } else { "N/A" }
 
             # Create the parameter splat
             $params = @{
