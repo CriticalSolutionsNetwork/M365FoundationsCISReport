@@ -9,11 +9,26 @@ function Test-RestrictOutlookAddins {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
+
         # Initialization code
         $customPolicyFailures = @()
         $defaultPolicyFailureDetails = @()
         $relevantRoles = @('My Custom Apps', 'My Marketplace Apps', 'My ReadWriteMailbox Apps')
         $recnum = "6.3.1"
+
+        # Conditions for 6.3.1 (L2) Ensure users installing Outlook add-ins is not allowed
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Verify that the roles MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are unchecked under Other roles.
+        #   - Condition B: Using PowerShell, verify that MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are not assigned to users.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: One or more of the roles MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are checked under Other roles.
+        #   - Condition B: Using PowerShell, verify that MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are assigned to users.
     }
 
     process {
@@ -28,6 +43,8 @@ function Test-RestrictOutlookAddins {
                     if ($policy.RoleAssignmentPolicy) {
                         $rolePolicyDetails = Get-RoleAssignmentPolicy -Identity $policy.RoleAssignmentPolicy
                         $foundRoles = $rolePolicyDetails.AssignedRoles | Where-Object { $_ -in $relevantRoles }
+
+                        # Condition B: Using PowerShell, verify that MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are not assigned to users.
                         if ($foundRoles) {
                             $customPolicyFailures += "Policy: $($policy.RoleAssignmentPolicy): Roles: $($foundRoles -join ', ')"
                         }
@@ -38,6 +55,8 @@ function Test-RestrictOutlookAddins {
             # Check Default Role Assignment Policy
             $defaultPolicy = Get-RoleAssignmentPolicy "Default Role Assignment Policy"
             $defaultPolicyRoles = $defaultPolicy.AssignedRoles | Where-Object { $_ -in $relevantRoles }
+
+            # Condition A: Verify that the roles MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are unchecked under Other roles.
             if ($defaultPolicyRoles) {
                 $defaultPolicyFailureDetails = $defaultPolicyRoles
             }

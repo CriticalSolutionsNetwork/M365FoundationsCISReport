@@ -9,7 +9,23 @@ function Test-ModernAuthExchangeOnline {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-        # Initialization code, if needed
+
+        # Conditions for 6.5.1 (L1) Ensure modern authentication for Exchange Online is enabled
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Modern authentication for Exchange Online is enabled.
+        #   - Condition B: Exchange Online clients use modern authentication to log in to Microsoft 365 mailboxes.
+        #   - Condition C: Users of older email clients, such as Outlook 2013 and Outlook 2016, are no longer able to authenticate to Exchange using Basic Authentication.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: Modern authentication for Exchange Online is not enabled.
+        #   - Condition B: Exchange Online clients do not use modern authentication to log in to Microsoft 365 mailboxes.
+        #   - Condition C: Users of older email clients, such as Outlook 2013 and Outlook 2016, are still able to authenticate to Exchange using Basic Authentication.
+
         $recnum = "6.5.1"
     }
 
@@ -18,6 +34,8 @@ function Test-ModernAuthExchangeOnline {
             # Ensuring the ExchangeOnlineManagement module is available
 
             # 6.5.1 (L1) Ensure modern authentication for Exchange Online is enabled
+
+            # Check modern authentication setting in Exchange Online configuration (Condition A and B)
             $orgConfig = Get-OrganizationConfig | Select-Object -Property Name, OAuth2ClientProfileEnabled
 
             # Prepare failure reasons and details based on compliance
@@ -28,6 +46,7 @@ function Test-ModernAuthExchangeOnline {
                 "N/A"
             }
 
+            # Details include the current setting (Condition A and B)
             $details = "OAuth2ClientProfileEnabled: $($orgConfig.OAuth2ClientProfileEnabled) for Organization: $($orgConfig.Name)"
 
             # Create and populate the CISAuditResult object

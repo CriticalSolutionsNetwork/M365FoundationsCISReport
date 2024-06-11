@@ -11,6 +11,24 @@ function Test-AuditLogSearch {
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "3.1.1"
+
+        <#
+        Conditions for 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
+
+        Validate test for a pass:
+        - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        - Specific conditions to check:
+            - Condition A: Audit log search is enabled in the Microsoft Purview compliance portal.
+            - Condition B: The audit log retains user and admin activity for 90 days.
+            - Condition C: Audit log search capabilities are functional (search results are displayed for activities within the past 30 days).
+
+        Validate test for a fail:
+        - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        - Specific conditions to check:
+            - Condition A: Audit log search is not enabled in the Microsoft Purview compliance portal.
+            - Condition B: The audit log does not retain user and admin activity for 90 days.
+            - Condition C: Audit log search capabilities are non-functional (no search results are displayed for activities within the past 30 days).
+        #>
     }
 
     process {
@@ -24,6 +42,7 @@ function Test-AuditLogSearch {
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $auditLogResult) {
+                # Condition A (Fail): Audit log search is not enabled in the Microsoft Purview compliance portal
                 "Audit log search is not enabled"
             }
             else {
@@ -31,6 +50,7 @@ function Test-AuditLogSearch {
             }
 
             $details = if ($auditLogResult) {
+                # Condition A (Pass): Audit log search is enabled in the Microsoft Purview compliance portal
                 "UnifiedAuditLogIngestionEnabled: True"
             }
             else {

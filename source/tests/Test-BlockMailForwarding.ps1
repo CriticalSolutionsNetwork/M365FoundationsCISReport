@@ -10,6 +10,24 @@ function Test-BlockMailForwarding {
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "6.2.1"
+
+        <#
+        Conditions for 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
+
+        Validate test for a pass:
+        - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        - Specific conditions to check:
+          - Condition A: Transport rules do not forward email to external domains.
+          - Condition B: Anti-spam outbound policy is configured to disable automatic email forwarding to external domains.
+          - Condition C: No exceptions to the forwarding rules unless explicitly defined by organizational policy.
+
+        Validate test for a fail:
+        - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        - Specific conditions to check:
+          - Condition A: One or more transport rules forward email to external domains.
+          - Condition B: Anti-spam outbound policy does not disable automatic email forwarding to external domains.
+          - Condition C: Unapproved exceptions to the forwarding rules are present.
+        #>
     }
 
     process {
@@ -34,6 +52,7 @@ function Test-BlockMailForwarding {
             $details = @()
 
             if ($transportRules.Count -gt 0) {
+                # Fail Condition A
                 $failureReasons += "Mail forwarding rules found: $($transportRules.Name -join ', ')"
                 $details += "Transport Rules Details:`nRule Name|Redirects To"
                 $details += $transportRules | ForEach-Object {
@@ -43,6 +62,7 @@ function Test-BlockMailForwarding {
             }
 
             if ($nonCompliantSpamPoliciesArray.Count -gt 0) {
+                # Fail Condition B
                 $failureReasons += "Outbound spam policies allowing automatic forwarding found."
                 $details += "Outbound Spam Policies Details:`nPolicy|AutoForwardingMode"
                 $details += $nonCompliantSpamPoliciesArray | ForEach-Object {

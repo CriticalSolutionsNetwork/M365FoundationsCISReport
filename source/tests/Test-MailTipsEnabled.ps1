@@ -13,6 +13,24 @@ function Test-MailTipsEnabled {
 
         $auditResult = [CISAuditResult]::new()
         $recnum = "6.5.2"
+
+        # Conditions for 6.5.2 (L2) Ensure MailTips are enabled for end users
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: MailTipsAllTipsEnabled is set to True.
+        #   - Condition B: MailTipsExternalRecipientsTipsEnabled is set to True.
+        #   - Condition C: MailTipsGroupMetricsEnabled is set to True.
+        #   - Condition D: MailTipsLargeAudienceThreshold is set to an acceptable value (default is 25).
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: MailTipsAllTipsEnabled is not set to True.
+        #   - Condition B: MailTipsExternalRecipientsTipsEnabled is not set to True.
+        #   - Condition C: MailTipsGroupMetricsEnabled is not set to True.
+        #   - Condition D: MailTipsLargeAudienceThreshold is not set to an acceptable value (default is 25).
     }
 
     process {
@@ -21,6 +39,8 @@ function Test-MailTipsEnabled {
 
             # Retrieve organization configuration for MailTips settings
             $orgConfig = Get-OrganizationConfig | Select-Object MailTipsAllTipsEnabled, MailTipsExternalRecipientsTipsEnabled, MailTipsGroupMetricsEnabled, MailTipsLargeAudienceThreshold
+
+            # Check the MailTips settings (Conditions A, B, C, D)
             $allTipsEnabled = $orgConfig.MailTipsAllTipsEnabled -and $orgConfig.MailTipsGroupMetricsEnabled -and $orgConfig.MailTipsLargeAudienceThreshold -eq 25
             $externalRecipientsTipsEnabled = $orgConfig.MailTipsExternalRecipientsTipsEnabled
 

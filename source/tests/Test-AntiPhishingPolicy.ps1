@@ -12,15 +12,31 @@ function Test-AntiPhishingPolicy {
         # Initialization code, if needed
         #$auditResults = @()
         $recnum = "2.1.7"
+
+        <#
+        Conditions for 2.1.7 (L1) Ensure that an anti-phishing policy has been created
+
+        Validate test for a pass:
+        - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        - Specific conditions to check:
+          - Condition A: Verify that an anti-phishing policy exists in the Microsoft 365 Security Center.
+          - Condition B: Using PowerShell, ensure the anti-phishing policy is configured with appropriate settings such as enabling impersonation protection and spoof intelligence.
+
+        Validate test for a fail:
+        - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        - Specific conditions to check:
+          - Condition A: No anti-phishing policy exists in the Microsoft 365 Security Center.
+          - Condition B: Using PowerShell, the anti-phishing policy is not configured with the required settings.
+        #>
     }
 
     process {
 
         try {
-            # 2.1.7 Ensure that an anti-phishing policy has been created
-
-            # Retrieve and validate the anti-phishing policies
+            # Condition A: Ensure that an anti-phishing policy has been created
             $antiPhishPolicies = Get-AntiPhishPolicy
+
+            # Condition B: Verify the anti-phishing policy settings using PowerShell
             $validatedPolicies = $antiPhishPolicies | Where-Object {
                 $_.Enabled -eq $true -and
                 $_.PhishThresholdLevel -ge 2 -and

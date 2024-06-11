@@ -9,6 +9,24 @@ function Test-MailboxAuditingE5 {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
 
+        # Conditions for 6.1.3 (L1) Ensure mailbox auditing for E5 users is Enabled
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Mailbox auditing is enabled for E5 users.
+        #   - Condition B: AuditAdmin actions include ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SendAs, SendOnBehalf, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
+        #   - Condition C: AuditDelegate actions include ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, SendAs, SendOnBehalf, SoftDelete, Update, UpdateFolderPermissions, UpdateInboxRules.
+        #   - Condition D: AuditOwner actions include ApplyRecord, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: Mailbox auditing is not enabled for E5 users.
+        #   - Condition B: AuditAdmin actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SendAs, SendOnBehalf, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
+        #   - Condition C: AuditDelegate actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, SendAs, SendOnBehalf, SoftDelete, Update, UpdateFolderPermissions, UpdateInboxRules.
+        #   - Condition D: AuditOwner actions do not include all of the following: ApplyRecord, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
+
         $e5SkuPartNumbers = @("SPE_E5", "ENTERPRISEPREMIUM", "OFFICEE5")
         $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
@@ -38,14 +56,17 @@ function Test-MailboxAuditingE5 {
 
                     $missingActions = @()
                     if ($mailbox.AuditEnabled) {
+                        # Validate Admin actions
                         foreach ($action in $AdminActions) {
-                            if ($mailbox.AuditAdmin -notcontains $action) { $missingActions += "Admin action '$action' missing" }
+                            if ($mailbox.AuditAdmin -notcontains $action) { $missingActions += "Admin action '$action' missing" } # Condition B
                         }
+                        # Validate Delegate actions
                         foreach ($action in $DelegateActions) {
-                            if ($mailbox.AuditDelegate -notcontains $action) { $missingActions += "Delegate action '$action' missing" }
+                            if ($mailbox.AuditDelegate -notcontains $action) { $missingActions += "Delegate action '$action' missing" } # Condition C
                         }
+                        # Validate Owner actions
                         foreach ($action in $OwnerActions) {
-                            if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" }
+                            if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" } # Condition D
                         }
 
                         if ($missingActions.Count -gt 0) {
@@ -65,10 +86,10 @@ function Test-MailboxAuditingE5 {
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
             $details = if ($allFailures.Count -eq 0) {
-                "All Office E5 users have correct mailbox audit settings."
+                "All Office E5 users have correct mailbox audit settings." # Condition A for pass
             }
             else {
-                "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n")
+                "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n") # Condition A for fail
             }
 
             # Populate the audit result

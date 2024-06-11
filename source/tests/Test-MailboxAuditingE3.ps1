@@ -6,6 +6,26 @@ function Test-MailboxAuditingE3 {
     )
 
     begin {
+        <#
+        Conditions for 6.1.2 (L1) Ensure mailbox auditing for E3 users is Enabled
+
+        Validate test for a pass:
+        - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        - Specific conditions to check:
+          - Condition A: Mailbox audit logging is enabled for all user mailboxes.
+          - Condition B: The `AuditAdmin` actions include `ApplyRecord`, `Create`, `HardDelete`, `MoveToDeletedItems`, `SendAs`, `SendOnBehalf`, `SoftDelete`, `Update`, `UpdateCalendarDelegation`, `UpdateFolderPermissions`, and `UpdateInboxRules`.
+          - Condition C: The `AuditDelegate` actions include `ApplyRecord`, `Create`, `HardDelete`, `MoveToDeletedItems`, `SendAs`, `SendOnBehalf`, `SoftDelete`, `Update`, `UpdateFolderPermissions`, and `UpdateInboxRules`.
+          - Condition D: The `AuditOwner` actions include `ApplyRecord`, `HardDelete`, `MoveToDeletedItems`, `SoftDelete`, `Update`, `UpdateCalendarDelegation`, `UpdateFolderPermissions`, and `UpdateInboxRules`.
+
+        Validate test for a fail:
+        - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        - Specific conditions to check:
+          - Condition A: Mailbox audit logging is not enabled for all user mailboxes.
+          - Condition B: The `AuditAdmin` actions do not include `ApplyRecord`, `Create`, `HardDelete`, `MoveToDeletedItems`, `SendAs`, `SendOnBehalf`, `SoftDelete`, `Update`, `UpdateCalendarDelegation`, `UpdateFolderPermissions`, and `UpdateInboxRules`.
+          - Condition C: The `AuditDelegate` actions do not include `ApplyRecord`, `Create`, `HardDelete`, `MoveToDeletedItems`, `SendAs`, `SendOnBehalf`, `SoftDelete`, `Update`, `UpdateFolderPermissions`, and `UpdateInboxRules`.
+          - Condition D: The `AuditOwner` actions do not include `ApplyRecord`, `HardDelete`, `MoveToDeletedItems`, `SoftDelete`, `Update`, `UpdateCalendarDelegation`, `UpdateFolderPermissions`, and `UpdateInboxRules`.
+        #>
+
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
 
@@ -39,12 +59,15 @@ function Test-MailboxAuditingE3 {
                     $missingActions = @()
                     if ($mailbox.AuditEnabled) {
                         foreach ($action in $AdminActions) {
+                            # Condition B: Checking if the `AuditAdmin` actions include required actions
                             if ($mailbox.AuditAdmin -notcontains $action) { $missingActions += "Admin action '$action' missing" }
                         }
                         foreach ($action in $DelegateActions) {
+                            # Condition C: Checking if the `AuditDelegate` actions include required actions
                             if ($mailbox.AuditDelegate -notcontains $action) { $missingActions += "Delegate action '$action' missing" }
                         }
                         foreach ($action in $OwnerActions) {
+                            # Condition D: Checking if the `AuditOwner` actions include required actions
                             if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" }
                         }
 
@@ -54,6 +77,7 @@ function Test-MailboxAuditingE3 {
                         }
                     }
                     else {
+                        # Condition A: Checking if mailbox audit logging is enabled
                         $allFailures += "$userUPN|False|||"
                     }
 
