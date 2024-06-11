@@ -9,6 +9,23 @@ function Test-SafeAttachmentsTeams {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
+
+        # Conditions for 2.1.5 (L2) Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Safe Attachments for SharePoint is enabled.
+        #   - Condition B: Safe Attachments for OneDrive is enabled.
+        #   - Condition C: Safe Attachments for Microsoft Teams is enabled.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: Safe Attachments for SharePoint is not enabled.
+        #   - Condition B: Safe Attachments for OneDrive is not enabled.
+        #   - Condition C: Safe Attachments for Microsoft Teams is not enabled.
+
         # Initialization code, if needed
         $recnum = "2.1.5"
     }
@@ -26,6 +43,10 @@ function Test-SafeAttachmentsTeams {
                 $_.EnableSafeDocs -eq $true -and
                 $_.AllowSafeDocsOpen -eq $false
             }
+
+            # Condition A: Check Safe Attachments for SharePoint
+            # Condition B: Check Safe Attachments for OneDrive
+            # Condition C: Check Safe Attachments for Microsoft Teams
 
             # Determine the result based on the ATP policy settings
             $result = $null -ne $atpPolicyResult
@@ -72,5 +93,3 @@ function Test-SafeAttachmentsTeams {
         return $auditResult
     }
 }
-
-# Additional helper functions (if any)

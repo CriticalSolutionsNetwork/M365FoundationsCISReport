@@ -11,23 +11,41 @@ function Test-SpamPolicyAdminNotify {
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
 
-        $auditResult = [CISAuditResult]::new()
         $recnum = "2.1.6"
+
+        <#
+        Conditions for 2.1.6 (L1) Ensure Exchange Online Spam Policies are set to notify administrators
+
+        Validate recommendation details:
+        - Confirm that the recommendation details are accurate and complete as per the CIS benchmark.
+
+        Validate test for a pass:
+        - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        - Specific conditions to check:
+          - Condition A: In the Microsoft 365 Security & Compliance Center, the Exchange Online Spam Policies are set to notify administrators when a sender in the organization has been blocked for sending spam emails.
+          - Condition B: Using PowerShell, the `NotifyOutboundSpam` and `NotifyOutboundSpamContact` properties are correctly set in all relevant spam filter policies.
+
+        Validate test for a fail:
+        - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        - Specific conditions to check:
+          - Condition A: In the Microsoft 365 Security & Compliance Center, the Exchange Online Spam Policies are not set to notify administrators when a sender in the organization has been blocked for sending spam emails.
+          - Condition B: Using PowerShell, the `NotifyOutboundSpam` and `NotifyOutboundSpamContact` properties are not correctly set in all relevant spam filter policies.
+        #>
     }
 
     process {
         try {
             # 2.1.6 Ensure Exchange Online Spam Policies are set to notify administrators
 
-            # Get the default hosted outbound spam filter policy
+            # Retrieve the default hosted outbound spam filter policy
             $hostedOutboundSpamFilterPolicy = Get-HostedOutboundSpamFilterPolicy | Where-Object { $_.IsDefault -eq $true }
 
-            # Check if both settings are enabled
+            # Check if both settings are enabled (Condition A and Condition B for pass)
             $bccSuspiciousOutboundMailEnabled = $hostedOutboundSpamFilterPolicy.BccSuspiciousOutboundMail
             $notifyOutboundSpamEnabled = $hostedOutboundSpamFilterPolicy.NotifyOutboundSpam
             $areSettingsEnabled = $bccSuspiciousOutboundMailEnabled -and $notifyOutboundSpamEnabled
 
-            # Prepare failure details if any setting is not enabled
+            # Prepare failure details if any setting is not enabled (Condition A and Condition B for fail)
             $failureDetails = @()
             if (-not $bccSuspiciousOutboundMailEnabled) {
                 $failureDetails += "BccSuspiciousOutboundMail is not enabled."
@@ -65,3 +83,4 @@ function Test-SpamPolicyAdminNotify {
         return $auditResult
     }
 }
+
