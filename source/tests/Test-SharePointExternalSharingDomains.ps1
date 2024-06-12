@@ -9,10 +9,25 @@ function Test-SharePointExternalSharingDomains {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-        # Initialization code, if needed
 
-        $auditResult = [CISAuditResult]::new()
+        # Initialization code, if needed
         $recnum = "7.2.6"
+
+        # Conditions for 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: The "Limit external sharing by domain" option is enabled in the SharePoint admin center.
+        #   - Condition B: The "SharingDomainRestrictionMode" is set to "AllowList" using PowerShell.
+        #   - Condition C: The "SharingAllowedDomainList" contains the domains trusted by the organization for external sharing.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: The "Limit external sharing by domain" option is not enabled in the SharePoint admin center.
+        #   - Condition B: The "SharingDomainRestrictionMode" is not set to "AllowList" using PowerShell.
+        #   - Condition C: The "SharingAllowedDomainList" does not contain the domains trusted by the organization for external sharing.
     }
 
     process {

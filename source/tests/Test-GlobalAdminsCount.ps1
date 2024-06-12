@@ -2,13 +2,27 @@ function Test-GlobalAdminsCount {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
     param (
-        # Aligned
         # Define your parameters here if needed
     )
 
     begin {
-        # Dot source the class script if necessary
+                # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
+        # Conditions for 1.1.3 (L1) Ensure that between two and four global admins are designated
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: The number of global admins is at least 2.
+        #   - Condition B: The number of global admins is at most 4.
+        #   - Condition C: The list of global admin usernames is accurately retrieved and displayed.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: The number of global admins is less than 2.
+        #   - Condition B: The number of global admins is more than 4.
+        #   - Condition C: Any discrepancies or errors in retrieving the list of global admin usernames.
 
         # Initialization code, if needed
         $recnum = "1.1.3"
@@ -16,17 +30,21 @@ function Test-GlobalAdminsCount {
 
     process {
         try {
-            # 1.1.3 (L1) Ensure that between two and four global admins are designated
-
-            # Retrieve global admin role and members
+            # Step: Retrieve global admin role
             $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
+
+            # Step: Retrieve global admin members
             $globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id
+
+            # Step: Count the number of global admins
             $globalAdminCount = $globalAdmins.Count
+
+            # Step: Retrieve and format the usernames of global admins
             $globalAdminUsernames = ($globalAdmins | ForEach-Object {
                 "$($_.AdditionalProperties["displayName"]) ($($_.AdditionalProperties["userPrincipalName"]))"
             }) -join ', '
 
-            # Prepare failure reasons and details based on compliance
+            # Step: Determine failure reasons based on global admin count
             $failureReasons = if ($globalAdminCount -lt 2) {
                 "Less than 2 global admins: $globalAdminUsernames"
             }
@@ -37,9 +55,10 @@ function Test-GlobalAdminsCount {
                 "N/A"
             }
 
+            # Step: Prepare details for the audit result
             $details = "Count: $globalAdminCount; Users: $globalAdminUsernames"
 
-            # Create and populate the CISAuditResult object
+            # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
                 Result        = $globalAdminCount -ge 2 -and $globalAdminCount -le 4

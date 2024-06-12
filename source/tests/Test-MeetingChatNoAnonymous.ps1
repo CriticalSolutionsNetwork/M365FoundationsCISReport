@@ -16,11 +16,24 @@ function Test-MeetingChatNoAnonymous {
     process {
         try {
             # 8.5.5 (L2) Ensure meeting chat does not allow anonymous users
-
-            # Connect to Teams PowerShell using Connect-MicrosoftTeams
+            #
+            # Validate test for a pass:
+            # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+            # - Specific conditions to check:
+            #   - Condition A: The `MeetingChatEnabledType` setting in Teams is set to `EnabledExceptAnonymous`.
+            #   - Condition B: The setting for meeting chat is configured to allow chat for everyone except anonymous users.
+            #   - Condition C: Verification using the Teams Admin Center confirms that the meeting chat settings are configured as recommended.
+            #
+            # Validate test for a fail:
+            # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+            # - Specific conditions to check:
+            #   - Condition A: The `MeetingChatEnabledType` setting in Teams is not set to `EnabledExceptAnonymous`.
+            #   - Condition B: The setting for meeting chat allows chat for anonymous users.
+            #   - Condition C: Verification using the Teams Admin Center indicates that the meeting chat settings are not configured as recommended.
 
             # Retrieve the Teams meeting policy for meeting chat
             $CsTeamsMeetingPolicyChat = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property MeetingChatEnabledType
+            # Condition A: Check if the MeetingChatEnabledType is set to 'EnabledExceptAnonymous'
             $chatAnonDisabled = $CsTeamsMeetingPolicyChat.MeetingChatEnabledType -eq 'EnabledExceptAnonymous'
 
             # Prepare failure reasons and details based on compliance

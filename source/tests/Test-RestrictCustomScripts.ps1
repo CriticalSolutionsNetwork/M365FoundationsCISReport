@@ -14,14 +14,27 @@ function Test-RestrictCustomScripts {
     }
 
     process {
-
         try {
             # 7.3.4 (L1) Ensure custom script execution is restricted on site collections
+            #
+            # Validate test for a pass:
+            # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+            # - Specific conditions to check:
+            #   - Condition A: The `DenyAddAndCustomizePages` setting is set to `Enabled` for each site collection.
+            #   - Condition B: The setting is validated through PowerShell commands ensuring the correct state.
+            #   - Condition C: Verification using the SharePoint Admin Center confirms the `DenyAddAndCustomizePages` setting is enforced.
+            #
+            # Validate test for a fail:
+            # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+            # - Specific conditions to check:
+            #   - Condition A: The `DenyAddAndCustomizePages` setting is not set to `Enabled` for any site collection.
+            #   - Condition B: The setting is not validated through PowerShell commands, indicating misconfiguration.
+            #   - Condition C: Verification using the SharePoint Admin Center indicates that the `DenyAddAndCustomizePages` setting is not enforced.
 
             # Retrieve all site collections and select necessary properties
             $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
 
-            # Replace 'sharepoint.com' with '<SPUrl>'
+            # Process URLs to replace 'sharepoint.com' with '<SPUrl>'
             $processedUrls = $SPOSitesCustomScript | ForEach-Object {
                 $_.Url = $_.Url -replace 'sharepoint\.com', '<SPUrl>'
                 $_

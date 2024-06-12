@@ -9,8 +9,29 @@ function Test-SafeAttachmentsPolicy {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
+
         # Initialization code, if needed
         $recnum = "2.1.4"
+
+    <#
+        Conditions for 2.1.4 (L2) Ensure Safe Attachments policy is enabled
+
+        Validate test for a pass:
+        - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        - Specific conditions to check:
+          - Condition A: The Safe Attachments policy is enabled in the Microsoft 365 Defender portal.
+          - Condition B: The policy covers all recipients within the organization.
+          - Condition C: The policy action is set to "Dynamic Delivery" or "Quarantine".
+          - Condition D: The policy is not disabled.
+
+        Validate test for a fail:
+        - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        - Specific conditions to check:
+          - Condition A: The Safe Attachments policy is not enabled in the Microsoft 365 Defender portal.
+          - Condition B: The policy does not cover all recipients within the organization.
+          - Condition C: The policy action is not set to "Dynamic Delivery" or "Quarantine".
+          - Condition D: The policy is disabled.
+    #>
     }
 
     process {
@@ -20,8 +41,12 @@ function Test-SafeAttachmentsPolicy {
             # Retrieve all Safe Attachment policies where Enable is set to True
             $safeAttachmentPolicies = Get-SafeAttachmentPolicy | Where-Object { $_.Enable -eq $true }
 
-            # Determine result and details based on the presence of enabled policies
+            # Condition A: Check if any Safe Attachments policy is enabled
             $result = $null -ne $safeAttachmentPolicies -and $safeAttachmentPolicies.Count -gt 0
+
+            # Condition B, C, D: Additional checks can be added here if more detailed policy attributes are required
+
+            # Determine details and failure reasons based on the presence of enabled policies
             $details = if ($result) {
                 "Enabled Safe Attachments Policies: $($safeAttachmentPolicies.Name -join ', ')"
             }
@@ -66,4 +91,3 @@ function Test-SafeAttachmentsPolicy {
     }
 }
 
-# Additional helper functions (if any)

@@ -28,14 +28,14 @@
 27,Test-MailTipsEnabled.ps1,6.5.2,Ensure MailTips are enabled for end users,E3,L2,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,EXO
 28,Test-RestrictStorageProvidersOutlook.ps1,6.5.3,Ensure additional storage providers are restricted in Outlook on the web,E3,L2,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,EXO
 29,Test-ModernAuthSharePoint.ps1,7.2.1,Modern Authentication for SharePoint Applications,E3,L1,3.1,Encrypt Sensitive Data in Transit,FALSE,TRUE,TRUE,TRUE,SPO
-30,Test-SharePointAADB2B.ps1,7.2.2,Ensure reauthentication with verification code is restricted,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,SPO
-31,Test-RestrictExternalSharing.ps1,7.2.3,Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled,E3,L1,0,Explicitly Not Mapped,TRUE,TRUE,TRUE,TRUE,SPO
-32,Test-OneDriveContentRestrictions.ps1,7.2.4,Ensure external content sharing is restricted,E3,L2,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
-33,Test-SharePointGuestsItemSharing.ps1,7.2.5,Ensure OneDrive content sharing is restricted,E3,L2,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
-34,Test-SharePointExternalSharingDomains.ps1,7.2.6,Ensure that SharePoint guest users cannot share items they don't own,E3,L2,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
-35,Test-LinkSharingRestrictions.ps1,7.2.7,Ensure SharePoint external sharing is managed through domain whitelist/blacklists,E3,L1,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
-36,Test-GuestAccessExpiration.ps1,7.2.9,Ensure link sharing is restricted in SharePoint and OneDrive,E3,L1,3.3,Configure Data Access Control Lists,FALSE,FALSE,FALSE,TRUE,SPO
-37,Test-ReauthWithCode.ps1,7.2.10,Ensure guest access to a site or OneDrive will expire automatically,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,SPO
+30,Test-SharePointAADB2B.ps1,7.2.2,Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,SPO
+31,Test-RestrictExternalSharing.ps1,7.2.3,Ensure external content sharing is restricted,E3,L1,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
+32,Test-OneDriveContentRestrictions.ps1,7.2.4,Ensure OneDrive content sharing is restricted,E3,L2,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
+33,Test-SharePointGuestsItemSharing.ps1,7.2.5,Ensure that SharePoint guest users cannot share items they don't own,E3,L2,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
+34,Test-SharePointExternalSharingDomains.ps1,7.2.6,Ensure SharePoint external sharing is managed through domain whitelist/blacklists,E3,L2,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
+35,Test-LinkSharingRestrictions.ps1,7.2.7,Ensure link sharing is restricted in SharePoint and OneDrive,E3,L1,3.3,Configure Data Access Control Lists,TRUE,TRUE,TRUE,TRUE,SPO
+36,Test-GuestAccessExpiration.ps1,7.2.9,Ensure guest access to a site or OneDrive will expire automatically,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,SPO
+37,Test-ReauthWithCode.ps1,7.2.10,Ensure reauthentication with verification code is restricted,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,SPO
 38,Test-DisallowInfectedFilesDownload.ps1,7.3.1,Ensure Office 365 SharePoint infected files are disallowed for download,E5,L2,10.1,Deploy and Maintain Anti-Malware Software,TRUE,TRUE,TRUE,TRUE,SPO
 39,Test-OneDriveSyncRestrictions.ps1,7.3.2,Ensure OneDrive sync is restricted for unmanaged devices,E3,L2,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,SPO
 40,Test-RestrictCustomScripts.ps1,7.3.4,Ensure custom script execution is restricted on site collections,E3,L1,2.7,Allowlist Authorized Scripts,FALSE,FALSE,TRUE,TRUE,SPO

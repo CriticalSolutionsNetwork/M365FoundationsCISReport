@@ -7,6 +7,7 @@ function Test-PasswordNeverExpirePolicy {
     )
 
     begin {
+        # .TODO add supported services to output details. ({Email, OfficeCommunicationsOnline, Intune})
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
@@ -17,11 +18,25 @@ function Test-PasswordNeverExpirePolicy {
 
         # Add headers for the details
         $detailsList += "Domain|Validity Period|IsDefault"
+
+        # Conditions for 1.3.1 (L1) Ensure the 'Password expiration policy' is set to 'Set passwords to never expire (recommended)'
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Password expiration policy is set to "Set passwords to never expire" in the Microsoft 365 admin center.
+        #   - Condition B: Using Microsoft Graph PowerShell, the `PasswordPolicies` property for all users is set to `DisablePasswordExpiration`.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: Password expiration policy is not set to "Set passwords to never expire" in the Microsoft 365 admin center.
+        #   - Condition B: Using Microsoft Graph PowerShell, the `PasswordPolicies` property for one or more users is not set to `DisablePasswordExpiration`.
     }
 
     process {
         try {
-            # Retrieve all domains or a specific domain
+            # Step: Retrieve all domains or a specific domain
             $domains = if ($DomainName) {
                 Get-MgDomain -DomainId $DomainName
             } else {
@@ -31,14 +46,14 @@ function Test-PasswordNeverExpirePolicy {
             foreach ($domain in $domains) {
                 $domainName = $domain.Id
                 $isDefault = $domain.IsDefault
-                # Retrieve password expiration policy
+                # Step (Condition A): Retrieve password expiration policy
                 $passwordPolicy = $domain.PasswordValidityPeriodInDays
 
-                # Determine if the policy is compliant
+                # Step (Condition A & B): Determine if the policy is compliant
                 $isCompliant = $passwordPolicy -eq 0
                 $overallResult = $overallResult -and $isCompliant
 
-                # Prepare failure reasons and details based on compliance
+                # Step (Condition A & B): Prepare failure reasons and details based on compliance
                 $failureReasons = if ($isCompliant) {
                     "N/A"
                 } else {
@@ -56,7 +71,7 @@ function Test-PasswordNeverExpirePolicy {
             $finalFailureReason = $failureReasonsList -join "`n"
             $finalDetails = $detailsList -join "`n"
 
-            # Create and populate the CISAuditResult object
+            # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
                 Result        = $overallResult

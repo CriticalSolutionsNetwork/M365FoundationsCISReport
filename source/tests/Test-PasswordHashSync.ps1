@@ -7,6 +7,22 @@ function Test-PasswordHashSync {
     )
 
     begin {
+        # Conditions for 5.1.8.1 (L1) Ensure password hash sync is enabled for hybrid deployments
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Password hash sync is enabled in the Azure AD Connect tool on the on-premises server.
+        #   - Condition B: Password hash sync is verified as enabled in the Azure AD Connect Sync section in the Microsoft Entra admin center.
+        #   - Condition C: Using Microsoft Graph PowerShell, the verification command returns the expected result indicating that password sync is enabled for the on-premises AD.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: Password hash sync is not enabled in the Azure AD Connect tool on the on-premises server.
+        #   - Condition B: Password hash sync is not verified as enabled in the Azure AD Connect Sync section in the Microsoft Entra admin center.
+        #   - Condition C: Using Microsoft Graph PowerShell, the verification command returns no result indicating that password sync is not enabled for the on-premises AD.
+
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
@@ -16,9 +32,8 @@ function Test-PasswordHashSync {
     process {
         try {
             # 5.1.8.1 (L1) Ensure password hash sync is enabled for hybrid deployments
-            # Pass if OnPremisesSyncEnabled is True. Fail otherwise.
 
-            # Retrieve password hash sync status
+            # Retrieve password hash sync status (Condition A and C)
             $passwordHashSync = Get-MgOrganization | Select-Object -ExpandProperty OnPremisesSyncEnabled
             $hashSyncResult = $passwordHashSync
 

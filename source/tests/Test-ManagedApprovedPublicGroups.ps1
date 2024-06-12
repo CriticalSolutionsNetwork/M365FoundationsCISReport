@@ -2,25 +2,37 @@ function Test-ManagedApprovedPublicGroups {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
     param (
-        # Aligned
         # Parameters can be added if needed
     )
 
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
+
         # Initialization code, if needed
         $recnum = "1.2.1"
+
+        # Conditions for 1.2.1 (L2) Ensure that only organizationally managed/approved public groups exist (Automated)
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: No groups have the status 'Public' in the privacy column on the Active teams and groups page.
+        #   - Condition B: Using Microsoft Graph PowerShell, all groups return a status other than 'Public' when checked.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: One or more groups have the status 'Public' in the privacy column on the Active teams and groups page.
+        #   - Condition B: Using Microsoft Graph PowerShell, one or more groups return a status of 'Public' when checked.
     }
 
     process {
         try {
-            # 1.2.1 (L2) Ensure that only organizationally managed/approved public groups exist (Automated)
-
-            # Retrieve all public groups
+            # Step: Retrieve all groups with visibility set to 'Public'
             $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
 
-            # Prepare failure reasons and details based on compliance
+            # Step: Determine failure reasons based on the presence of public groups
             $failureReasons = if ($null -ne $allGroups -and $allGroups.Count -gt 0) {
                 "There are public groups present that are not organizationally managed/approved."
             }
@@ -28,6 +40,7 @@ function Test-ManagedApprovedPublicGroups {
                 "N/A"
             }
 
+            # Step: Prepare details for the audit result
             $details = if ($null -eq $allGroups -or $allGroups.Count -eq 0) {
                 "No public groups found."
             }
@@ -36,7 +49,7 @@ function Test-ManagedApprovedPublicGroups {
                 "Public groups found: $($groupDetails -join ', ')"
             }
 
-            # Create and populate the CISAuditResult object
+            # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
                 Result        = $null -eq $allGroups -or $allGroups.Count -eq 0
@@ -61,7 +74,7 @@ function Test-ManagedApprovedPublicGroups {
     }
 
     end {
-        # Return auditResults
+        # Return the audit result
         return $auditResult
     }
 }

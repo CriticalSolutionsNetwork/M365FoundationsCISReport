@@ -8,7 +8,7 @@ function Test-TeamsExternalAccess {
 
     begin {
         # Dot source the class script if necessary
-        #. .\source\Classes\CISAuditResult.ps1
+        # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
 
         $auditResult = [CISAuditResult]::new()
@@ -18,6 +18,20 @@ function Test-TeamsExternalAccess {
     process {
         try {
             # 8.2.1 (L1) Ensure 'external access' is restricted in the Teams admin center
+            #
+            # Validate test for a pass:
+            # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+            # - Specific conditions to check:
+            #   - Condition A: The `AllowTeamsConsumer` setting is `False`.
+            #   - Condition B: The `AllowPublicUsers` setting is `False`.
+            #   - Condition C: The `AllowFederatedUsers` setting is `False` or, if `True`, the `AllowedDomains` contains only authorized domain names.
+            #
+            # Validate test for a fail:
+            # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+            # - Specific conditions to check:
+            #   - Condition A: The `AllowTeamsConsumer` setting is not `False`.
+            #   - Condition B: The `AllowPublicUsers` setting is not `False`.
+            #   - Condition C: The `AllowFederatedUsers` setting is `True` and the `AllowedDomains` contains unauthorized domain names or is not configured correctly.
 
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
 

@@ -7,11 +7,26 @@ function Test-SharePointAADB2B {
     )
 
     begin {
+        # Conditions for 7.2.2 (L1) Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Ensure the `EnableAzureADB2BIntegration` property is set to `True` for the SharePoint tenant.
+        #   - Condition B: Verify that the SharePoint and OneDrive integration with Azure AD B2B is active.
+        #   - Condition C: Ensure that guest accounts are managed in Azure AD and subject to access policies.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: The `EnableAzureADB2BIntegration` property is set to `False` for the SharePoint tenant.
+        #   - Condition B: The integration between SharePoint, OneDrive, and Azure AD B2B is not active.
+        #   - Condition C: Guest accounts are not managed in Azure AD and are not subject to access policies.
+
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
 
-        $auditResult = [CISAuditResult]::new()
         $recnum = "7.2.2"
     }
 

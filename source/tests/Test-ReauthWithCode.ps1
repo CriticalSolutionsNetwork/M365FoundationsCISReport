@@ -7,6 +7,22 @@ function Test-ReauthWithCode {
     )
 
     begin {
+        <#
+        Conditions for 7.2.10 (L1) Ensure reauthentication with verification code is restricted
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: The `EmailAttestationRequired` property is set to `True`.
+        #   - Condition B: The `EmailAttestationReAuthDays` property is set to `15` or less.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: The `EmailAttestationRequired` property is set to `False`.
+        #   - Condition B: The `EmailAttestationReAuthDays` property is set to more than `15`.
+        #>
+
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
