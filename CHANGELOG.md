@@ -4,6 +4,16 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Added condition comments to each test.
+
+### Fixed
+
+- Fixed csv CIS controls that were not matched correctly.
+
+## [0.1.9] - 2024-06-10
+
 ### Fixed
 
 - Fixed bug in 1.1.1 that caused the test to fail/pass incorrectly. Added verbose output.
@@ -11,6 +21,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Docs
 
 - Updated helper csv formatting for one cis control.
+
 
 ## [0.1.8] - 2024-06-09
 
