@@ -9,6 +9,7 @@ function Test-ReportSecurityInTeams {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
+
         # Initialization code, if needed
         $recnum = "8.6.1"
     }
@@ -18,9 +19,14 @@ function Test-ReportSecurityInTeams {
             # 8.6.1 (L1) Ensure users can report security concerns in Teams
 
             # Retrieve the necessary settings for Teams and Exchange Online
+            # Condition A: Ensure the 'Report a security concern' setting in the Teams admin center is set to 'On'.
             $CsTeamsMessagingPolicy = Get-CsTeamsMessagingPolicy -Identity Global | Select-Object -Property AllowSecurityEndUserReporting
+
+            # Condition B: Verify that 'Monitor reported messages in Microsoft Teams' is checked in the Microsoft 365 Defender portal.
+            # Condition C: Ensure the 'Send reported messages to' setting in the Microsoft 365 Defender portal is set to 'My reporting mailbox only' with the correct report email addresses.
             $ReportSubmissionPolicy = Get-ReportSubmissionPolicy | Select-Object -Property ReportJunkToCustomizedAddress, ReportNotJunkToCustomizedAddress, ReportPhishToCustomizedAddress, ReportChatMessageToCustomizedAddressEnabled
 
+            # Check if all the required settings are enabled
             $securityReportEnabled = $CsTeamsMessagingPolicy.AllowSecurityEndUserReporting -and
             $ReportSubmissionPolicy.ReportJunkToCustomizedAddress -and
             $ReportSubmissionPolicy.ReportNotJunkToCustomizedAddress -and
@@ -66,7 +72,7 @@ function Test-ReportSecurityInTeams {
     }
 
     end {
-        # Return auditResult
+        # Return the audit result
         return $auditResult
     }
 }
