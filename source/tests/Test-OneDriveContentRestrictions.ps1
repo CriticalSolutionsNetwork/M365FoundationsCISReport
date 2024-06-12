@@ -7,6 +7,22 @@ function Test-OneDriveContentRestrictions {
     )
 
     begin {
+        # 7.2.4 (L2) Ensure OneDrive content sharing is restricted
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: The OneDriveSharingCapability setting is configured to "Disabled" using the PowerShell cmdlet `Get-SPOTenant | fl OneDriveSharingCapability`.
+        #   - Condition B: The OneDriveSharingCapability is set to "Only people in your organization" in the SharePoint admin center under Policies > Sharing > OneDrive.
+        #   - Condition C: OneDrive content sharing is not more permissive than SharePoint content sharing.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: The OneDriveSharingCapability setting is not configured to "Disabled" using the PowerShell cmdlet `Get-SPOTenant | fl OneDriveSharingCapability`.
+        #   - Condition B: The OneDriveSharingCapability is not set to "Only people in your organization" in the SharePoint admin center under Policies > Sharing > OneDrive.
+        #   - Condition C: OneDrive content sharing is more permissive than SharePoint content sharing.
+
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed

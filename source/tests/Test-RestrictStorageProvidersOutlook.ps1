@@ -7,6 +7,22 @@ function Test-RestrictStorageProvidersOutlook {
     )
 
     begin {
+        <#
+        # 6.5.3 (L2) Ensure additional storage providers are restricted in Outlook on the web
+        #
+        # Validate test for a pass:
+        # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+        # - Specific conditions to check:
+        #   - Condition A: Using PowerShell, verify that `AdditionalStorageProvidersAvailable` is set to `False` in the OwaMailboxPolicy.
+        #   - Condition B: Ensure that the command `Get-OwaMailboxPolicy | Format-Table Name, AdditionalStorageProvidersAvailable` returns `False`.
+        #
+        # Validate test for a fail:
+        # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+        # - Specific conditions to check:
+        #   - Condition A: Using PowerShell, verify that `AdditionalStorageProvidersAvailable` is not set to `False` in the OwaMailboxPolicy.
+        #   - Condition B: Ensure that the command `Get-OwaMailboxPolicy | Format-Table Name, AdditionalStorageProvidersAvailable` does not return `False`.
+        #>
+
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
@@ -19,6 +35,7 @@ function Test-RestrictStorageProvidersOutlook {
 
             # Retrieve all OwaMailbox policies
             $owaPolicies = Get-OwaMailboxPolicy
+            # Condition A: Check if AdditionalStorageProvidersAvailable is set to False
             $nonCompliantPolicies = $owaPolicies | Where-Object { $_.AdditionalStorageProvidersAvailable }
 
             # Determine compliance
@@ -68,5 +85,3 @@ function Test-RestrictStorageProvidersOutlook {
         return $auditResult
     }
 }
-
-# Additional helper functions (if any)

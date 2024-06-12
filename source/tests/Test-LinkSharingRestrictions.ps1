@@ -17,6 +17,20 @@ function Test-LinkSharingRestrictions {
     process {
         try {
             # 7.2.7 (L1) Ensure link sharing is restricted in SharePoint and OneDrive
+            #
+            # Validate test for a pass:
+            # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+            # - Specific conditions to check:
+            #   - Condition A: The `DefaultSharingLinkType` setting in SharePoint and OneDrive is set to `Direct`.
+            #   - Condition B: The setting `Choose the type of link that's selected by default when users share files and folders in SharePoint and OneDrive` is set to `Specific people (only the people the user specifies)`.
+            #   - Condition C: Verification using the UI confirms that the link sharing settings are configured as recommended.
+            #
+            # Validate test for a fail:
+            # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+            # - Specific conditions to check:
+            #   - Condition A: The `DefaultSharingLinkType` setting in SharePoint and OneDrive is not set to `Direct`.
+            #   - Condition B: The setting `Choose the type of link that's selected by default when users share files and folders in SharePoint and OneDrive` is not set to `Specific people (only the people the user specifies)`.
+            #   - Condition C: Verification using the UI indicates that the link sharing settings are not configured as recommended.
 
             # Retrieve link sharing configuration for SharePoint and OneDrive
             $SPOTenantLinkSharing = Get-SPOTenant | Select-Object DefaultSharingLinkType

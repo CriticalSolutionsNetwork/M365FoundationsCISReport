@@ -16,6 +16,20 @@ function Test-NoAnonymousMeetingJoin {
     process {
         try {
             # 8.5.1 (L2) Ensure anonymous users can't join a meeting
+            #
+            # Validate test for a pass:
+            # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+            # - Specific conditions to check:
+            #   - Condition A: `AllowAnonymousUsersToJoinMeeting` is set to `False`.
+            #   - Condition B: Verification using the UI confirms that `Anonymous users can join a meeting` is set to `Off` in the Global meeting policy.
+            #   - Condition C: PowerShell command output indicates that anonymous users are not allowed to join meetings.
+            #
+            # Validate test for a fail:
+            # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+            # - Specific conditions to check:
+            #   - Condition A: `AllowAnonymousUsersToJoinMeeting` is not set to `False`.
+            #   - Condition B: Verification using the UI shows that `Anonymous users can join a meeting` is not set to `Off` in the Global meeting policy.
+            #   - Condition C: PowerShell command output indicates that anonymous users are allowed to join meetings.
 
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
 

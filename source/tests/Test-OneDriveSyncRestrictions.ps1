@@ -16,12 +16,27 @@ function Test-OneDriveSyncRestrictions {
     process {
         try {
             # 7.3.2 (L2) Ensure OneDrive sync is restricted for unmanaged devices
+            #
+            # Validate test for a pass:
+            # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
+            # - Specific conditions to check:
+            #   - Condition A: Verify that "Allow syncing only on computers joined to specific domains" is enabled.
+            #   - Condition B: Check that "TenantRestrictionEnabled" is set to True.
+            #   - Condition C: Ensure that "AllowedDomainList" contains the trusted domain GUIDs from the on-premises environment.
+            #
+            # Validate test for a fail:
+            # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
+            # - Specific conditions to check:
+            #   - Condition A: "Allow syncing only on computers joined to specific domains" is not enabled.
+            #   - Condition B: "TenantRestrictionEnabled" is set to False.
+            #   - Condition C: "AllowedDomainList" does not contain the trusted domain GUIDs from the on-premises environment.
 
             # Retrieve OneDrive sync client restriction settings
             $SPOTenantSyncClientRestriction = Get-SPOTenantSyncClientRestriction | Select-Object TenantRestrictionEnabled, AllowedDomainList
             $isSyncRestricted = $SPOTenantSyncClientRestriction.TenantRestrictionEnabled -and $SPOTenantSyncClientRestriction.AllowedDomainList
 
-            # Prepare failure reasons and details based on compliance
+            # Condition A: Check if TenantRestrictionEnabled is True
+            # Condition B: Ensure AllowedDomainList contains trusted domains GUIDs
             $failureReasons = if (-not $isSyncRestricted) {
                 "OneDrive sync is not restricted to managed devices. TenantRestrictionEnabled should be True and AllowedDomainList should contain trusted domains GUIDs."
             }
@@ -29,6 +44,7 @@ function Test-OneDriveSyncRestrictions {
                 "N/A"
             }
 
+            # Condition C: Prepare details based on whether sync is restricted
             $details = if ($isSyncRestricted) {
                 "OneDrive sync is restricted for unmanaged devices."
             }
