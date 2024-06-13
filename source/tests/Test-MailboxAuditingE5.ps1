@@ -42,6 +42,7 @@ function Test-MailboxAuditingE5 {
     process {
         if ($null -ne $founde5Sku) {
             $allUsers = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde5Sku.SkuId) )" -All
+            $mailboxes = Get-EXOMailbox -PropertySets Audit
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
@@ -52,9 +53,9 @@ function Test-MailboxAuditingE5 {
                     #$licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
                     #$hasOfficeE5 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e5SkuPartNumbers }).Count -gt 0
                     #Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E5 license."
-
+                    $mailbox = $mailboxes | Where-Object { $_.UserPrincipalName -eq $user.UserPrincipalName }
                     $userUPN = $user.UserPrincipalName
-                    $mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
+                    #$mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
 
                     $missingActions = @()
                     if ($mailbox.AuditEnabled) {

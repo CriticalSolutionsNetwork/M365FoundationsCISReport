@@ -45,6 +45,7 @@ function Test-MailboxAuditingE3 {
     process {
         if ($null -ne $founde3Sku) {
             $allUsers = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde3Sku.SkuId) )" -All
+            $mailboxes = Get-EXOMailbox -PropertySets Audit
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
@@ -57,7 +58,7 @@ function Test-MailboxAuditingE3 {
                     #Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E3 license."
 
                     $userUPN = $user.UserPrincipalName
-                    $mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
+                    $mailbox = $mailboxes | Where-Object { $_.UserPrincipalName -eq $user.UserPrincipalName }
 
                     $missingActions = @()
                     if ($mailbox.AuditEnabled) {
