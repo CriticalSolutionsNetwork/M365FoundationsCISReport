@@ -24,6 +24,8 @@
     .NOTES
         The function requires the MSOL module to be installed and connected to your tenant.
         Ensure that you have the necessary permissions to read user and MFA status information.
+    .LINK
+    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Get-MFAStatus
 #>
 function Get-MFAStatus {
     [CmdletBinding()]
