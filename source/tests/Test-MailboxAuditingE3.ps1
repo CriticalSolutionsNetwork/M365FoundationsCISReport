@@ -43,7 +43,7 @@ function Test-MailboxAuditingE3 {
 
 
     process {
-        if ($null -ne $founde3Sku) {
+        if (($founde3Sku.count)-ne 0) {
             $allUsers = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde3Sku.SkuId) )" -All
             $mailboxes = Get-EXOMailbox -PropertySets Audit
             try {
