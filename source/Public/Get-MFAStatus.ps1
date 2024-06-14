@@ -28,6 +28,7 @@
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Get-MFAStatus
 #>
 function Get-MFAStatus {
+    [OutputType([System.Object])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
@@ -37,6 +38,7 @@ function Get-MFAStatus {
 
     begin {
         # Connect to Microsoft Online service
+        Import-Module MSOnline -ErrorAction SilentlyContinue
     }
 
     process {
