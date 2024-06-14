@@ -4,6 +4,13 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed 6.1.2/6.1.3 tests to minimize calls to the Graph API.
+- Fixed 2.1.1,2.1.4,2.1.5 to suppress error messages and create a standard object when no e5"
+
+## [0.1.10] - 2024-06-12
+
 ### Added
 
 - Added condition comments to each test.
