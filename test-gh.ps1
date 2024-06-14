@@ -210,3 +210,196 @@ if ($warnings.Count -gt 0) {
 Get-GitHubRepository -OwnerName 'CriticalSolutionsNetwork' -RepositoryName 'M365FoundationsCISReport'
 
 
+#########################################################################################
+connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome
+# Retrieve the subscribed SKUs
+$sub = Get-MgSubscribedSku -All
+
+# Define the product array
+$ProductArray = @(
+    "Microsoft_Cloud_App_Security_App_Governance_Add_On",
+    "Defender_Threat_Intelligence",
+    "THREAT_INTELLIGENCE",
+    "WIN_DEF_ATP",
+    "Microsoft_Defender_for_Endpoint_F2",
+    "DEFENDER_ENDPOINT_P1",
+    "DEFENDER_ENDPOINT_P1_EDU",
+    "MDATP_XPLAT",
+    "MDATP_Server",
+    "ATP_ENTERPRISE_FACULTY",
+    "ATA",
+    "ATP_ENTERPRISE_GOV",
+    "ATP_ENTERPRISE_USGOV_GCCHIGH",
+    "THREAT_INTELLIGENCE_GOV",
+    "TVM_Premium_Standalone",
+    "TVM_Premium_Add_on",
+    "ATP_ENTERPRISE",
+    "Azure_Information_Protection_Premium_P1",
+    "Azure_Information_Protection_Premium_P2",
+    "Microsoft_Application_Protection_and_Governance",
+    "Exchange_Online_Protection",
+    "Microsoft_365_Defender",
+    "Cloud_App_Security_Discovery"
+)
+
+# Define the hashtable
+$ProductHashTable = @{
+    "App governance add-on to Microsoft Defender for Cloud Apps" = "Microsoft_Cloud_App_Security_App_Governance_Add_On"
+    "Defender Threat Intelligence" = "Defender_Threat_Intelligence"
+    "Microsoft Defender for Office 365 (Plan 2)" = "THREAT_INTELLIGENCE"
+    "Microsoft Defender for Endpoint" = "WIN_DEF_ATP"
+    "Microsoft Defender for Endpoint F2" = "Microsoft_Defender_for_Endpoint_F2"
+    "Microsoft Defender for Endpoint P1" = "DEFENDER_ENDPOINT_P1"
+    "Microsoft Defender for Endpoint P1 for EDU" = "DEFENDER_ENDPOINT_P1_EDU"
+    "Microsoft Defender for Endpoint P2_XPLAT" = "MDATP_XPLAT"
+    "Microsoft Defender for Endpoint Server" = "MDATP_Server"
+    "Microsoft Defender for Office 365 (Plan 1) Faculty" = "ATP_ENTERPRISE_FACULTY"
+    "Microsoft Defender for Identity" = "ATA"
+    "Microsoft Defender for Office 365 (Plan 1) GCC" = "ATP_ENTERPRISE_GOV"
+    "Microsoft Defender for Office 365 (Plan 1)_USGOV_GCCHIGH" = "ATP_ENTERPRISE_USGOV_GCCHIGH"
+    "Microsoft Defender for Office 365 (Plan 2) GCC" = "THREAT_INTELLIGENCE_GOV"
+    "Microsoft Defender Vulnerability Management" = "TVM_Premium_Standalone"
+    "Microsoft Defender Vulnerability Management Add-on" = "TVM_Premium_Add_on"
+    "Microsoft Defender for Office 365 (Plan 1)" = "ATP_ENTERPRISE"
+    "Azure Information Protection Premium P1" = "Azure_Information_Protection_Premium_P1"
+    "Azure Information Protection Premium P2" = "Azure_Information_Protection_Premium_P2"
+    "Microsoft Application Protection and Governance" = "Microsoft_Application_Protection_and_Governance"
+    "Exchange Online Protection" = "Exchange_Online_Protection"
+    "Microsoft 365 Defender" = "Microsoft_365_Defender"
+    "Cloud App Security Discovery" = "Cloud_App_Security_Discovery"
+}
+
+# Reverse the hashtable
+$ReverseProductHashTable = @{}
+foreach ($key in $ProductHashTable.Keys) {
+    $ReverseProductHashTable[$ProductHashTable[$key]] = $key
+}
+
+# Loop through each SKU and get the enabled security features
+$securityFeatures = foreach ($sku in $sub) {
+if ($sku.SkuPartNumber -eq "MDATP_XPLAT_EDU") {
+Write-Host "the SKU is: `n$($sku  | gm)"
+            [PSCustomObject]@{
+            Skupartnumber      = $sku.skupartnumber
+            AppliesTo          = $sku.AppliesTo
+            ProvisioningStatus = $sku.ProvisioningStatus
+            ServicePlanId      = $sku.ServicePlanId
+            ServicePlanName    = $sku.ServicePlanName
+            FriendlyName       = "Defender P2 for EDU"
+        }
+   }
+   else {
+
+       $sku.serviceplans | Where-Object { $_.serviceplanname -in $ProductArray } | ForEach-Object {
+        $friendlyName = $ReverseProductHashTable[$_.ServicePlanName]
+        [PSCustomObject]@{
+            Skupartnumber      = $sku.skupartnumber
+            AppliesTo          = $_.AppliesTo
+            ProvisioningStatus = $_.ProvisioningStatus
+            ServicePlanId      = $_.ServicePlanId
+            ServicePlanName    = $_.ServicePlanName
+            FriendlyName       = $friendlyName
+        }
+    }
+
+   }
+
+}
+
+# Output the security features
+$securityFeatures | Format-Table -AutoSize
+
+
+
+##########
+
+# Ensure the ImportExcel module is available
+
+
+# Ensure the ImportExcel module is available
+if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
+    Install-Module -Name ImportExcel -Force -Scope CurrentUser
+}
+
+# Function to wait until the file is available
+function Wait-ForFile {
+    param (
+        [string]$FilePath
+    )
+    while (Test-Path -Path $FilePath -PathType Leaf -and -not (Get-Content $FilePath -ErrorAction SilentlyContinue)) {
+        Start-Sleep -Seconds 1
+    }
+}
+
+# Path to the Excel file
+$excelFilePath = "C:\Users\dougrios\OneDrive - CRITICALSOLUTIONS NET LLC\Documents\_Tools\Benchies\SKUs.xlsx"
+
+# Wait for the file to be available
+
+
+# Import the Excel file
+$excelData = Import-Excel -Path $excelFilePath
+
+# Retrieve the subscribed SKUs
+$subscribedSkus = Get-MgSubscribedSku -All
+
+# Define the hashtable with security-related product names
+$ProductHashTable = @{
+    "App governance add-on to Microsoft Defender for Cloud Apps" = "Microsoft_Cloud_App_Security_App_Governance_Add_On"
+    "Defender Threat Intelligence" = "Defender_Threat_Intelligence"
+    "Microsoft Defender for Office 365 (Plan 2)" = "THREAT_INTELLIGENCE"
+    "Microsoft Defender for Endpoint" = "WIN_DEF_ATP"
+    "Microsoft Defender for Endpoint F2" = "Microsoft_Defender_for_Endpoint_F2"
+    "Microsoft Defender for Endpoint P1" = "DEFENDER_ENDPOINT_P1"
+    "Microsoft Defender for Endpoint P1 for EDU" = "DEFENDER_ENDPOINT_P1_EDU"
+    "Microsoft Defender for Endpoint P2_XPLAT" = "MDATP_XPLAT"
+    "Microsoft Defender for Endpoint Server" = "MDATP_Server"
+    "Microsoft Defender for Office 365 (Plan 1) Faculty" = "ATP_ENTERPRISE_FACULTY"
+    "Microsoft Defender for Identity" = "ATA"
+    "Microsoft Defender for Office 365 (Plan 1) GCC" = "ATP_ENTERPRISE_GOV"
+    "Microsoft Defender for Office 365 (Plan 1)_USGOV_GCCHIGH" = "ATP_ENTERPRISE_USGOV_GCCHIGH"
+    "Microsoft Defender for Office 365 (Plan 2) GCC" = "THREAT_INTELLIGENCE_GOV"
+    "Microsoft Defender Vulnerability Management" = "TVM_Premium_Standalone"
+    "Microsoft Defender Vulnerability Management Add-on" = "TVM_Premium_Add_on"
+    "Microsoft Defender for Office 365 (Plan 1)" = "ATP_ENTERPRISE"
+    "Azure Information Protection Premium P1" = "Azure_Information_Protection_Premium_P1"
+    "Azure Information Protection Premium P2" = "Azure_Information_Protection_Premium_P2"
+    "Microsoft Application Protection and Governance" = "Microsoft_Application_Protection_and_Governance"
+    "Exchange Online Protection" = "Exchange_Online_Protection"
+    "Microsoft 365 Defender" = "Microsoft_365_Defender"
+    "Cloud App Security Discovery" = "Cloud_App_Security_Discovery"
+}
+
+# Create a hashtable to store the SKU part numbers and their associated security features
+$skuSecurityFeatures = @{}
+
+# Populate the hashtable with data from the Excel file
+foreach ($row in $excelData) {
+    if ($null -ne $row.'String ID' -and $null -ne $row.'Service plans included (friendly names)') {
+        $skuSecurityFeatures[$row.'String ID'] = $row.'Service plans included (friendly names)'
+    }
+}
+
+# Display the SKU part numbers and their associated security features
+foreach ($sku in $subscribedSkus) {
+    $skuPartNumber = $sku.SkuPartNumber
+    if ($skuSecurityFeatures.ContainsKey($skuPartNumber)) {
+        $securityFeatures = $skuSecurityFeatures[$skuPartNumber]
+
+        # Check if the security feature is in the hashtable
+        $isSecurityFeature = $ProductHashTable.ContainsKey($securityFeatures)
+
+        if ($isSecurityFeature) {
+            Write-Output "SKU Part Number: $skuPartNumber"
+            Write-Output "Security Features: $securityFeatures (Security-related)"
+        } else {
+            Write-Output "SKU Part Number: $skuPartNumber"
+            Write-Output "Security Features: $securityFeatures"
+        }
+        Write-Output "----------------------------"
+    } else {
+        Write-Output "SKU Part Number: $skuPartNumber"
+        Write-Output "Security Features: Not Found in Excel"
+        Write-Output "----------------------------"
+    }
+}
