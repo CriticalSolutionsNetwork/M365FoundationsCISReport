@@ -27,32 +27,35 @@ function Test-MailboxAuditingE5 {
         #   - Condition C: AuditDelegate actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, SendAs, SendOnBehalf, SoftDelete, Update, UpdateFolderPermissions, UpdateInboxRules.
         #   - Condition D: AuditOwner actions do not include all of the following: ApplyRecord, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
 
-        $e5SkuPartNumbers = @("SPE_E5", "ENTERPRISEPREMIUM", "OFFICEE5")
+        $e5SkuPartNumber = "SPE_E5"
         $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
         $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
         $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MailItemsAccessed", "MoveToDeletedItems", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
 
         $allFailures = @()
-        $allUsers = Get-AzureADUser -All $true
+        #$allUsers = Get-AzureADUser -All $true
+        $founde5Sku = Get-MgSubscribedSku -All | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
         $processedUsers = @{}  # Dictionary to track processed users
         $recnum = "6.1.3"
     }
 
     process {
-        try {
-            foreach ($user in $allUsers) {
-                if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
-                    Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
-                    continue
-                }
+        if (($founde5Sku.count) -ne 0) {
+            $allUsers = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde5Sku.SkuId) )" -All
+            $mailboxes = Get-EXOMailbox -PropertySets Audit
+            try {
+                foreach ($user in $allUsers) {
+                    if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
+                        Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
+                        continue
+                    }
 
-                $licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
-                $hasOfficeE5 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e5SkuPartNumbers }).Count -gt 0
-                Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E5 license."
-
-                if ($hasOfficeE5) {
+                    #$licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
+                    #$hasOfficeE5 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e5SkuPartNumbers }).Count -gt 0
+                    #Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E5 license."
+                    $mailbox = $mailboxes | Where-Object { $_.UserPrincipalName -eq $user.UserPrincipalName }
                     $userUPN = $user.UserPrincipalName
-                    $mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
+                    #$mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
 
                     $missingActions = @()
                     if ($mailbox.AuditEnabled) {
@@ -81,38 +84,48 @@ function Test-MailboxAuditingE5 {
                     # Mark the user as processed
                     $processedUsers[$user.UserPrincipalName] = $true
                 }
-            }
 
-            # Prepare failure reasons and details based on compliance
-            $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
-            $details = if ($allFailures.Count -eq 0) {
-                "All Office E5 users have correct mailbox audit settings." # Condition A for pass
-            }
-            else {
-                "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n") # Condition A for fail
-            }
+                # Prepare failure reasons and details based on compliance
+                $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+                $details = if ($allFailures.Count -eq 0) {
+                    "All Office E5 users have correct mailbox audit settings." # Condition A for pass
+                }
+                else {
+                    "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n") # Condition A for fail
+                }
 
-            # Populate the audit result
+                # Populate the audit result
+                $params = @{
+                    Rec           = $recnum
+                    Result        = $allFailures.Count -eq 0
+                    Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
+                    Details       = $details
+                    FailureReason = $failureReasons
+                }
+                $auditResult = Initialize-CISAuditResult @params
+            }
+            catch {
+                Write-Error "An error occurred during the test: $_"
+
+                # Retrieve the description from the test definitions
+                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+                $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
+
+                $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+                # Call Initialize-CISAuditResult with error parameters
+                $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            }
+        }
+        else {
             $params = @{
                 Rec           = $recnum
-                Result        = $allFailures.Count -eq 0
-                Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
-                Details       = $details
-                FailureReason = $failureReasons
+                Result        = $false
+                Status        = "Fail"
+                Details       = "No M365 E5 licenses found."
+                FailureReason = "The audit is for M365 E5 licenses, but no such licenses were found."
             }
             $auditResult = Initialize-CISAuditResult @params
-        }
-        catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
     }
 

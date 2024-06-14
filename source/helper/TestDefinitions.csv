@@ -18,8 +18,8 @@
 17,Test-RestrictTenantCreation.ps1,5.1.2.3,Ensure 'Restrict non-admin users from creating tenants' is set to 'Yes',E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,Microsoft Graph
 18,Test-PasswordHashSync.ps1,5.1.8.1,Ensure password hash sync is enabled for hybrid deployments,E3,L1,6.7,Centralize Access Control,FALSE,TRUE,TRUE,TRUE,Microsoft Graph
 19,Test-AuditDisabledFalse.ps1,6.1.1,Ensure 'AuditDisabled' organizationally is set to 'False',E3,L1,8.2,Collect Audit Logs,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
-20,Test-MailboxAuditingE3.ps1,6.1.2,Ensure mailbox auditing for Office E3 users is Enabled,E3,L1,8.2,Collect audit logs.,TRUE,TRUE,TRUE,TRUE,AzureAD | EXO | Microsoft Graph
-21,Test-MailboxAuditingE5.ps1,6.1.3,Ensure mailbox auditing for Office E5 users is Enabled,E5,L1,8.2,Collect audit logs.,TRUE,TRUE,TRUE,TRUE,AzureAD | EXO | Microsoft Graph
+20,Test-MailboxAuditingE3.ps1,6.1.2,Ensure mailbox auditing for Office E3 users is Enabled,E3,L1,8.2,Collect audit logs.,TRUE,TRUE,TRUE,TRUE,EXO | Microsoft Graph
+21,Test-MailboxAuditingE5.ps1,6.1.3,Ensure mailbox auditing for Office E5 users is Enabled,E5,L1,8.2,Collect audit logs.,TRUE,TRUE,TRUE,TRUE,EXO | Microsoft Graph
 22,Test-BlockMailForwarding.ps1,6.2.1,Ensure all forms of mail forwarding are blocked and/or disabled,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,EXO
 23,Test-NoWhitelistDomains.ps1,6.2.2,Ensure mail transport rules do not whitelist specific domains,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,EXO
 24,Test-IdentifyExternalEmail.ps1,6.2.3,Ensure email from external senders is identified,E3,L1,0,Explicitly Not Mapped,FALSE,FALSE,FALSE,TRUE,EXO

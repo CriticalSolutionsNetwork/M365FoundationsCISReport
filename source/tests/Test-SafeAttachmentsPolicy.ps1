@@ -1,10 +1,7 @@
 function Test-SafeAttachmentsPolicy {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
-    param (
-        # Aligned
-        # Parameters can be added if needed
-    )
+    param ()
 
     begin {
         # Dot source the class script if necessary
@@ -13,7 +10,7 @@ function Test-SafeAttachmentsPolicy {
         # Initialization code, if needed
         $recnum = "2.1.4"
 
-    <#
+        <#
         Conditions for 2.1.4 (L2) Ensure Safe Attachments policy is enabled
 
         Validate test for a pass:
@@ -31,57 +28,85 @@ function Test-SafeAttachmentsPolicy {
           - Condition B: The policy does not cover all recipients within the organization.
           - Condition C: The policy action is not set to "Dynamic Delivery" or "Quarantine".
           - Condition D: The policy is disabled.
-    #>
+        #>
     }
 
     process {
-        try {
-            # 2.1.4 (L2) Ensure Safe Attachments policy is enabled
+        if (Get-Command Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue) {
+            try {
+                # Retrieve all Safe Attachment policies where Enable is set to True
+                $safeAttachmentPolicies = Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue | Where-Object { $_.Enable -eq $true }
+                # Check if any Safe Attachments policy is enabled (Condition A)
+                $result = $null -ne $safeAttachmentPolicies -and $safeAttachmentPolicies.Count -gt 0
 
-            # Retrieve all Safe Attachment policies where Enable is set to True
-            $safeAttachmentPolicies = Get-SafeAttachmentPolicy | Where-Object { $_.Enable -eq $true }
+                # Initialize details and failure reasons
+                $details = @()
+                $failureReasons = @()
 
-            # Condition A: Check if any Safe Attachments policy is enabled
-            $result = $null -ne $safeAttachmentPolicies -and $safeAttachmentPolicies.Count -gt 0
+                foreach ($policy in $safeAttachmentPolicies) {
+                    # Initialize policy detail and failed status
+                    $failed = $false
 
-            # Condition B, C, D: Additional checks can be added here if more detailed policy attributes are required
+                    # Check if the policy action is set to "Dynamic Delivery" or "Quarantine" (Condition C)
+                    if ($policy.Action -notin @("DynamicDelivery", "Quarantine")) {
+                        $failureReasons += "Policy '$($policy.Name)' action is not set to 'Dynamic Delivery' or 'Quarantine'."
+                        $failed = $true
+                    }
 
-            # Determine details and failure reasons based on the presence of enabled policies
-            $details = if ($result) {
-                "Enabled Safe Attachments Policies: $($safeAttachmentPolicies.Name -join ', ')"
+                    # Check if the policy is not disabled (Condition D)
+                    if (-not $policy.Enable) {
+                        $failureReasons += "Policy '$($policy.Name)' is disabled."
+                        $failed = $true
+                    }
+
+                    # Add policy details to the details array
+                    $details += [PSCustomObject]@{
+                        Policy   = $policy.Name
+                        Enabled  = $policy.Enable
+                        Action   = $policy.Action
+                        Failed   = $failed
+                    }
+                }
+
+                # The result is a pass if there are no failure reasons
+                $result = $failureReasons.Count -eq 0
+
+                # Format details for output
+                $detailsString = $details | Format-Table -AutoSize | Out-String
+                $failureReasonsString = ($failureReasons | ForEach-Object { $_ }) -join ' '
+
+                # Create and populate the CISAuditResult object
+                $params = @{
+                    Rec           = $recnum
+                    Result        = $result
+                    Status        = if ($result) { "Pass" } else { "Fail" }
+                    Details       = $detailsString
+                    FailureReason = if ($result) { "N/A" } else { $failureReasonsString }
+                }
+                $auditResult = Initialize-CISAuditResult @params
             }
-            else {
-                "No Safe Attachments Policies are enabled."
-            }
+            catch {
+                Write-Error "An error occurred during the test: $_"
 
-            $failureReasons = if ($result) {
-                "N/A"
-            }
-            else {
-                "Safe Attachments policy is not enabled."
-            }
+                # Retrieve the description from the test definitions
+                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+                $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
 
-            # Create and populate the CISAuditResult object
+                $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+                # Call Initialize-CISAuditResult with error parameters
+                $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            }
+        }
+        else {
             $params = @{
                 Rec           = $recnum
-                Result        = $result
-                Status        = if ($result) { "Pass" } else { "Fail" }
-                Details       = $details
-                FailureReason = $failureReasons
+                Result        = $false
+                Status        = "Fail"
+                Details       = "No M365 E5 licenses found."
+                FailureReason = "The audit is for M365 E5 licenses and the required EXO commands will not be available otherwise."
             }
             $auditResult = Initialize-CISAuditResult @params
-        }
-        catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
     }
 
@@ -90,4 +115,3 @@ function Test-SafeAttachmentsPolicy {
         return $auditResult
     }
 }
-
