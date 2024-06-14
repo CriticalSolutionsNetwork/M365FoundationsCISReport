@@ -31,12 +31,11 @@ function Test-SafeAttachmentsTeams {
     }
 
     process {
-        # Retrieve the ATP policies for Office 365 and check Safe Attachments settings
-        [void]($atpPolicies = Get-AtpPolicyForO365)
-        if ($null -ne $atpPolicies) {
+        if (Get-Command Get-AtpPolicyForO365 -ErrorAction SilentlyContinue) {
             try {
                 # 2.1.5 (L2) Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled
-
+                # Retrieve the ATP policies for Office 365 and check Safe Attachments settings
+                $atpPolicies = Get-AtpPolicyForO365
                 # Check if the required ATP policies are enabled
                 $atpPolicyResult = $atpPolicies | Where-Object {
                     $_.EnableATPForSPOTeamsODB -eq $true -and
@@ -92,8 +91,8 @@ function Test-SafeAttachmentsTeams {
                 Rec           = $recnum
                 Result        = $false
                 Status        = "Fail"
-                Details       = "No M365 E3 licenses found."
-                FailureReason = "The audit is for M365 E3 licenses, but no such licenses were found."
+                Details       = "No M365 E5 licenses found."
+                FailureReason = "The audit is for M365 E5 licenses and the required EXO commands will not be available otherwise."
             }
             $auditResult = Initialize-CISAuditResult @params
         }

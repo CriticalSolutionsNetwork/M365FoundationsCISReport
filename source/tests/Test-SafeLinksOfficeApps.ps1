@@ -40,12 +40,11 @@ function Test-SafeLinksOfficeApps {
     }
 
     process {
-        # Retrieve all Safe Links policies
-        [void]($policies = Get-SafeLinksPolicy)
-        if ($null -ne $policies) {
+        if (Get-Command Get-SafeLinksPolicy -ErrorAction SilentlyContinue) {
             try {
                 # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
-
+                # Retrieve all Safe Links policies
+                $policies = Get-SafeLinksPolicy
                 # Initialize the details collection
                 $misconfiguredDetails = @()
 
