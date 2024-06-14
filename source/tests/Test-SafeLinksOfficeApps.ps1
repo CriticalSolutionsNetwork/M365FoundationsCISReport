@@ -40,61 +40,72 @@ function Test-SafeLinksOfficeApps {
     }
 
     process {
-        try {
-            # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
+        # Retrieve all Safe Links policies
+        [void]($policies = Get-SafeLinksPolicy)
+        if ($null -ne $policies) {
+            try {
+                # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
 
-            # Retrieve all Safe Links policies
-            $policies = Get-SafeLinksPolicy
+                # Initialize the details collection
+                $misconfiguredDetails = @()
 
-            # Initialize the details collection
-            $misconfiguredDetails = @()
+                foreach ($policy in $policies) {
+                    # Get the detailed configuration of each policy
+                    $policyDetails = Get-SafeLinksPolicy -Identity $policy.Name
 
-            foreach ($policy in $policies) {
-                # Get the detailed configuration of each policy
-                $policyDetails = Get-SafeLinksPolicy -Identity $policy.Name
+                    # Check each required property and record failures
+                    # Condition A: Checking policy settings
+                    $failures = @()
+                    if ($policyDetails.EnableSafeLinksForEmail -ne $true) { $failures += "EnableSafeLinksForEmail: False" } # Email: On
+                    if ($policyDetails.EnableSafeLinksForTeams -ne $true) { $failures += "EnableSafeLinksForTeams: False" } # Teams: On
+                    if ($policyDetails.EnableSafeLinksForOffice -ne $true) { $failures += "EnableSafeLinksForOffice: False" } # Office 365 Apps: On
+                    if ($policyDetails.TrackClicks -ne $true) { $failures += "TrackClicks: False" } # Click protection settings: On
+                    if ($policyDetails.AllowClickThrough -ne $false) { $failures += "AllowClickThrough: True" } # Do not track when users click safe links: Off
 
-                # Check each required property and record failures
-                # Condition A: Checking policy settings
-                $failures = @()
-                if ($policyDetails.EnableSafeLinksForEmail -ne $true) { $failures += "EnableSafeLinksForEmail: False" } # Email: On
-                if ($policyDetails.EnableSafeLinksForTeams -ne $true) { $failures += "EnableSafeLinksForTeams: False" } # Teams: On
-                if ($policyDetails.EnableSafeLinksForOffice -ne $true) { $failures += "EnableSafeLinksForOffice: False" } # Office 365 Apps: On
-                if ($policyDetails.TrackClicks -ne $true) { $failures += "TrackClicks: False" } # Click protection settings: On
-                if ($policyDetails.AllowClickThrough -ne $false) { $failures += "AllowClickThrough: True" } # Do not track when users click safe links: Off
-
-                # Only add details for policies that have misconfigurations
-                if ($failures.Count -gt 0) {
-                    $misconfiguredDetails += "Policy: $($policy.Name); Failures: $($failures -join ', ')"
+                    # Only add details for policies that have misconfigurations
+                    if ($failures.Count -gt 0) {
+                        $misconfiguredDetails += "Policy: $($policy.Name); Failures: $($failures -join ', ')"
+                    }
                 }
+
+                # Prepare the final result
+                # Condition B: Ensuring no misconfigurations
+                $result = $misconfiguredDetails.Count -eq 0
+                $details = if ($result) { "All Safe Links policies are correctly configured." } else { $misconfiguredDetails -join ' | ' }
+                $failureReasons = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
+
+                # Create and populate the CISAuditResult object
+                $params = @{
+                    Rec           = $recnum
+                    Result        = $result
+                    Status        = if ($result) { "Pass" } else { "Fail" }
+                    Details       = $details
+                    FailureReason = $failureReasons
+                }
+                $auditResult = Initialize-CISAuditResult @params
             }
+            catch {
+                Write-Error "An error occurred during the test: $_"
 
-            # Prepare the final result
-            # Condition B: Ensuring no misconfigurations
-            $result = $misconfiguredDetails.Count -eq 0
-            $details = if ($result) { "All Safe Links policies are correctly configured." } else { $misconfiguredDetails -join ' | ' }
-            $failureReasons = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
+                # Retrieve the description from the test definitions
+                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+                $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
 
-            # Create and populate the CISAuditResult object
+                $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+
+                # Call Initialize-CISAuditResult with error parameters
+                $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            }
+        }
+        else {
             $params = @{
                 Rec           = $recnum
-                Result        = $result
-                Status        = if ($result) { "Pass" } else { "Fail" }
-                Details       = $details
-                FailureReason = $failureReasons
+                Result        = $false
+                Status        = "Fail"
+                Details       = "No M365 E5 licenses found."
+                FailureReason = "The audit is for M365 E5 licenses and the required EXO commands will not be available otherwise."
             }
             $auditResult = Initialize-CISAuditResult @params
-        }
-        catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
         }
     }
 
