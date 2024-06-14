@@ -4,6 +4,10 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Added Get-MFAStatus function to help with auditing mfa for conditional access controls.
+
 ### Fixed
 
 - Fixed 6.1.2/6.1.3 tests to minimize calls to the Graph API.
