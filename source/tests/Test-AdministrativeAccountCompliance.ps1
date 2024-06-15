@@ -101,7 +101,7 @@ function Test-AdministrativeAccountCompliance {
 
             $result = $nonCompliantUsers.Count -eq 0
             $status = if ($result) { 'Pass' } else { 'Fail' }
-            $details = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | Cloud-Only Status | Entra ID License Status | Other Applications Assigned Status`n$failureReasons" } else { "N/A" }
+            $details = if ($nonCompliantUsers) { "Username | Roles | Cloud-Only Status | Entra ID License Status | Other Applications Assigned Status`n$failureReasons" } else { "N/A" }
 
             Write-Verbose "Assessment completed. Result: $status"
 

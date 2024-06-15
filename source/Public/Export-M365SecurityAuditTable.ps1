@@ -12,12 +12,12 @@ function Export-M365SecurityAuditTable {
 
         [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromAuditResultsSingle")]
         [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromCsvSingle")]
-        [ValidateSet("6.1.2","6.1.3","7.3.4")]
+        [ValidateSet("1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4")]
         [string]$TestNumber,
 
         [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromAuditResultsMultiple")]
         [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromCsvMultiple")]
-        [ValidateSet("6.1.2","6.1.3","7.3.4")]
+        [ValidateSet("1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4")]
         [string[]]$TestNumbers,
 
         [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "FromAuditResultsMultiple")]
@@ -50,9 +50,8 @@ function Export-M365SecurityAuditTable {
         }
     }
 
-    #$script:TestDefinitionsObject = Import-Csv -Path .\source\helper\TestDefinitions.csv
     if (-not $TestNumbers -and -not $TestNumber) {
-        $TestNumbers = "6.1.2","6.1.3","7.3.4"
+        $TestNumbers = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
         if (-not $ExportPath) {
             Write-Error "ExportPath is required when exporting all test results."
             return
@@ -71,6 +70,19 @@ function Export-M365SecurityAuditTable {
         }
 
         switch ($test) {
+            "6.1.2" {
+                $details = $auditResult.Details
+                $csv = $details | ConvertFrom-Csv -Delimiter '|'
+
+                foreach ($row in $csv) {
+                    $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
+                    $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate | Where-Object { $_ -notin @("MailItemsAccessed") }) -join ','
+                    $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
+                }
+
+                $newObjectDetails = $csv
+                $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
+            }
             "6.1.3" {
                 $details = $auditResult.Details
                 $csv = $details | ConvertFrom-Csv -Delimiter '|'
@@ -83,9 +95,6 @@ function Export-M365SecurityAuditTable {
 
                 $newObjectDetails = $csv
                 $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
-            }
-            "7.3.4" {
-                # Placeholder for specific logic for 7.3.4 if needed
             }
             Default {
                 $details = $auditResult.Details
@@ -101,10 +110,11 @@ function Export-M365SecurityAuditTable {
             $testDef = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $result.TestNumber }
             if ($testDef) {
                 $fileName = "$ExportPath\$($timestamp)_$($result.TestNumber).$($testDef.TestFileName -replace '\.ps1$').csv"
-                $result.Details | Out-File -FilePath $fileName
+                $result.Details | Export-Csv -Path $fileName -NoTypeInformation -Delimiter '|'
             }
         }
-    } else {
+    }
+    else {
         return $results.Details
     }
 }
