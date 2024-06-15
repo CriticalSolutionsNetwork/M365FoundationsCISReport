@@ -1,3 +1,76 @@
+
+# Refresh authentication to ensure the correct scopes
+gh auth refresh -s project,read:project,write:project,repo
+
+# Create the project
+gh project create --owner CriticalSolutionsNetwork --title "Test Validation Project"
+
+$repoOwner = "CriticalSolutionsNetwork"
+$repoName = "M365FoundationsCISReport"
+$directoryPath = ".\source\tests"
+$projectName = "Test Validation Project"
+
+# Function to create GitHub issues
+function Create-GitHubIssue {
+    param (
+        [string]$title,
+        [string]$body,
+        [string]$project
+    )
+
+    # Create the issue and add it to the specified project
+    $issue = gh issue create --repo "$repoOwner/$repoName" --title "$title" --body "$body" --project "$project"
+    return $issue
+}
+
+# Load test definitions from CSV
+$testDefinitionsPath = ".\source\helper\TestDefinitions.csv"
+$testDefinitions = Import-Csv -Path $testDefinitionsPath
+
+# Iterate over each .ps1 file in the directory
+Get-ChildItem -Path $directoryPath -Filter "*.ps1" | ForEach-Object {
+    $fileName = $_.Name
+    $testDefinition = $testDefinitions | Where-Object { $_.TestFileName -eq $fileName }
+
+    if ($testDefinition) {
+        $rec = $testDefinition.Rec
+        $elevel = $testDefinition.ELevel
+        $profileLevel = $testDefinition.ProfileLevel
+        $ig1 = $testDefinition.IG1
+        $ig2 = $testDefinition.IG2
+        $ig3 = $testDefinition.IG3
+        $connection = $testDefinition.Connection
+
+        $issueTitle = "Rec: $rec - Validate $fileName, ELevel: $elevel, ProfileLevel: $profileLevel, IG1: $ig1, IG2: $ig2, IG3: $ig3, Connection: $connection"
+        $issueBody = @"
+# Validation for $fileName
+
+## Tasks
+- [ ] Validate test for a pass
+  - Description of passing criteria:
+- [ ] Validate test for a fail
+  - Description of failing criteria:
+- [ ] Add notes and observations
+  - Placeholder for additional notes:
+"@
+
+        # Create the issue using GitHub CLI
+        try {
+            Create-GitHubIssue -title "$issueTitle" -body "$issueBody" -project "$projectName"
+            Write-Output "Created issue for $fileName"
+        } catch {
+            Write-Error "Failed to create issue for $fileName : $_"
+        }
+
+        # Introduce a delay of 2 seconds
+        Start-Sleep -Seconds 2
+    } else {
+        Write-Warning "No matching test definition found for $fileName"
+    }
+}
+
+
+##########################################################################################################################################
 $repoOwner = "CriticalSolutionsNetwork"
 $repoName = "M365FoundationsCISReport"
 $directoryPath = ".\source\tests"
@@ -403,3 +476,61 @@ foreach ($sku in $subscribedSkus) {
         Write-Output "----------------------------"
     }
 }
+
+
+
+
+
+
+######DELETE################
+
+
+
+# Example object details string
+$objectDetails = @"
+UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing
+aocasio@criticalsolutions.net|True|CP,FB,MV|FB,MV|CR,ML,MV
+douglasrios@criticalsolutions.net|True|CP,FB,MV|FB,MV|CR,ML,MV
+evamar@criticalsolutions.net|True|CP,FB,MV|FB,MV|CR,ML,MV
+helpdesk@criticalsolutions.net|True|CP,FB, MV|FB, MV|CR,ML,MV
+tbousliman@criticalsolutions.net|True|CP,FB,MV|FB,MV|CR,ML,MV
+"@
+
+# Convert the details string to objects
+$detailsObjects = $objectDetails | ConvertFrom-Csv -Delimiter "|"
+
+# Function to expand abbreviated actions back to full names
+function Expand-AbbreviatedActions {
+    param (
+        [string[]]$AbbreviatedActions,
+        [hashtable]$Dictionary
+    )
+    $expandedActions = @()
+    foreach ($abbrev in $AbbreviatedActions) {
+        $fullAction = $Dictionary.GetEnumerator() | Where-Object { $_.Value -eq $abbrev } | Select-Object -ExpandProperty Key
+        $expandedActions += $fullAction
+    }
+    return $expandedActions -join ','
+}
+
+# Iterate through each detail object and convert actions
+foreach ($detail in $detailsObjects) {
+    if ($detail.AdminActionsMissing) {
+        $adminActions = $detail.AdminActionsMissing -split ","
+        $expandedAdminActions = Expand-AbbreviatedActions -AbbreviatedActions $adminActions -Dictionary (Get-Action -Dictionaries).AdminActions
+        $detail.AdminActionsMissing = $expandedAdminActions
+    }
+    if ($detail.DelegateActionsMissing) {
+        $delegateActions = $detail.DelegateActionsMissing -split ","
+        $expandedDelegateActions = Expand-AbbreviatedActions -AbbreviatedActions $delegateActions -Dictionary (Get-Action -Dictionaries).DelegateActions
+        $detail.DelegateActionsMissing = $expandedDelegateActions
+    }
+    if ($detail.OwnerActionsMissing) {
+        $ownerActions = $detail.OwnerActionsMissing -split ","
+        $expandedOwnerActions = Expand-AbbreviatedActions -AbbreviatedActions $ownerActions -Dictionary (Get-Action -Dictionaries).OwnerActions
+        $detail.OwnerActionsMissing = $expandedOwnerActions
+    }
+}
+
+# Output the modified details objects
+$detailsObjects
