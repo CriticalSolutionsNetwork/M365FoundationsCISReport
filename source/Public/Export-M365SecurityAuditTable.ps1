@@ -143,7 +143,8 @@ function Export-M365SecurityAuditTable {
                 $fileName = "$ExportPath\$($timestamp)_$($result.TestNumber).$($testDef.TestFileName -replace '\.ps1$').csv"
                 if ($result.Details.Count -eq 0) {
                     Write-Information "No results found for test number $($result.TestNumber)." -InformationAction Continue
-                } else {
+                }
+                else {
                     $result.Details | Export-Csv -Path $fileName -NoTypeInformation
                 }
             }
@@ -153,9 +154,11 @@ function Export-M365SecurityAuditTable {
             $originalFileName = "$ExportPath\$timestamp`_M365FoundationsAudit.csv"
             $AuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
         }
-    } elseif ($OutputTestNumber) {
+    }
+    elseif ($OutputTestNumber) {
         return $results[0].Details
-    } else {
+    }
+    else {
         Write-Error "No valid operation specified. Please provide valid parameters."
     }
 }
