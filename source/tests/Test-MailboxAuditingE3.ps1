@@ -29,7 +29,7 @@ function Test-MailboxAuditingE3 {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
 
-        $e3SkuPartNumber = "SPE_E5"
+        $e3SkuPartNumber = "SPE_E3"
 
         $actionDictionaries = Get-Action -Dictionaries
         # E3 specific actions
