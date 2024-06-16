@@ -7,8 +7,10 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Added
 
 - Added `Export-M365SecurityAuditTable` public function to export applicable audit results to a table format.
+- Added paramter to `Export-M365SecurityAuditTable` to specify output of the original audit results.
 - Added `Remove-RowsWithEmptyCSVStatus` public function to remove rows with empty status from the CSV file.
 - Added `Get-Action` private function to retrieve the action for the test 6.1.2 and 6.1.3 tests.
+- Added output modifications to tests that produce tables to ensure they can be exported with the new `Export-M365SecurityAuditTable` function.
 
 ## [0.1.11] - 2024-06-14
 
