@@ -293,7 +293,7 @@ function Invoke-M365SecurityAudit {
             $exceedingTests = Get-ExceededLengthResultDetail -AuditResults $allAuditResults -TestNumbersToCheck $TestNumbersToCheck -ReturnExceedingTestsOnly -DetailsLengthLimit 30000
             if ($exceedingTests.Count -gt 0) {
                 Write-Information "The following tests exceeded the details length limit: $($exceedingTests -join ', ')" -InformationAction Continue
-                Write-Host "(Assuming the results were instantiated. Ex: `$object = invoke-M365SecurityAudit) Use the following command and adjust as neccesary to view the full details of the test results:" -ForegroundColor Gray
+                Write-Host "(Assuming the results were instantiated. Ex: `$object = invoke-M365SecurityAudit) Use the following command and adjust as neccesary to view the full details of the test results:" -ForegroundColor DarkCyan
                 Write-Host "Export-M365SecurityAuditTable -ExportAllTests -AuditResults `$object -ExportPath `"C:\temp`" -ExportOriginalTests" -ForegroundColor Green
             }
             return $allAuditResults.ToArray() | Sort-Object -Property Rec
