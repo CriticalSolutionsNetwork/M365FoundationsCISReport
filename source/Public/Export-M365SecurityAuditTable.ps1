@@ -96,7 +96,7 @@ function Export-M365SecurityAuditTable {
     foreach ($test in $testsToProcess) {
         $auditResult = $AuditResults | Where-Object { $_.Rec -eq $test }
         if (-not $auditResult) {
-            Write-Error "No audit results found for the test number $test."
+            Write-Information "No audit results found for the test number $test."
             continue
         }
 
