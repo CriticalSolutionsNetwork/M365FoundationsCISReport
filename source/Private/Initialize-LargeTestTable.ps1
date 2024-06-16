@@ -23,7 +23,7 @@ function Initialize-LargeTestTable {
     )
     process {
         $header = "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing"
-        $lineTemplate = "user{0}@contosonorthwind.net|True|FB,CP,MV,MTDI|FB,MV|ML,MV,CR"
+        $lineTemplate = "user{0}@contosonorthwind.net|True|FB,CP,MV|FB,MV|ML,MV,CR"
         # Generate the header and lines
         $lines = @($header)
         for ($i = 1; $i -le $lineCount; $i++) {

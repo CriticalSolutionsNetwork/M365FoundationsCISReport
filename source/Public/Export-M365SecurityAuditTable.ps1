@@ -105,26 +105,34 @@ function Export-M365SecurityAuditTable {
                 $details = $auditResult.Details
                 $csv = $details | ConvertFrom-Csv -Delimiter '|'
 
-                foreach ($row in $csv) {
-                    $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
-                    $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate | Where-Object { $_ -notin @("MailItemsAccessed") }) -join ','
-                    $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
+                if ($null -ne $csv) {
+                    foreach ($row in $csv) {
+                        $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
+                        $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate | Where-Object { $_ -notin @("MailItemsAccessed") }) -join ','
+                        $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
+                    }
+                    $newObjectDetails = $csv
                 }
-
-                $newObjectDetails = $csv
+                else {
+                    $newObjectDetails = $details
+                }
                 $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
             }
             "6.1.3" {
                 $details = $auditResult.Details
                 $csv = $details | ConvertFrom-Csv -Delimiter '|'
 
-                foreach ($row in $csv) {
-                    $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin) -join ','
-                    $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate) -join ','
-                    $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner) -join ','
+                if ($null -ne $csv) {
+                    foreach ($row in $csv) {
+                        $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin) -join ','
+                        $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate) -join ','
+                        $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner) -join ','
+                    }
+                    $newObjectDetails = $csv
                 }
-
-                $newObjectDetails = $csv
+                else {
+                    $newObjectDetails = $details
+                }
                 $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
             }
             Default {
