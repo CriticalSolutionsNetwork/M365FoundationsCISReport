@@ -1,5 +1,49 @@
+<#
+    .SYNOPSIS
+    Exports M365 security audit results to a CSV file or outputs a specific test result as an object.
+    .DESCRIPTION
+    This function exports M365 security audit results from either an array of CISAuditResult objects or a CSV file.
+    It can export all results to a specified path or output a specific test result as an object.
+    .PARAMETER AuditResults
+    An array of CISAuditResult objects containing the audit results.
+    .PARAMETER CsvPath
+    The path to a CSV file containing the audit results.
+    .PARAMETER OutputTestNumber
+    The test number to output as an object. Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
+    .PARAMETER ExportAllTests
+    Switch to export all test results.
+    .PARAMETER ExportPath
+    The path where the CSV files will be exported.
+    .PARAMETER ExportOriginalTests
+    Switch to export the original audit results to a CSV file.
+    .INPUTS
+    [CISAuditResult[]], [string]
+    .OUTPUTS
+    [PSCustomObject]
+    .EXAMPLE
+    # Output object for a single test number from audit results
+    Export-M365SecurityAuditTable -AuditResults $object -OutputTestNumber 6.1.2
+    .EXAMPLE
+    # Export all results from audit results to the specified path
+    Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp"
+    .EXAMPLE
+    # Output object for a single test number from CSV
+    Export-M365SecurityAuditTable -CsvPath "C:\temp\auditresultstoday1.csv" -OutputTestNumber 6.1.2
+    .EXAMPLE
+    # Export all results from CSV to the specified path
+    Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
+    .EXAMPLE
+    # Export all results from audit results to the specified path along with the original tests
+    Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
+    .EXAMPLE
+    # Export all results from CSV to the specified path along with the original tests
+    Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
+    .LINK
+    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
+#>
 function Export-M365SecurityAuditTable {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     param (
         [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "ExportAllResultsFromAuditResults")]
         [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "OutputObjectFromAuditResultsSingle")]
@@ -21,7 +65,11 @@ function Export-M365SecurityAuditTable {
 
         [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromAuditResults")]
         [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromCsv")]
-        [string]$ExportPath
+        [string]$ExportPath,
+
+        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
+        [switch]$ExportOriginalTests
     )
 
     function Initialize-CISAuditResult {
@@ -158,6 +206,11 @@ function Export-M365SecurityAuditTable {
                 $fileName = "$ExportPath\$($timestamp)_$($result.TestNumber).$($testDef.TestFileName -replace '\.ps1$').csv"
                 $result.Details | Export-Csv -Path $fileName -NoTypeInformation
             }
+        }
+
+        if ($ExportOriginalTests) {
+            $originalFileName = "$ExportPath\$timestamp`_M365FoundationsAudit.csv"
+            $AuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
         }
     } elseif ($OutputTestNumber) {
         return $results[0].Details
