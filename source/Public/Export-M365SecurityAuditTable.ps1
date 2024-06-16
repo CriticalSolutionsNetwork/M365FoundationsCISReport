@@ -137,6 +137,8 @@ function Export-M365SecurityAuditTable {
 
     if ($ExportPath) {
         $timestamp = (Get-Date).ToString("yyyy.MM.dd_HH.mm.ss")
+        $exportedTests = @()
+
         foreach ($result in $results) {
             $testDef = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $result.TestNumber }
             if ($testDef) {
@@ -146,7 +148,19 @@ function Export-M365SecurityAuditTable {
                 }
                 else {
                     $result.Details | Export-Csv -Path $fileName -NoTypeInformation
+                    $exportedTests += $result.TestNumber
                 }
+            }
+        }
+        if ($exportedTests.Count -gt 0) {
+            Write-Information "The following tests were included in the export: $($exportedTests -join ', ')" -InformationAction Continue
+        }
+        else {
+            if ($ExportOriginalTests) {
+                Write-Information "No specified tests were included in the export other than the full audit results." -InformationAction Continue
+            }
+            else {
+                Write-Information "No specified tests were included in the export." -InformationAction Continue
             }
         }
 
@@ -156,7 +170,12 @@ function Export-M365SecurityAuditTable {
         }
     }
     elseif ($OutputTestNumber) {
-        return $results[0].Details
+        if ($results[0].Details) {
+            return $results[0].Details
+        }
+        else {
+            Write-Information "No results found for test number $($OutputTestNumber)." -InformationAction Continue
+        }
     }
     else {
         Write-Error "No valid operation specified. Please provide valid parameters."
