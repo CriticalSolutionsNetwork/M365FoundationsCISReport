@@ -166,28 +166,12 @@ function Export-M365SecurityAuditTable {
 
         if ($ExportOriginalTests) {
             # Define the test numbers to check
-            $testNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-            # Iterate through the AuditResults and check the Details length for the specified test numbers
-            for ($i = 0; $i -lt $AuditResults.Count; $i++) {
-                $auditResult = $AuditResults[$i]
-                if ($auditResult.Rec -in $testNumbersToCheck) {
-                    if ($auditResult.Details.Length -gt 30000) {
-                        if ($exportedTests -contains $auditResult.Rec) {
-                            Write-Information "The test result for $($auditResult.Rec) is too large for CSV and was included in the export. Check the exported files."
-                            $auditResult.Details = "The test result is too large to be exported to CSV. Use the audit result and the export function for full output."
-                        }
-                        else {
-                            Write-Information "The test result for $($auditResult.Rec) is too large for CSV."
-                            $auditResult.Details = "The test result is too large to be exported to CSV. Use the audit result and the export function for full output."
-                        }
-                        # Update the AuditResults array with the modified auditResult
-                        $AuditResults[$i] = $auditResult
-                    }
-                }
-            }
-            # Export the modified audit results to a CSV file
+            $TestNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
+
+            # Check for large details and update the AuditResults array
+            $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000
             $originalFileName = "$ExportPath\$timestamp`_M365FoundationsAudit.csv"
-            $AuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
+            $updatedAuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
         }
     }
     elseif ($OutputTestNumber) {

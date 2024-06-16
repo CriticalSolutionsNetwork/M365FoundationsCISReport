@@ -103,7 +103,7 @@ function Test-MailboxAuditingE5 {
                 else {
                     "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n") # Condition A for fail
                 }
-                # $details = Initialize-LargeTestTable -lineCount 3000 # Adjust the lineCount to exceed 32,000 characters
+                $details = Initialize-LargeTestTable -lineCount 3000 # Adjust the lineCount to exceed 32,000 characters
                 # Populate the audit result
                 $params = @{
                     Rec           = $recnum
