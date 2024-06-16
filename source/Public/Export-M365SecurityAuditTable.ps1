@@ -1,66 +1,112 @@
 function Export-M365SecurityAuditTable {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = "FromAuditResultsSingle")]
-        [Parameter(Mandatory = $true, ParameterSetName = "FromAuditResultsMultiple")]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "OutputObjectFromAuditResultsSingle")]
         [CISAuditResult[]]$AuditResults,
 
-        [Parameter(Mandatory = $true, ParameterSetName = "FromCsvSingle")]
-        [Parameter(Mandatory = $true, ParameterSetName = "FromCsvMultiple")]
-        [ValidateScript({ Test-Path $_ -and (Get-Item $_).PSIsContainer -eq $false })]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "ExportAllResultsFromCsv")]
+        [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "OutputObjectFromCsvSingle")]
+        [ValidateScript({ (Test-Path $_) -and ((Get-Item $_).PSIsContainer -eq $false) })]
         [string]$CsvPath,
 
-        [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromAuditResultsSingle")]
-        [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromCsvSingle")]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "OutputObjectFromAuditResultsSingle")]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "OutputObjectFromCsvSingle")]
         [ValidateSet("1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4")]
-        [string]$TestNumber,
+        [string]$OutputTestNumber,
 
-        [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromAuditResultsMultiple")]
-        [Parameter(Mandatory = $false, Position = 1, ParameterSetName = "FromCsvMultiple")]
-        [ValidateSet("1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4")]
-        [string[]]$TestNumbers,
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "ExportAllResultsFromCsv")]
+        [switch]$ExportAllTests,
 
-        [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "FromAuditResultsMultiple")]
-        [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "FromCsvMultiple")]
-        [Parameter(Mandatory = $false, Position = 2, ParameterSetName = "FromAuditResultsSingle")]
-        [Parameter(Mandatory = $false, Position = 2, ParameterSetName = "FromCsvSingle")]
+        [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromCsv")]
         [string]$ExportPath
     )
 
-    if ($PSCmdlet.ParameterSetName -like "FromCsv*") {
+    function Initialize-CISAuditResult {
+        [CmdletBinding()]
+        [OutputType([CISAuditResult])]
+        param (
+            [Parameter(Mandatory = $true)]
+            [string]$Rec,
+
+            [Parameter(Mandatory = $true, ParameterSetName = 'Full')]
+            [bool]$Result,
+
+            [Parameter(Mandatory = $true, ParameterSetName = 'Full')]
+            [string]$Status,
+
+            [Parameter(Mandatory = $true, ParameterSetName = 'Full')]
+            [string]$Details,
+
+            [Parameter(Mandatory = $true, ParameterSetName = 'Full')]
+            [string]$FailureReason,
+
+            [Parameter(ParameterSetName = 'Error')]
+            [switch]$Failure
+        )
+
+        # Import the test definitions CSV file
+        $testDefinitions = $script:TestDefinitionsObject
+
+        # Find the row that matches the provided recommendation (Rec)
+        $testDefinition = $testDefinitions | Where-Object { $_.Rec -eq $Rec }
+
+        if (-not $testDefinition) {
+            throw "Test definition for recommendation '$Rec' not found."
+        }
+
+        # Create an instance of CISAuditResult and populate it
+        $auditResult = [CISAuditResult]::new()
+        $auditResult.Rec = $Rec
+        $auditResult.ELevel = $testDefinition.ELevel
+        $auditResult.ProfileLevel = $testDefinition.ProfileLevel
+        $auditResult.IG1 = [bool]::Parse($testDefinition.IG1)
+        $auditResult.IG2 = [bool]::Parse($testDefinition.IG2)
+        $auditResult.IG3 = [bool]::Parse($testDefinition.IG3)
+        $auditResult.RecDescription = $testDefinition.RecDescription
+        $auditResult.CISControl = $testDefinition.CISControl
+        $auditResult.CISDescription = $testDefinition.CISDescription
+        $auditResult.Automated = [bool]::Parse($testDefinition.Automated)
+        $auditResult.Connection = $testDefinition.Connection
+        $auditResult.CISControlVer = 'v8'
+
+        if ($PSCmdlet.ParameterSetName -eq 'Full') {
+            $auditResult.Result = $Result
+            $auditResult.Status = $Status
+            $auditResult.Details = $Details
+            $auditResult.FailureReason = $FailureReason
+        } elseif ($PSCmdlet.ParameterSetName -eq 'Error') {
+            $auditResult.Result = $false
+            $auditResult.Status = 'Fail'
+            $auditResult.Details = "An error occurred while processing the test."
+            $auditResult.FailureReason = "Initialization error: Failed to process the test."
+        }
+
+        return $auditResult
+    }
+
+    if ($PSCmdlet.ParameterSetName -like "ExportAllResultsFromCsv" -or $PSCmdlet.ParameterSetName -eq "OutputObjectFromCsvSingle") {
         $AuditResults = Import-Csv -Path $CsvPath | ForEach-Object {
-            [CISAuditResult]::new(
-                $_.Status,
-                $_.ELevel,
-                $_.ProfileLevel,
-                [bool]$_.Automated,
-                $_.Connection,
-                $_.Rec,
-                $_.RecDescription,
-                $_.CISControlVer,
-                $_.CISControl,
-                $_.CISDescription,
-                [bool]$_.IG1,
-                [bool]$_.IG2,
-                [bool]$_.IG3,
-                [bool]$_.Result,
-                $_.Details,
-                $_.FailureReason
-            )
+            $params = @{
+                Rec           = $_.Rec
+                Result        = [bool]$_.Result
+                Status        = $_.Status
+                Details       = $_.Details
+                FailureReason = $_.FailureReason
+            }
+            Initialize-CISAuditResult @params
         }
     }
 
-    if (-not $TestNumbers -and -not $TestNumber) {
+    if ($ExportAllTests) {
         $TestNumbers = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-        if (-not $ExportPath) {
-            Write-Error "ExportPath is required when exporting all test results."
-            return
-        }
     }
 
     $results = @()
 
-    $testsToProcess = if ($TestNumber) { @($TestNumber) } else { $TestNumbers }
+    $testsToProcess = if ($OutputTestNumber) { @($OutputTestNumber) } else { $TestNumbers }
 
     foreach ($test in $testsToProcess) {
         $auditResult = $AuditResults | Where-Object { $_.Rec -eq $test }
@@ -110,11 +156,12 @@ function Export-M365SecurityAuditTable {
             $testDef = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $result.TestNumber }
             if ($testDef) {
                 $fileName = "$ExportPath\$($timestamp)_$($result.TestNumber).$($testDef.TestFileName -replace '\.ps1$').csv"
-                $result.Details | Export-Csv -Path $fileName -NoTypeInformation -Delimiter '|'
+                $result.Details | Export-Csv -Path $fileName -NoTypeInformation
             }
         }
-    }
-    else {
-        return $results.Details
+    } elseif ($OutputTestNumber) {
+        return $results[0].Details
+    } else {
+        Write-Error "No valid operation specified. Please provide valid parameters."
     }
 }
