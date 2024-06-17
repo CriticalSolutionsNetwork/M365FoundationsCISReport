@@ -103,7 +103,12 @@ function Export-M365SecurityAuditTable {
         switch ($test) {
             "6.1.2" {
                 $details = $auditResult.Details
-                $csv = $details | ConvertFrom-Csv -Delimiter '|'
+                if ($details -ne "No M365 E3 licenses found.") {
+                    $csv = $details | ConvertFrom-Csv -Delimiter '|'
+                }
+                else {
+                    $csv = $null
+                }
 
                 if ($null -ne $csv) {
                     foreach ($row in $csv) {
@@ -120,7 +125,12 @@ function Export-M365SecurityAuditTable {
             }
             "6.1.3" {
                 $details = $auditResult.Details
-                $csv = $details | ConvertFrom-Csv -Delimiter '|'
+                if ($details -ne "No M365 E5 licenses found.") {
+                    $csv = $details | ConvertFrom-Csv -Delimiter '|'
+                }
+                else {
+                    $csv = $null
+                }
 
                 if ($null -ne $csv) {
                     foreach ($row in $csv) {
@@ -155,8 +165,10 @@ function Export-M365SecurityAuditTable {
                     Write-Information "No results found for test number $($result.TestNumber)." -InformationAction Continue
                 }
                 else {
-                    $result.Details | Export-Csv -Path $fileName -NoTypeInformation
-                    $exportedTests += $result.TestNumber
+                    if (($result.Details -ne "No M365 E3 licenses found.") -and ($result.Details -ne "No M365 E5 licenses found.")) {
+                        $result.Details | Export-Csv -Path $fileName -NoTypeInformation
+                        $exportedTests += $result.TestNumber
+                    }
                 }
             }
         }
