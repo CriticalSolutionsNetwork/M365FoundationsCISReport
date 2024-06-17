@@ -6,6 +6,17 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Added tenant output to connect function.
+- Added skip tenant connection confirmation to main function.
+
+### Fixed
+
+- Fixed comment examples for `Export-M365SecurityAuditTable`.
+
+## [0.1.12] - 2024-06-17
+
+### Added
+
 - Added `Export-M365SecurityAuditTable` public function to export applicable audit results to a table format.
 - Added paramter to `Export-M365SecurityAuditTable` to specify output of the original audit results.
 - Added `Remove-RowsWithEmptyCSVStatus` public function to remove rows with empty status from the CSV file.
