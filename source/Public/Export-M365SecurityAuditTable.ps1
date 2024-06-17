@@ -21,23 +21,23 @@
     .OUTPUTS
     [PSCustomObject]
     .EXAMPLE
-    # Output object for a single test number from audit results
     Export-M365SecurityAuditTable -AuditResults $object -OutputTestNumber 6.1.2
+    # Output object for a single test number from audit results
     .EXAMPLE
-    # Export all results from audit results to the specified path
     Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp"
+    # Export all results from audit results to the specified path
     .EXAMPLE
-    # Output object for a single test number from CSV
     Export-M365SecurityAuditTable -CsvPath "C:\temp\auditresultstoday1.csv" -OutputTestNumber 6.1.2
+    # Output object for a single test number from CSV
     .EXAMPLE
-    # Export all results from CSV to the specified path
     Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
+    # Export all results from CSV to the specified path
     .EXAMPLE
-    # Export all results from audit results to the specified path along with the original tests
     Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
+    # Export all results from audit results to the specified path along with the original tests
     .EXAMPLE
-    # Export all results from CSV to the specified path along with the original tests
     Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
+    # Export all results from CSV to the specified path along with the original tests
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
 #>
