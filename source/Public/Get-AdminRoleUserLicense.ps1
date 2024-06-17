@@ -25,7 +25,6 @@
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Get-AdminRoleUserLicense
 #>
 function Get-AdminRoleUserLicense {
-    # Set output type to System.Collections.ArrayList
     [OutputType([System.Collections.ArrayList])]
     [CmdletBinding()]
     param (
@@ -42,33 +41,37 @@ function Get-AdminRoleUserLicense {
         $userIds = [System.Collections.ArrayList]::new()
     }
 
-    Process {
-        $adminroles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
+    process {
+        Write-Verbose "Retrieving all admin roles"
+        $adminRoleNames = (Get-MgDirectoryRole | Where-Object { $null -ne $_.RoleTemplateId }).DisplayName
 
-        foreach ($role in $adminroles) {
-            $usersInRole = Get-MgRoleManagementDirectoryRoleAssignment -Filter "roleDefinitionId eq '$($role.Id)'"
+        Write-Verbose "Filtering admin roles"
+        $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { ($adminRoleNames -contains $_.DisplayName) -and ($_.DisplayName -ne "Directory Synchronization Accounts") }
 
-            foreach ($user in $usersInRole) {
-                $userDetails = Get-MgUser -UserId $user.PrincipalId -Property "DisplayName, UserPrincipalName, Id, onPremisesSyncEnabled" -ErrorAction SilentlyContinue
+        foreach ($role in $adminRoles) {
+            Write-Verbose "Processing role: $($role.DisplayName)"
+            $roleAssignments = Get-MgRoleManagementDirectoryRoleAssignment -Filter "roleDefinitionId eq '$($role.Id)'"
+
+            foreach ($assignment in $roleAssignments) {
+                Write-Verbose "Processing role assignment for principal ID: $($assignment.PrincipalId)"
+                $userDetails = Get-MgUser -UserId $assignment.PrincipalId -Property "DisplayName, UserPrincipalName, Id, OnPremisesSyncEnabled" -ErrorAction SilentlyContinue
 
                 if ($userDetails) {
-                    [void]($userIds.Add($user.PrincipalId))
-                    [void](
-                        $adminRoleUsers.Add(
-                            [PSCustomObject]@{
-                                RoleName          = $role.DisplayName
-                                UserName          = $userDetails.DisplayName
-                                UserPrincipalName = $userDetails.UserPrincipalName
-                                UserId            = $userDetails.Id
-                                HybridUser        = $userDetails.onPremisesSyncEnabled
-                                Licenses          = $null  # Initialize as $null
-                            }
-                        )
-                    )
+                    Write-Verbose "Retrieved user details for: $($userDetails.UserPrincipalName)"
+                    [void]($userIds.Add($userDetails.Id))
+                    [void]($adminRoleUsers.Add([PSCustomObject]@{
+                        RoleName          = $role.DisplayName
+                        UserName          = $userDetails.DisplayName
+                        UserPrincipalName = $userDetails.UserPrincipalName
+                        UserId            = $userDetails.Id
+                        HybridUser        = [bool]$userDetails.OnPremisesSyncEnabled
+                        Licenses          = $null  # Initialize as $null
+                    }))
                 }
             }
         }
 
+        Write-Verbose "Retrieving licenses for admin role users"
         foreach ($userId in $userIds.ToArray() | Select-Object -Unique) {
             $licenses = Get-MgUserLicenseDetail -UserId $userId -ErrorAction SilentlyContinue
             if ($licenses) {
@@ -80,7 +83,7 @@ function Get-AdminRoleUserLicense {
         }
     }
 
-    End {
+    end {
         Write-Host "Disconnecting from Microsoft Graph..." -ForegroundColor Green
         Disconnect-MgGraph | Out-Null
         return $adminRoleUsers

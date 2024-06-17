@@ -4,10 +4,6 @@ function Test-SafeAttachmentsPolicy {
     param ()
 
     begin {
-        # Dot source the class script if necessary
-        #. .\source\Classes\CISAuditResult.ps1
-
-        # Initialization code, if needed
         $recnum = "2.1.4"
 
         <#
@@ -61,18 +57,20 @@ function Test-SafeAttachmentsPolicy {
 
                     # Add policy details to the details array
                     $details += [PSCustomObject]@{
-                        Policy   = $policy.Name
-                        Enabled  = $policy.Enable
-                        Action   = $policy.Action
-                        Failed   = $failed
+                        Policy  = $policy.Name
+                        Enabled = $policy.Enable
+                        Action  = $policy.Action
+                        Failed  = $failed
                     }
                 }
 
                 # The result is a pass if there are no failure reasons
                 $result = $failureReasons.Count -eq 0
 
-                # Format details for output
-                $detailsString = $details | Format-Table -AutoSize | Out-String
+                # Format details for output manually
+                $detailsString = "Policy|Enabled|Action|Failed`n" + ($details |
+                    ForEach-Object {"$($_.Policy)|$($_.Enabled)|$($_.Action)|$($_.Failed)`n"}
+                )
                 $failureReasonsString = ($failureReasons | ForEach-Object { $_ }) -join ' '
 
                 # Create and populate the CISAuditResult object
@@ -103,8 +101,8 @@ function Test-SafeAttachmentsPolicy {
                 Rec           = $recnum
                 Result        = $false
                 Status        = "Fail"
-                Details       = "No M365 E5 licenses found."
-                FailureReason = "The audit is for M365 E5 licenses and the required EXO commands will not be available otherwise."
+                Details       = "No Safe Attachments policies found."
+                FailureReason = "The audit needs Safe Attachment features available or required EXO commands will not be available otherwise."
             }
             $auditResult = Initialize-CISAuditResult @params
         }

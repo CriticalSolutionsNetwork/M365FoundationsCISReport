@@ -20,7 +20,12 @@ function Test-AdministrativeAccountCompliance {
         try {
             # Retrieve all admin roles
             Write-Verbose "Retrieving all admin roles"
-            $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { $_.DisplayName -like "*Admin*" }
+            # Get the DisplayNames of all admin roles
+            $adminRoleNames = (Get-MgDirectoryRole | Where-Object { $null -ne $_.RoleTemplateId }).DisplayName
+
+            # Use the DisplayNames to filter the roles in Get-MgRoleManagementDirectoryRoleDefinition
+            $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { ($adminRoleNames -contains $_.DisplayName) -and ($_.DisplayName -ne "Directory Synchronization Accounts")}
+
             $adminRoleUsers = @()
 
             # Loop through each admin role to get role assignments and user details
@@ -47,9 +52,10 @@ function Test-AdministrativeAccountCompliance {
 
                         # Condition C: Check if the account has no other licenses
                         $hasInvalidLicense = $licenses.SkuPartNumber | ForEach-Object { $validLicenses -notcontains $_ }
+                        $invalidLicenses = $licenses.SkuPartNumber | Where-Object { $validLicenses -notcontains $_ }
                         $applicationAssignmentStatus = if ($hasInvalidLicense) { "Fail" } else { "Pass" }
 
-                        Write-Verbose "User: $($userDetails.UserPrincipalName), Cloud-Only: $cloudOnlyStatus, Valid Licenses: $validLicensesStatus, Other Applications Assigned: $applicationAssignmentStatus"
+                        Write-Verbose "User: $($userDetails.UserPrincipalName), Cloud-Only: $cloudOnlyStatus, Valid Licenses: $validLicensesStatus, Invalid Licenses: $($invalidLicenses -join ', ')"
 
                         # Collect user information
                         $adminRoleUsers += [PSCustomObject]@{
@@ -95,13 +101,14 @@ function Test-AdministrativeAccountCompliance {
             $failureReasons = $failureReasons -join "`n"
             $failureReason = if ($nonCompliantUsers) {
                 "Non-Compliant Accounts: $($nonCompliantUsers.Count)"
-            } else {
+            }
+            else {
                 "Compliant Accounts: $($uniqueAdminRoleUsers.Count)"
             }
 
             $result = $nonCompliantUsers.Count -eq 0
             $status = if ($result) { 'Pass' } else { 'Fail' }
-            $details = if ($nonCompliantUsers) { "Non-compliant accounts: `nUsername | Roles | Cloud-Only Status | Entra ID License Status | Other Applications Assigned Status`n$failureReasons" } else { "N/A" }
+            $details = if ($nonCompliantUsers) { "Username | Roles | Cloud-Only Status | EntraID P1/P2 License Status | Other Applications Assigned Status`n$failureReasons" } else { "N/A" }
 
             Write-Verbose "Assessment completed. Result: $status"
 

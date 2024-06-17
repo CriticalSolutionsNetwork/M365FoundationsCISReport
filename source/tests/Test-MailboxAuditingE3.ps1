@@ -30,20 +30,21 @@ function Test-MailboxAuditingE3 {
         #. .\source\Classes\CISAuditResult.ps1
 
         $e3SkuPartNumber = "SPE_E3"
-        $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
-        $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
-        $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MoveToDeletedItems", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
+
+        $actionDictionaries = Get-Action -Dictionaries
+        # E3 specific actions
+        $AdminActions = $actionDictionaries.AdminActions.Keys | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }
+        $DelegateActions = $actionDictionaries.DelegateActions.Keys | Where-Object { $_ -notin @("MailItemsAccessed") }
+        $OwnerActions = $actionDictionaries.OwnerActions.Keys | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }
 
         $allFailures = @()
-        #$allUsers = Get-AzureADUser -All $true
-        $founde3Sku = Get-MgSubscribedSku -All | Where-Object {$_.SkuPartNumber -eq $e3SkuPartNumber}
+        $founde3Sku = Get-MgSubscribedSku -All | Where-Object { $_.SkuPartNumber -eq $e3SkuPartNumber }
         $processedUsers = @{}  # Dictionary to track processed users
         $recnum = "6.1.2"
     }
 
-
     process {
-        if (($founde3Sku.count)-ne 0) {
+        if ($founde3Sku.Count -ne 0) {
             $allUsers = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde3Sku.SkuId) )" -All
             $mailboxes = Get-EXOMailbox -PropertySets Audit
             try {
@@ -53,36 +54,36 @@ function Test-MailboxAuditingE3 {
                         continue
                     }
 
-                    #$licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
-                    #$hasOfficeE3 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e3SkuPartNumbers }).Count -gt 0
-                    #Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E3 license."
-
                     $userUPN = $user.UserPrincipalName
                     $mailbox = $mailboxes | Where-Object { $_.UserPrincipalName -eq $user.UserPrincipalName }
 
-                    $missingActions = @()
+                    $missingAdminActions = @()
+                    $missingDelegateActions = @()
+                    $missingOwnerActions = @()
+
                     if ($mailbox.AuditEnabled) {
                         foreach ($action in $AdminActions) {
-                            # Condition B: Checking if the `AuditAdmin` actions include required actions
-                            if ($mailbox.AuditAdmin -notcontains $action) { $missingActions += "Admin action '$action' missing" }
+                            if ($mailbox.AuditAdmin -notcontains $action) {
+                                $missingAdminActions += (Get-Action -Actions $action -ActionType "Admin")
+                            }
                         }
                         foreach ($action in $DelegateActions) {
-                            # Condition C: Checking if the `AuditDelegate` actions include required actions
-                            if ($mailbox.AuditDelegate -notcontains $action) { $missingActions += "Delegate action '$action' missing" }
+                            if ($mailbox.AuditDelegate -notcontains $action) {
+                                $missingDelegateActions += (Get-Action -Actions $action -ActionType "Delegate")
+                            }
                         }
                         foreach ($action in $OwnerActions) {
-                            # Condition D: Checking if the `AuditOwner` actions include required actions
-                            if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" }
+                            if ($mailbox.AuditOwner -notcontains $action) {
+                                $missingOwnerActions += (Get-Action -Actions $action -ActionType "Owner")
+                            }
                         }
 
-                        if ($missingActions.Count -gt 0) {
-                            $formattedActions = Format-MissingAction -missingActions $missingActions
-                            $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
+                        if ($missingAdminActions.Count -gt 0 -or $missingDelegateActions.Count -gt 0 -or $missingOwnerActions.Count -gt 0) {
+                            $allFailures += "$userUPN|True|$($missingAdminActions -join ',')|$($missingDelegateActions -join ',')|$($missingOwnerActions -join ',')"
                         }
                     }
                     else {
-                        # Condition A: Checking if mailbox audit logging is enabled
-                        $allFailures += "$userUPN|False|||"
+                        $allFailures += "$userUPN|False|||" # Condition A for fail
                     }
 
                     # Mark the user as processed
@@ -90,7 +91,12 @@ function Test-MailboxAuditingE3 {
                 }
 
                 # Prepare failure reasons and details based on compliance
-                $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+                if ($allFailures.Count -eq 0) {
+                    $failureReasons = "N/A"
+                }
+                else {
+                    $failureReasons = "Audit issues detected."
+                }
                 $details = if ($allFailures.Count -eq 0) {
                     "All Office E3 users have correct mailbox audit settings."
                 }
@@ -134,14 +140,13 @@ function Test-MailboxAuditingE3 {
     }
 
     end {
-        #$verbosePreference = 'Continue'
         $detailsLength = $details.Length
         Write-Verbose "Character count of the details: $detailsLength"
 
         if ($detailsLength -gt 32767) {
             Write-Verbose "Warning: The character count exceeds the limit for Excel cells."
         }
-        #$verbosePreference = 'SilentlyContinue'
+
         return $auditResult
     }
 }

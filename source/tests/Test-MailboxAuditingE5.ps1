@@ -28,14 +28,15 @@ function Test-MailboxAuditingE5 {
         #   - Condition D: AuditOwner actions do not include all of the following: ApplyRecord, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
 
         $e5SkuPartNumber = "SPE_E5"
-        $AdminActions = @("ApplyRecord", "Copy", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
-        $DelegateActions = @("ApplyRecord", "Create", "FolderBind", "HardDelete", "MailItemsAccessed", "Move", "MoveToDeletedItems", "SendAs", "SendOnBehalf", "SoftDelete", "Update", "UpdateFolderPermissions", "UpdateInboxRules")
-        $OwnerActions = @("ApplyRecord", "Create", "HardDelete", "MailboxLogin", "Move", "MailItemsAccessed", "MoveToDeletedItems", "Send", "SoftDelete", "Update", "UpdateCalendarDelegation", "UpdateFolderPermissions", "UpdateInboxRules")
+        $founde5Sku = Get-MgSubscribedSku -All | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
+
+        $actionDictionaries = Get-Action -Dictionaries
+        $AdminActions = $actionDictionaries.AdminActions.Keys
+        $DelegateActions = $actionDictionaries.DelegateActions.Keys
+        $OwnerActions = $actionDictionaries.OwnerActions.Keys
 
         $allFailures = @()
-        #$allUsers = Get-AzureADUser -All $true
-        $founde5Sku = Get-MgSubscribedSku -All | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
-        $processedUsers = @{}  # Dictionary to track processed users
+        $processedUsers = @{}
         $recnum = "6.1.3"
     }
 
@@ -50,35 +51,39 @@ function Test-MailboxAuditingE5 {
                         continue
                     }
 
-                    #$licenseDetails = Get-MgUserLicenseDetail -UserId $user.UserPrincipalName
-                    #$hasOfficeE5 = ($licenseDetails | Where-Object { $_.SkuPartNumber -in $e5SkuPartNumbers }).Count -gt 0
-                    #Write-Verbose "Evaluating user $($user.UserPrincipalName) for Office E5 license."
                     $mailbox = $mailboxes | Where-Object { $_.UserPrincipalName -eq $user.UserPrincipalName }
                     $userUPN = $user.UserPrincipalName
-                    #$mailbox = Get-EXOMailbox -Identity $userUPN -PropertySets Audit
 
-                    $missingActions = @()
+                    $missingAdminActions = @()
+                    $missingDelegateActions = @()
+                    $missingOwnerActions = @()
+
                     if ($mailbox.AuditEnabled) {
                         # Validate Admin actions
                         foreach ($action in $AdminActions) {
-                            if ($mailbox.AuditAdmin -notcontains $action) { $missingActions += "Admin action '$action' missing" } # Condition B
+                            if ($mailbox.AuditAdmin -notcontains $action) {
+                                $missingAdminActions += (Get-Action -Actions $action -ActionType "Admin") # Condition B
+                            }
                         }
                         # Validate Delegate actions
                         foreach ($action in $DelegateActions) {
-                            if ($mailbox.AuditDelegate -notcontains $action) { $missingActions += "Delegate action '$action' missing" } # Condition C
+                            if ($mailbox.AuditDelegate -notcontains $action) {
+                                $missingDelegateActions += (Get-Action -Actions $action -ActionType "Delegate") # Condition C
+                            }
                         }
                         # Validate Owner actions
                         foreach ($action in $OwnerActions) {
-                            if ($mailbox.AuditOwner -notcontains $action) { $missingActions += "Owner action '$action' missing" } # Condition D
+                            if ($mailbox.AuditOwner -notcontains $action) {
+                                $missingOwnerActions += (Get-Action -Actions $action -ActionType "Owner") # Condition D
+                            }
                         }
 
-                        if ($missingActions.Count -gt 0) {
-                            $formattedActions = Format-MissingAction -missingActions $missingActions
-                            $allFailures += "$userUPN|True|$($formattedActions.Admin)|$($formattedActions.Delegate)|$($formattedActions.Owner)"
+                        if ($missingAdminActions.Count -gt 0 -or $missingDelegateActions.Count -gt 0 -or $missingOwnerActions.Count -gt 0) {
+                            $allFailures += "$userUPN|True|$($missingAdminActions -join ',')|$($missingDelegateActions -join ',')|$($missingOwnerActions -join ',')"
                         }
                     }
                     else {
-                        $allFailures += "$userUPN|False|||"
+                        $allFailures += "$userUPN|False|||" # Condition A for fail
                     }
 
                     # Mark the user as processed
@@ -86,14 +91,19 @@ function Test-MailboxAuditingE5 {
                 }
 
                 # Prepare failure reasons and details based on compliance
-                $failureReasons = if ($allFailures.Count -eq 0) { "N/A" } else { "Audit issues detected." }
+                if ($allFailures.Count -eq 0) {
+                    $failureReasons = "N/A"
+                }
+                else {
+                    $failureReasons = "Audit issues detected."
+                }
                 $details = if ($allFailures.Count -eq 0) {
                     "All Office E5 users have correct mailbox audit settings." # Condition A for pass
                 }
                 else {
                     "UserPrincipalName|AuditEnabled|AdminActionsMissing|DelegateActionsMissing|OwnerActionsMissing`n" + ($allFailures -join "`n") # Condition A for fail
                 }
-
+                # $details = Initialize-LargeTestTable -lineCount 3000 # Adjust the lineCount to exceed 32,000 characters
                 # Populate the audit result
                 $params = @{
                     Rec           = $recnum
@@ -130,14 +140,13 @@ function Test-MailboxAuditingE5 {
     }
 
     end {
-        #$verbosePreference = 'Continue'
         $detailsLength = $details.Length
         Write-Verbose "Character count of the details: $detailsLength"
 
         if ($detailsLength -gt 32767) {
             Write-Verbose "Warning: The character count exceeds the limit for Excel cells."
         }
-        #$verbosePreference = 'SilentlyContinue'
+
         return $auditResult
     }
 }

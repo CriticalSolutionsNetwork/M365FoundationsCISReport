@@ -64,7 +64,7 @@ function Test-BlockMailForwarding {
             if ($nonCompliantSpamPoliciesArray.Count -gt 0) {
                 # Fail Condition B
                 $failureReasons += "Outbound spam policies allowing automatic forwarding found."
-                $details += "Outbound Spam Policies Details:`nPolicy|AutoForwardingMode"
+                $details += "Policy|AutoForwardingMode"
                 $details += $nonCompliantSpamPoliciesArray | ForEach-Object {
                     "$($_.Name)|$($_.AutoForwardingMode)"
                 }
