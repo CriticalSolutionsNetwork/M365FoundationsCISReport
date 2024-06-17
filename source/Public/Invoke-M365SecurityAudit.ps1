@@ -240,11 +240,18 @@ function Invoke-M365SecurityAudit {
         $currentTestIndex = 0
 
         # Establishing connections if required
-        $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
-        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
-            Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
-            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
+        try {
+            $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
+            if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
+                Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
+                Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
+            }
         }
+        catch {
+            Write-Host "Execution aborted: $_" -ForegroundColor Red
+            break
+        }
+
 
 
         Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue
