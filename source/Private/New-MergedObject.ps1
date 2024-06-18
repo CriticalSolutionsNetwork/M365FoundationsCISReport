@@ -10,7 +10,7 @@ function New-MergedObject {
     )
 
     $newObject = New-Object PSObject
-    $currentDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $currentDate = Get-Date -Format "yyyy-MM-ddTHH:mm:ss"
 
     foreach ($property in $ExcelItem.PSObject.Properties) {
         $newObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value -Force
