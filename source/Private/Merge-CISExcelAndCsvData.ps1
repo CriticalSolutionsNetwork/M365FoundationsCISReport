@@ -26,6 +26,9 @@ function Merge-CISExcelAndCsvData {
             $AuditResults
         }
 
+        # Extract recommendation numbers from the CSV
+        $csvRecs = $csvData | Select-Object -ExpandProperty Rec
+
         # Ensure headers are included in the merged data
         $headers = @()
         $firstItem = $import[0]
@@ -36,11 +39,13 @@ function Merge-CISExcelAndCsvData {
 
         $mergedData = @()
         foreach ($item in $import) {
-            $csvRow = $csvData | Where-Object { $_.Rec -eq $item.'recommendation #' }
-            if ($csvRow) {
+            # Check if the recommendation number exists in the CSV
+            $recNum = $item.'recommendation #'
+            if ($csvRecs -contains $recNum) {
+                $csvRow = $csvData | Where-Object { $_.Rec -eq $recNum }
                 $mergedData += New-MergedObject -ExcelItem $item -CsvRow $csvRow
             } else {
-                $mergedData += New-MergedObject -ExcelItem $item -CsvRow ([PSCustomObject]@{Connection=$null; Status=$null; Date=$null; Details=$null; FailureReason=$null})
+                $mergedData += $item
             }
         }
 

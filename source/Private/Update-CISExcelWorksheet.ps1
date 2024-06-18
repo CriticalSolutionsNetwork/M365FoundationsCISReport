@@ -35,7 +35,8 @@ function Update-CISExcelWorksheet {
         }
 
         # Update the worksheet with the provided data
-        Update-WorksheetCell -Worksheet $worksheet -Data $Data -StartingRowIndex $StartingRowIndex
+        $validRows = $Data | Where-Object { $_.'recommendation #' -ne $null }
+        Update-WorksheetCell -Worksheet $worksheet -Data $validRows -StartingRowIndex $StartingRowIndex
 
         # Save and close the Excel package
         Close-ExcelPackage $excelPackage
