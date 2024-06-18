@@ -10,6 +10,7 @@ function New-MergedObject {
     )
 
     $newObject = New-Object PSObject
+    $currentDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
     foreach ($property in $ExcelItem.PSObject.Properties) {
         $newObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value -Force
@@ -17,6 +18,7 @@ function New-MergedObject {
 
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Connection' -Value $CsvRow.Connection -Force
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Status' -Value $CsvRow.Status -Force
+    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Date' -Value $currentDate -Force
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Details' -Value $CsvRow.Details -Force
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_FailureReason' -Value $CsvRow.FailureReason -Force
 

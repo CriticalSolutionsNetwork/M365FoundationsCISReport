@@ -10,8 +10,8 @@ function Update-WorksheetCell {
     $firstItem = $Data[0]
     $colIndex = 1
     foreach ($property in $firstItem.PSObject.Properties) {
-        # Update headers if they don't exist or if explicitly needed
-        if ($Worksheet.Cells[1, $colIndex].Value -ne $property.Name) {
+        if ($StartingRowIndex -eq 2 -and $Worksheet.Cells[1, $colIndex].Value -eq $null) {
+            # Add header if it's not present
             $Worksheet.Cells[1, $colIndex].Value = $property.Name
         }
         $colIndex++

@@ -16,23 +16,44 @@ function Merge-CISExcelAndCsvData {
     )
 
     process {
+        # Import data from Excel
         $import = Import-Excel -Path $ExcelPath -WorksheetName $WorksheetName
 
+        # Import data from CSV or use provided object
         $csvData = if ($PSCmdlet.ParameterSetName -eq 'CsvInput') {
             Import-Csv -Path $CsvPath
         } else {
             $AuditResults
         }
 
-        $mergedData = foreach ($item in $import) {
+        # Ensure headers are included in the merged data
+        $headers = @()
+        $firstItem = $import[0]
+        foreach ($property in $firstItem.PSObject.Properties) {
+            $headers += $property.Name
+        }
+        $headers += 'CSV_Connection', 'CSV_Status', 'CSV_Date', 'CSV_Details', 'CSV_FailureReason'
+
+        $mergedData = @()
+        foreach ($item in $import) {
             $csvRow = $csvData | Where-Object { $_.Rec -eq $item.'recommendation #' }
             if ($csvRow) {
-                New-MergedObject -ExcelItem $item -CsvRow $csvRow
+                $mergedData += New-MergedObject -ExcelItem $item -CsvRow $csvRow
             } else {
-                $item
+                $mergedData += New-MergedObject -ExcelItem $item -CsvRow ([PSCustomObject]@{Connection=$null; Status=$null; Date=$null; Details=$null; FailureReason=$null})
             }
         }
 
-        return $mergedData
+        # Create a new PSObject array with headers included
+        $result = @()
+        foreach ($item in $mergedData) {
+            $newItem = New-Object PSObject
+            foreach ($header in $headers) {
+                $newItem | Add-Member -MemberType NoteProperty -Name $header -Value $item.$header -Force
+            }
+            $result += $newItem
+        }
+
+        return $result
     }
 }

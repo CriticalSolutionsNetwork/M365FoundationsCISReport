@@ -24,6 +24,16 @@ function Update-CISExcelWorksheet {
             throw "Worksheet '$WorksheetName' not found in '$ExcelPath'"
         }
 
+        # Ensure headers are set
+        $firstItem = $Data[0]
+        $colIndex = 1
+        foreach ($property in $firstItem.PSObject.Properties) {
+            if ($worksheet.Cells[1, $colIndex].Value -eq $null -or $worksheet.Cells[1, $colIndex].Value -ne $property.Name) {
+                $worksheet.Cells[1, $colIndex].Value = $property.Name
+            }
+            $colIndex++
+        }
+
         # Update the worksheet with the provided data
         Update-WorksheetCell -Worksheet $worksheet -Data $Data -StartingRowIndex $StartingRowIndex
 
