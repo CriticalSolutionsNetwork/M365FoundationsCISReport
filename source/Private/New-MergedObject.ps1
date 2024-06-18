@@ -18,7 +18,11 @@ function New-MergedObject {
 
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Connection' -Value $CsvRow.Connection -Force
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Status' -Value $CsvRow.Status -Force
-    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Date' -Value $currentDate -Force
+    if ($CsvRow.Status -ne $null) {
+        $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Date' -Value $currentDate -Force
+    } else {
+        $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Date' -Value $null -Force
+    }
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Details' -Value $CsvRow.Details -Force
     $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_FailureReason' -Value $CsvRow.FailureReason -Force
 
