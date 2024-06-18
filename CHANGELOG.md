@@ -13,6 +13,10 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Fixed comment examples for `Export-M365SecurityAuditTable`.
 
+### Changed
+
+- Updated `Sync-CISExcelAndCsvData` to be one function.
+
 ## [0.1.12] - 2024-06-17
 
 ### Added
