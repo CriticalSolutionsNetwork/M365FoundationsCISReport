@@ -24,7 +24,6 @@ function Update-CISExcelWorksheet {
             throw "Worksheet '$WorksheetName' not found in '$ExcelPath'"
         }
 
-
         # Update the worksheet with the provided data
         Update-WorksheetCell -Worksheet $worksheet -Data $Data -StartingRowIndex $StartingRowIndex
 

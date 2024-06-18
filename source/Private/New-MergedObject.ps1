@@ -12,11 +12,13 @@ function New-MergedObject {
     $newObject = New-Object PSObject
 
     foreach ($property in $ExcelItem.PSObject.Properties) {
-        $newObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value
+        $newObject | Add-Member -MemberType NoteProperty -Name $property.Name -Value $property.Value -Force
     }
-    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Connection' -Value $CsvRow.Connection
-    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Status' -Value $CsvRow.Status
-    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Details' -Value $CsvRow.Details
-    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_FailureReason' -Value $CsvRow.FailureReason
+
+    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Connection' -Value $CsvRow.Connection -Force
+    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Status' -Value $CsvRow.Status -Force
+    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_Details' -Value $CsvRow.Details -Force
+    $newObject | Add-Member -MemberType NoteProperty -Name 'CSV_FailureReason' -Value $CsvRow.FailureReason -Force
+
     return $newObject
 }

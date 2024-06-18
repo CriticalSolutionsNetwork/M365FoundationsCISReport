@@ -66,25 +66,22 @@ function Sync-CISExcelAndCsvData {
     )
 
     process {
-        # Verify ImportExcel module is available
         $requiredModules = Get-RequiredModule -SyncFunction
         foreach ($module in $requiredModules) {
             Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
         }
 
-        # Merge Excel and CSV data or Audit Results
         if ($PSCmdlet.ParameterSetName -eq 'CsvInput') {
             $mergedData = Merge-CISExcelAndCsvData -ExcelPath $ExcelPath -WorksheetName $WorksheetName -CsvPath $CsvPath
         } else {
             $mergedData = Merge-CISExcelAndCsvData -ExcelPath $ExcelPath -WorksheetName $WorksheetName -AuditResults $AuditResults
         }
 
-        # Output the merged data if the user chooses to skip the update
         if ($SkipUpdate) {
             return $mergedData
         } else {
-            # Update the Excel worksheet with the merged data
             Update-CISExcelWorksheet -ExcelPath $ExcelPath -WorksheetName $WorksheetName -Data $mergedData
         }
     }
 }
+
