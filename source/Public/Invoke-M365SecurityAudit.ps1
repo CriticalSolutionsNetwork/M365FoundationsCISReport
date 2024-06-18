@@ -27,6 +27,8 @@
     If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
     .PARAMETER NoModuleCheck
     If specified, the cmdlet will not check for the presence of required modules.
+    .PARAMETER DoNotConfirmConnections
+    If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
     .EXAMPLE
     PS> Invoke-M365SecurityAudit
     Performs a security audit using default parameters.
@@ -174,7 +176,8 @@ function Invoke-M365SecurityAudit {
         # Common parameters for all parameter sets
         [switch]$DoNotConnect,
         [switch]$DoNotDisconnect,
-        [switch]$NoModuleCheck
+        [switch]$NoModuleCheck,
+        [switch]$DoNotConfirmConnections
     )
 
     Begin {
@@ -240,11 +243,18 @@ function Invoke-M365SecurityAudit {
         $currentTestIndex = 0
 
         # Establishing connections if required
-        $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
-        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
-            Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
-            Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections
+        try {
+            $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
+            if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
+                Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
+                Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections -SkipConfirmation:$DoNotConfirmConnections
+            }
         }
+        catch {
+            Write-Host "Execution aborted: $_" -ForegroundColor Red
+            break
+        }
+
 
 
         Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue

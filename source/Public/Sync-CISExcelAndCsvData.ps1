@@ -1,90 +1,102 @@
 <#
-.SYNOPSIS
-Synchronizes data between an Excel file and either a CSV file or an output object from Invoke-M365SecurityAudit, and optionally updates the Excel worksheet.
-.DESCRIPTION
-The Sync-CISExcelAndCsvData function merges data from a specified Excel file with data from either a CSV file or an output object from Invoke-M365SecurityAudit based on a common key. It can also update the Excel worksheet with the merged data. This function is particularly useful for updating Excel records with additional data from a CSV file or audit results while preserving the original formatting and structure of the Excel worksheet.
-.PARAMETER ExcelPath
-The path to the Excel file that contains the original data. This parameter is mandatory.
-.PARAMETER WorksheetName
-The name of the worksheet within the Excel file that contains the data to be synchronized. This parameter is mandatory.
-.PARAMETER CsvPath
-The path to the CSV file containing data to be merged with the Excel data. This parameter is mandatory when using the CsvInput parameter set.
-.PARAMETER AuditResults
-An array of CISAuditResult objects from Invoke-M365SecurityAudit to be merged with the Excel data. This parameter is mandatory when using the ObjectInput parameter set. It can also accept pipeline input.
-.PARAMETER SkipUpdate
-If specified, the function will return the merged data object without updating the Excel worksheet. This is useful for previewing the merged data.
-.EXAMPLE
-PS> Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -WorksheetName "DataSheet" -CsvPath "path\to\data.csv"
-Merges data from 'data.csv' into 'excel.xlsx' on the 'DataSheet' worksheet and updates the worksheet with the merged data.
-.EXAMPLE
-PS> $mergedData = Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -WorksheetName "DataSheet" -CsvPath "path\to\data.csv" -SkipUpdate
-Retrieves the merged data object for preview without updating the Excel worksheet.
-.EXAMPLE
-PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://tenant-admin.url" -DomainName "example.com"
-PS> Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -WorksheetName "DataSheet" -AuditResults $auditResults
-Merges data from the audit results into 'excel.xlsx' on the 'DataSheet' worksheet and updates the worksheet with the merged data.
-.EXAMPLE
-PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://tenant-admin.url" -DomainName "example.com"
-PS> $mergedData = Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -WorksheetName "DataSheet" -AuditResults $auditResults -SkipUpdate
-Retrieves the merged data object for preview without updating the Excel worksheet.
-.EXAMPLE
-PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://tenant-admin.url" -DomainName "example.com" | Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -WorksheetName "DataSheet"
-Pipes the audit results into Sync-CISExcelAndCsvData to merge data into 'excel.xlsx' on the 'DataSheet' worksheet and updates the worksheet with the merged data.
-.INPUTS
-System.String, CISAuditResult[]
-You can pipe CISAuditResult objects to Sync-CISExcelAndCsvData.
-.OUTPUTS
-Object[]
-If the SkipUpdate switch is used, the function returns an array of custom objects representing the merged data.
-.NOTES
-- Ensure that the 'ImportExcel' module is installed and up to date.
-- It is recommended to backup the Excel file before running this script to prevent accidental data loss.
-- This function is part of the CIS Excel and CSV Data Management Toolkit.
-.LINK
-https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
+    .SYNOPSIS
+    Synchronizes and updates data in an Excel worksheet with new information from a CSV file, including audit dates.
+    .DESCRIPTION
+    The Sync-CISExcelAndCsvData function merges and updates data in a specified Excel worksheet from a CSV file. This includes adding or updating fields for connection status, details, failure reasons, and the date of the update. It's designed to ensure that the Excel document maintains a running log of changes over time, ideal for tracking remediation status and audit history.
+    .PARAMETER ExcelPath
+    Specifies the path to the Excel file to be updated. This parameter is mandatory.
+    .PARAMETER CsvPath
+    Specifies the path to the CSV file containing new data. This parameter is mandatory.
+    .PARAMETER SheetName
+    Specifies the name of the worksheet in the Excel file where data will be merged and updated. This parameter is mandatory.
+    .EXAMPLE
+    PS> Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "AuditData"
+    Updates the 'AuditData' worksheet in 'excel.xlsx' with data from 'data.csv', adding new information and the date of the update.
+    .INPUTS
+    System.String
+    The function accepts strings for file paths and worksheet names.
+    .OUTPUTS
+    None
+    The function directly updates the Excel file and does not output any objects.
+    .NOTES
+    - Ensure that the 'ImportExcel' module is installed and up to date to handle Excel file manipulations.
+    - It is recommended to back up the Excel file before running this function to avoid accidental data loss.
+    - The CSV file should have columns that match expected headers like 'Connection', 'Details', 'FailureReason', and 'Status' for correct data mapping.
+    .LINK
+    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
 #>
+
 function Sync-CISExcelAndCsvData {
-    [OutputType([void], [PSCustomObject[]])]
-    [CmdletBinding(DefaultParameterSetName = 'CsvInput')]
-    param (
-        [Parameter(Mandatory = $true)]
-        [ValidateScript({ Test-Path $_ })]
+    [OutputType([void])]
+    [CmdletBinding()]
+    param(
         [string]$ExcelPath,
-
-        [Parameter(Mandatory = $true)]
-        [string]$WorksheetName,
-
-        [Parameter(Mandatory = $true, ParameterSetName = 'CsvInput')]
-        [ValidateScript({ Test-Path $_ })]
         [string]$CsvPath,
-
-        [Parameter(Mandatory = $true, ParameterSetName = 'ObjectInput', ValueFromPipeline = $true)]
-        [CISAuditResult[]]$AuditResults,
-
-        [Parameter(Mandatory = $false)]
-        [switch]$SkipUpdate
+        [string]$SheetName
     )
 
-    process {
-        # Verify ImportExcel module is available
-        $requiredModules = Get-RequiredModule -SyncFunction
-        foreach ($module in $requiredModules) {
-            Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModuleName $module.SubModuleName
-        }
+    # Import the CSV file
+    $csvData = Import-Csv -Path $CsvPath
 
-        # Merge Excel and CSV data or Audit Results
-        if ($PSCmdlet.ParameterSetName -eq 'CsvInput') {
-            $mergedData = Merge-CISExcelAndCsvData -ExcelPath $ExcelPath -WorksheetName $WorksheetName -CsvPath $CsvPath
-        } else {
-            $mergedData = Merge-CISExcelAndCsvData -ExcelPath $ExcelPath -WorksheetName $WorksheetName -AuditResults $AuditResults
-        }
+    # Get the current date in the specified format
+    $currentDate = Get-Date -Format "yyyy-MM-ddTHH:mm:ss"
 
-        # Output the merged data if the user chooses to skip the update
-        if ($SkipUpdate) {
-            return $mergedData
-        } else {
-            # Update the Excel worksheet with the merged data
-            Update-CISExcelWorksheet -ExcelPath $ExcelPath -WorksheetName $WorksheetName -Data $mergedData
+    # Load the Excel workbook
+    $excelPackage = Open-ExcelPackage -Path $ExcelPath
+    $worksheet = $excelPackage.Workbook.Worksheets[$SheetName]
+
+    # Define and check new headers, including the date header
+    $lastCol = $worksheet.Dimension.End.Column
+    $newHeaders = @("CSV_Connection", "CSV_Status", "CSV_Date", "CSV_Details", "CSV_FailureReason")
+    $existingHeaders = $worksheet.Cells[1, 1, 1, $lastCol].Value
+
+    # Add new headers if they do not exist
+    foreach ($header in $newHeaders) {
+        if ($header -notin $existingHeaders) {
+            $lastCol++
+            $worksheet.Cells[1, $lastCol].Value = $header
         }
     }
+
+    # Save changes made to add headers
+    $excelPackage.Save()
+
+    # Update the worksheet variable to include possible new columns
+    $worksheet = $excelPackage.Workbook.Worksheets[$SheetName]
+
+    # Mapping the headers to their corresponding column numbers
+    $headerMap = @{}
+    for ($col = 1; $col -le $worksheet.Dimension.End.Column; $col++) {
+        $headerMap[$worksheet.Cells[1, $col].Text] = $col
+    }
+
+    # For each record in CSV, find the matching row and update/add data
+    foreach ($row in $csvData) {
+        # Find the matching recommendation # row
+        $matchRow = $null
+        for ($i = 2; $i -le $worksheet.Dimension.End.Row; $i++) {
+            if ($worksheet.Cells[$i, $headerMap['Recommendation #']].Text -eq $row.rec) {
+                $matchRow = $i
+                break
+            }
+        }
+
+        # Update values if a matching row is found
+        if ($matchRow) {
+            foreach ($header in $newHeaders) {
+                if ($header -eq 'CSV_Date') {
+                    $columnIndex = $headerMap[$header]
+                    $worksheet.Cells[$matchRow, $columnIndex].Value = $currentDate
+                } else {
+                    $csvKey = $header -replace 'CSV_', ''
+                    $columnIndex = $headerMap[$header]
+                    $worksheet.Cells[$matchRow, $columnIndex].Value = $row.$csvKey
+                }
+            }
+        }
+    }
+
+    # Save the updated Excel file
+    $excelPackage.Save()
+    $excelPackage.Dispose()
 }

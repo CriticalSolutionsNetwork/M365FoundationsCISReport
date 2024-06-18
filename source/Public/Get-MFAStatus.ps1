@@ -44,7 +44,7 @@ function Get-MFAStatus {
     process {
         if (Get-Module MSOnline){
             Connect-MsolService
-            Write-Host -Object "Finding Azure Active Directory Accounts..."
+            Write-Host "Finding Azure Active Directory Accounts..."
             # Get all users, excluding guests
             $Users = if ($PSBoundParameters.ContainsKey('UserId')) {
                 Get-MsolUser -UserPrincipalName $UserId
@@ -52,7 +52,7 @@ function Get-MFAStatus {
                 Get-MsolUser -All | Where-Object { $_.UserType -ne "Guest" }
             }
             $Report = [System.Collections.Generic.List[Object]]::new() # Create output list
-            Write-Host -Object "Processing" $Users.Count "accounts..."
+            Write-Host "Processing $($Users.Count) accounts..."
             ForEach ($User in $Users) {
                 $MFADefaultMethod = ($User.StrongAuthenticationMethods | Where-Object { $_.IsDefault -eq "True" }).MethodType
                 $MFAPhoneNumber = $User.StrongAuthenticationUserDetails.PhoneNumber
@@ -92,12 +92,11 @@ function Get-MFAStatus {
                 $Report.Add($ReportLine)
             }
 
-            Write-Host -Object "Processing complete."
+            Write-Host "Processing complete."
             return $Report | Select-Object UserPrincipalName, DisplayName, MFAState, MFADefaultMethod, MFAPhoneNumber, PrimarySMTP, Aliases | Sort-Object UserPrincipalName
         }
         else {
-            Write-Host -Object "You must first install MSOL using:`nInstall-Module MSOnline -Scope CurrentUser -Force"
+            Write-Host "You must first install MSOL using:`nInstall-Module MSOnline -Scope CurrentUser -Force"
         }
     }
-
 }
