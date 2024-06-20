@@ -17,7 +17,7 @@ function Test-PasswordNeverExpirePolicy {
         $failureReasonsList = @()
 
         # Add headers for the details
-        $detailsList += "Domain|Validity Period|IsDefault"
+        $detailsList += "Domain|Validity Period|Notification Window|IsDefault"
 
         # Conditions for 1.3.1 (L1) Ensure the 'Password expiration policy' is set to 'Set passwords to never expire (recommended)'
         #
@@ -26,12 +26,14 @@ function Test-PasswordNeverExpirePolicy {
         # - Specific conditions to check:
         #   - Condition A: Password expiration policy is set to "Set passwords to never expire" in the Microsoft 365 admin center.
         #   - Condition B: Using Microsoft Graph PowerShell, the `PasswordPolicies` property for all users is set to `DisablePasswordExpiration`.
+        #   - Condition C: Notification window for password expiration is set to 30 days.
         #
         # Validate test for a fail:
         # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
         # - Specific conditions to check:
         #   - Condition A: Password expiration policy is not set to "Set passwords to never expire" in the Microsoft 365 admin center.
         #   - Condition B: Using Microsoft Graph PowerShell, the `PasswordPolicies` property for one or more users is not set to `DisablePasswordExpiration`.
+        #   - Condition C: Notification window for password expiration is not set to 30 days.
     }
 
     process {
@@ -46,21 +48,23 @@ function Test-PasswordNeverExpirePolicy {
             foreach ($domain in $domains) {
                 $domainName = $domain.Id
                 $isDefault = $domain.IsDefault
+                # Step (Condition C): Determine if the notification window is set to 30 days
+                $notificationWindow = $domain.PasswordNotificationWindowInDays
+                $notificationPolIsCompliant = $notificationWindow -eq 30
                 # Step (Condition A): Retrieve password expiration policy
                 $passwordPolicy = $domain.PasswordValidityPeriodInDays
-
+                $pwPolIsCompliant = $passwordPolicy -eq 2147483647
                 # Step (Condition A & B): Determine if the policy is compliant
-                $isCompliant = $passwordPolicy -eq 0
-                $overallResult = $overallResult -and $isCompliant
+                $overallResult = $overallResult -and $notificationPolIsCompliant -and $pwPolIsCompliant
 
                 # Step (Condition A & B): Prepare failure reasons and details based on compliance
-                $failureReasons = if ($isCompliant) {
+                $failureReasons = if ($notificationPolIsCompliant -and $pwPolIsCompliant) {
                     "N/A"
                 } else {
-                    "Password expiration is not set to never expire for domain $domainName. Run the following command to remediate: `nUpdate-MgDomain -DomainId $domainName -PasswordValidityPeriodInDays 2147483647 -PasswordNotificationWindowInDays 30`n"
+                    "Password expiration is not set to never expire or notification window is not set to 30 days for domain $domainName. Run the following command to remediate: `nUpdate-MgDomain -DomainId $domainName -PasswordValidityPeriodInDays 2147483647 -PasswordNotificationWindowInDays 30`n"
                 }
 
-                $details = "$domainName|$passwordPolicy days|$isDefault"
+                $details = "$domainName|$passwordPolicy days|$notificationWindow days|$isDefault"
 
                 # Add details and failure reasons to the lists
                 $detailsList += $details
