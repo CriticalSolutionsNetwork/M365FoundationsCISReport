@@ -8,6 +8,10 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Fixed test 1.3.1 to include notification window for password expiration.
 
+### Added
+
+- Added export to excel to `Export-M365SecurityAuditTable` function.
+
 ## [0.1.13] - 2024-06-18
 
 ### Added
