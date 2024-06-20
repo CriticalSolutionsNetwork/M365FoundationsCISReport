@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed test 1.3.1 to include notification window for password expiration.
+
+## [0.1.13] - 2024-06-18
+
 ### Added
 
 - Added tenant output to connect function.
