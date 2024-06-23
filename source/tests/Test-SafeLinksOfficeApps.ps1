@@ -40,33 +40,12 @@ function Test-SafeLinksOfficeApps {
     }
 
     process {
-        if (Get-Command Get-SafeLinksPolicy -ErrorAction SilentlyContinue) {
+        # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
+        # Retrieve all Safe Links policies
+        $misconfiguredDetails = Get-ExoOutput -Rec $recnum
+        # Misconfigured details returns 1 if EXO Commands needed for the test are not available
+        if ($misconfiguredDetails -ne 1) {
             try {
-                # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
-                # Retrieve all Safe Links policies
-                $policies = Get-SafeLinksPolicy
-                # Initialize the details collection
-                $misconfiguredDetails = @()
-
-                foreach ($policy in $policies) {
-                    # Get the detailed configuration of each policy
-                    $policyDetails = Get-SafeLinksPolicy -Identity $policy.Name
-
-                    # Check each required property and record failures
-                    # Condition A: Checking policy settings
-                    $failures = @()
-                    if ($policyDetails.EnableSafeLinksForEmail -ne $true) { $failures += "EnableSafeLinksForEmail: False" } # Email: On
-                    if ($policyDetails.EnableSafeLinksForTeams -ne $true) { $failures += "EnableSafeLinksForTeams: False" } # Teams: On
-                    if ($policyDetails.EnableSafeLinksForOffice -ne $true) { $failures += "EnableSafeLinksForOffice: False" } # Office 365 Apps: On
-                    if ($policyDetails.TrackClicks -ne $true) { $failures += "TrackClicks: False" } # Click protection settings: On
-                    if ($policyDetails.AllowClickThrough -ne $false) { $failures += "AllowClickThrough: True" } # Do not track when users click safe links: Off
-
-                    # Only add details for policies that have misconfigurations
-                    if ($failures.Count -gt 0) {
-                        $misconfiguredDetails += "Policy: $($policy.Name); Failures: $($failures -join ', ')"
-                    }
-                }
-
                 # Prepare the final result
                 # Condition B: Ensuring no misconfigurations
                 $result = $misconfiguredDetails.Count -eq 0

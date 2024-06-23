@@ -33,8 +33,7 @@ function Test-CustomerLockbox {
     process {
         try {
             # Step: Retrieve the organization configuration (Condition C: Pass/Fail)
-            $orgConfig = Get-OrganizationConfig | Select-Object CustomerLockBoxEnabled
-            $customerLockboxEnabled = $orgConfig.CustomerLockBoxEnabled
+            $customerLockboxEnabled = Get-ExoOutput -Rec $recnum
 
             # Step: Prepare failure reasons and details based on compliance (Condition A, B, & C: Fail)
             $failureReasons = if (-not $customerLockboxEnabled) {

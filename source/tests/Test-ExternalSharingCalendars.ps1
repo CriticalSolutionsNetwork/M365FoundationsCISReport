@@ -31,7 +31,7 @@ function Test-ExternalSharingCalendars {
     process {
         try {
             # Step: Retrieve sharing policies related to calendar sharing
-            $sharingPolicies = Get-SharingPolicy | Where-Object { $_.Domains -like '*CalendarSharing*' }
+            $sharingPolicies = Get-ExoOutput -Rec $recnum
 
             # Step (Condition A & B: Pass/Fail): Check if calendar sharing is disabled in all applicable policies
             $isExternalSharingDisabled = $true

@@ -30,7 +30,7 @@ function Test-BlockSharedMailboxSignIn {
     process {
         try {
             # Step: Retrieve shared mailbox details
-            $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
+            $MBX = Get-ExoOutput -Rec $recnum
 
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
             $sharedMailboxDetails = $MBX | ForEach-Object { Get-AzureADUser -ObjectId $_.ExternalDirectoryObjectId }
