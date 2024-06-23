@@ -15,8 +15,9 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Added export to excel to `Export-M365SecurityAuditTable` function.
 - `Get-AdminRoleUserLicense` function to get the license of a user with admin roles for 1.1.1.
 - Skip MSOL connection confirmation to `Get-MFAStatus` function.
-- Get-MgOutput function to get the output of the Microsoft Graph API per test and adjusted tests to utilize.
-- Added `Get-ExoOutput` function to get the output of the Exchange Online API per test and adjusted tests to utilize.
+- Added `Get-CISMgOutput` function to get the output of the Microsoft Graph API per test and adjusted tests to utilize.
+- Added `Get-CISExoOutput` function to get the output of the Exchange Online API per test and adjusted tests to utilize.
+- Added `Get-CISMSTeamsOutput` function to get the output of the Microsoft Teams API per test and adjusted tests to utilize.
 - Updated EXO tests to utilize the new output functions ('1.2.2', '1.3.3', '1.3.6', '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', '6.5.1', '6.5.2', '6.5.3', '8.6.1').
 
 ## [0.1.13] - 2024-06-18
