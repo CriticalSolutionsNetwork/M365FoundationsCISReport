@@ -107,19 +107,19 @@
         Output:
         What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
     .INPUTS
-    None. You cannot pipe objects to Invoke-M365SecurityAudit.
+        None. You cannot pipe objects to Invoke-M365SecurityAudit.
     .OUTPUTS
-    CISAuditResult[]
-    The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
+        CISAuditResult[]
+        The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
     .NOTES
-    - This module is based on CIS benchmarks.
-    - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
-    - Commercial use is not permitted. This module cannot be sold or used for commercial purposes.
-    - Modifications and sharing are allowed under the same license.
-    - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
-    - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
+        - This module is based on CIS benchmarks.
+        - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+        - Commercial use is not permitted. This module cannot be sold or used for commercial purposes.
+        - Modifications and sharing are allowed under the same license.
+        - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
+        - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
     .LINK
-    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
+        https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
