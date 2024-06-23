@@ -31,9 +31,10 @@ function Test-BlockSharedMailboxSignIn {
         try {
             # Step: Retrieve shared mailbox details
             $MBX = Get-CISExoOutput -Rec $recnum
-
+            $objectids = $MBX.ExternalDirectoryObjectId
+            $users = Get-CISAadOutput -Rec $recnum
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
-            $sharedMailboxDetails = $MBX | ForEach-Object { Get-AzureADUser -ObjectId $_.ExternalDirectoryObjectId }
+            $sharedMailboxDetails = $users | Where-Object {$_.objectid -in $objectids}
 
             # Step: Identify enabled mailboxes (Condition B: Pass/Fail)
             $enabledMailboxes = $sharedMailboxDetails | Where-Object { $_.AccountEnabled } | ForEach-Object { $_.DisplayName }
