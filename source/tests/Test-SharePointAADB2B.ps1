@@ -33,7 +33,7 @@ function Test-SharePointAADB2B {
     process {
         try {
             # 7.2.2 (L1) Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled
-            $SPOTenantAzureADB2B = Get-SPOTenant | Select-Object EnableAzureADB2BIntegration
+            $SPOTenantAzureADB2B = Get-CISSpoOutput -Rec $recnum
 
             # Populate the auditResult object with the required properties
             $params = @{

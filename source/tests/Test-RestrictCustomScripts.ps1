@@ -32,7 +32,7 @@ function Test-RestrictCustomScripts {
             #   - Condition C: Verification using the SharePoint Admin Center indicates that the `DenyAddAndCustomizePages` setting is not enforced.
 
             # Retrieve all site collections and select necessary properties
-            $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
+            $SPOSitesCustomScript = Get-CISSpoOutput -Rec $recnum
 
             # Process URLs to replace 'sharepoint.com' with '<SPUrl>'
             $processedUrls = $SPOSitesCustomScript | ForEach-Object {

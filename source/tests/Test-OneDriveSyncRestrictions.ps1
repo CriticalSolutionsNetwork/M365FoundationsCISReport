@@ -32,7 +32,7 @@ function Test-OneDriveSyncRestrictions {
             #   - Condition C: "AllowedDomainList" does not contain the trusted domain GUIDs from the on-premises environment.
 
             # Retrieve OneDrive sync client restriction settings
-            $SPOTenantSyncClientRestriction = Get-SPOTenantSyncClientRestriction | Select-Object TenantRestrictionEnabled, AllowedDomainList
+            $SPOTenantSyncClientRestriction = Get-CISSpoOutput -Rec $recnum
             $isSyncRestricted = $SPOTenantSyncClientRestriction.TenantRestrictionEnabled -and $SPOTenantSyncClientRestriction.AllowedDomainList
 
             # Condition A: Check if TenantRestrictionEnabled is True

@@ -33,7 +33,7 @@ function Test-SharePointGuestsItemSharing {
     process {
         try {
             # 7.2.5 (L2) Ensure that SharePoint guest users cannot share items they don't own
-            $SPOTenant = Get-SPOTenant | Select-Object PreventExternalUsersFromResharing
+            $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $isGuestResharingPrevented = $SPOTenant.PreventExternalUsersFromResharing
 
             # Populate the auditResult object with the required properties

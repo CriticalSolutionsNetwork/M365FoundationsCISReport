@@ -34,7 +34,7 @@ function Test-DisallowInfectedFilesDownload {
             #   - Condition C: Verification using the PowerShell command indicates that the setting is incorrectly configured.
 
             # Retrieve the SharePoint tenant configuration
-            $SPOTenantDisallowInfectedFileDownload = Get-SPOTenant | Select-Object DisallowInfectedFileDownload
+            $SPOTenantDisallowInfectedFileDownload = Get-CISSpoOutput -Rec $recnum
 
             # Condition A: The `DisallowInfectedFileDownload` setting is set to `True`
             $isDisallowInfectedFileDownloadEnabled = $SPOTenantDisallowInfectedFileDownload.DisallowInfectedFileDownload

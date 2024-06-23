@@ -33,7 +33,7 @@ function Test-ModernAuthSharePoint {
     process {
         try {
             # 7.2.1 (L1) Ensure modern authentication for SharePoint applications is required
-            $SPOTenant = Get-SPOTenant | Select-Object -Property LegacyAuthProtocolsEnabled
+            $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $modernAuthForSPRequired = -not $SPOTenant.LegacyAuthProtocolsEnabled
 
             # Prepare failure reasons and details based on compliance

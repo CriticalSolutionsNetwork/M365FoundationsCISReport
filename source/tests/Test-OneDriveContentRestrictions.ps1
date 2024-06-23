@@ -34,7 +34,7 @@ function Test-OneDriveContentRestrictions {
             # 7.2.4 (L2) Ensure OneDrive content sharing is restricted
 
             # Retrieve OneDrive sharing capability settings
-            $SPOTenant = Get-SPOTenant | Select-Object OneDriveSharingCapability
+            $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $isOneDriveSharingRestricted = $SPOTenant.OneDriveSharingCapability -eq 'Disabled'
 
             # Prepare failure reasons and details based on compliance

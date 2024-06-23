@@ -33,7 +33,7 @@ function Test-SharePointExternalSharingDomains {
     process {
         try {
             # 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
-            $SPOTenant = Get-SPOTenant | Select-Object SharingDomainRestrictionMode, SharingAllowedDomainList
+            $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $isDomainRestrictionConfigured = $SPOTenant.SharingDomainRestrictionMode -eq 'AllowList'
 
             # Populate the auditResult object with the required properties

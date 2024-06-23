@@ -34,7 +34,7 @@ function Test-ReauthWithCode {
             # 7.2.10 (L1) Ensure reauthentication with verification code is restricted
 
             # Retrieve reauthentication settings for SharePoint Online
-            $SPOTenantReauthentication = Get-SPOTenant | Select-Object EmailAttestationRequired, EmailAttestationReAuthDays
+            $SPOTenantReauthentication = Get-CISSpoOutput -Rec $recnum
             $isReauthenticationRestricted = $SPOTenantReauthentication.EmailAttestationRequired -and $SPOTenantReauthentication.EmailAttestationReAuthDays -le 15
 
             # Prepare failure reasons and details based on compliance

@@ -34,7 +34,7 @@ function Test-GuestAccessExpiration {
             #   - Condition C: Verification using the SharePoint Admin Center indicates that guest access is not set to expire automatically after the specified number of days.
 
             # Retrieve SharePoint tenant settings related to guest access expiration
-            $SPOTenantGuestAccess = Get-SPOTenant | Select-Object ExternalUserExpirationRequired, ExternalUserExpireInDays
+            $SPOTenantGuestAccess = Get-CISSpoOutput -Rec $recnum
             $isGuestAccessExpirationConfiguredCorrectly = $SPOTenantGuestAccess.ExternalUserExpirationRequired -and $SPOTenantGuestAccess.ExternalUserExpireInDays -le 30
 
             # Prepare failure reasons and details based on compliance
