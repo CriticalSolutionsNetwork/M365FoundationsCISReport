@@ -73,11 +73,11 @@ function Connect-M365Suite {
         if ($RequiredConnections -contains "SPO") {
             Write-Host "Connecting to SharePoint Online..." -ForegroundColor Yellow
             Connect-SPOService -Url $TenantAdminUrl | Out-Null
-            $spoContext = Get-SPOSite -Limit 1
+            $spoContext = Get-SPOCrossTenantHostUrl
+            $tenantName = Get-UrlLine -Output $spoContext
             $tenantInfo += [PSCustomObject]@{
                 Service = "SharePoint Online"
-                TenantName = $spoContext.Url
-                TenantID = $spoContext.GroupId
+                TenantName = $tenantName
             }
             $connectedServices += "SPO"
             Write-Host "Successfully connected to SharePoint Online." -ForegroundColor Green
