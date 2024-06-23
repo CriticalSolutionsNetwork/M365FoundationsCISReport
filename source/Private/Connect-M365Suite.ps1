@@ -18,9 +18,9 @@ function Connect-M365Suite {
 
     try {
         if ($RequiredConnections -contains "AzureAD" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "AzureAD | EXO | Microsoft Graph") {
-            Write-Host "Connecting to Azure Active Directory..." -ForegroundColor Cyan
-            Connect-AzureAD | Out-Null
-            $tenantDetails = Get-AzureADTenantDetail
+            Write-Host "Connecting to Azure Active Directory..." -ForegroundColor Yellow
+            Connect-AzureAD -WarningAction SilentlyContinue | Out-Null
+            $tenantDetails = Get-AzureADTenantDetail -WarningAction SilentlyContinue
             $tenantInfo += [PSCustomObject]@{
                 Service = "Azure Active Directory"
                 TenantName = $tenantDetails.DisplayName
@@ -31,7 +31,7 @@ function Connect-M365Suite {
         }
 
         if ($RequiredConnections -contains "Microsoft Graph" -or $RequiredConnections -contains "EXO | Microsoft Graph") {
-            Write-Host "Connecting to Microsoft Graph with scopes: Directory.Read.All, Domain.Read.All, Policy.Read.All, Organization.Read.All" -ForegroundColor Cyan
+            Write-Host "Connecting to Microsoft Graph with scopes: Directory.Read.All, Domain.Read.All, Policy.Read.All, Organization.Read.All" -ForegroundColor Yellow
             try {
                 Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome | Out-Null
                 $graphOrgDetails = Get-MgOrganization
@@ -58,8 +58,8 @@ function Connect-M365Suite {
         }
 
         if ($RequiredConnections -contains "EXO" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "Microsoft Teams | EXO" -or $RequiredConnections -contains "EXO | Microsoft Graph") {
-            Write-Host "Connecting to Exchange Online..." -ForegroundColor Cyan
-            Connect-ExchangeOnline -ShowBanner $false | Out-Null
+            Write-Host "Connecting to Exchange Online..." -ForegroundColor Yellow
+            Connect-ExchangeOnline -ShowBanner:$false | Out-Null
             $exoTenant = (Get-OrganizationConfig).Identity
             $tenantInfo += [PSCustomObject]@{
                 Service = "Exchange Online"
@@ -71,7 +71,7 @@ function Connect-M365Suite {
         }
 
         if ($RequiredConnections -contains "SPO") {
-            Write-Host "Connecting to SharePoint Online..." -ForegroundColor Cyan
+            Write-Host "Connecting to SharePoint Online..." -ForegroundColor Yellow
             Connect-SPOService -Url $TenantAdminUrl | Out-Null
             $spoContext = Get-SPOSite -Limit 1
             $tenantInfo += [PSCustomObject]@{
@@ -84,7 +84,7 @@ function Connect-M365Suite {
         }
 
         if ($RequiredConnections -contains "Microsoft Teams" -or $RequiredConnections -contains "Microsoft Teams | EXO") {
-            Write-Host "Connecting to Microsoft Teams..." -ForegroundColor Cyan
+            Write-Host "Connecting to Microsoft Teams..." -ForegroundColor Yellow
             Connect-MicrosoftTeams | Out-Null
             $teamsTenantDetails = Get-CsTenant
             $tenantInfo += [PSCustomObject]@{
