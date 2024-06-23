@@ -39,12 +39,7 @@ function Test-PasswordNeverExpirePolicy {
     process {
         try {
             # Step: Retrieve all domains or a specific domain
-            $domains = if ($DomainName) {
-                Get-MgDomain -DomainId $DomainName
-            } else {
-                Get-MgDomain
-            }
-
+            $domains = Get-CISMgOutput -Rec $recnum -DomainId $DomainName
             foreach ($domain in $domains) {
                 $domainName = $domain.Id
                 $isDefault = $domain.IsDefault
@@ -60,7 +55,8 @@ function Test-PasswordNeverExpirePolicy {
                 # Step (Condition A & B): Prepare failure reasons and details based on compliance
                 $failureReasons = if ($notificationPolIsCompliant -and $pwPolIsCompliant) {
                     "N/A"
-                } else {
+                }
+                else {
                     "Password expiration is not set to never expire or notification window is not set to 30 days for domain $domainName. Run the following command to remediate: `nUpdate-MgDomain -DomainId $domainName -PasswordValidityPeriodInDays 2147483647 -PasswordNotificationWindowInDays 30`n"
                 }
 
@@ -86,16 +82,8 @@ function Test-PasswordNeverExpirePolicy {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 
