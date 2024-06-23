@@ -35,7 +35,7 @@ function Get-CISAadOutput {
         }
     }
     end {
-        Write-Verbose "Retuning data for Rec: $Rec"
+        Write-Verbose "Get-CISAadOutput: Retuning data for Rec: $Rec"
         return $users
     }
 } # end function Get-CISAadOutput

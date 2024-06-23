@@ -38,6 +38,7 @@ function Get-CISMgOutput {
         #>
     }
     process {
+        Write-Verbose "Get-CISMgOutput: Retuning data for Rec: $Rec"
         switch ($rec) {
             '1.1.1' {
                 # 1.1.1

@@ -38,6 +38,7 @@ function Get-CISSpoOutput {
         #>
     }
     process {
+        Write-Verbose "Retuning data for Rec: $Rec"
         switch ($Rec) {
             '7.2.1' {
                 # Test-ModernAuthSharePoint.ps1

@@ -18,7 +18,7 @@ function Get-CISExoOutput {
     )
     begin {
         # Begin Block #
-    <#
+        <#
         # Tests
         1.2.2
         1.3.3
@@ -48,6 +48,7 @@ function Get-CISExoOutput {
     #>
     }
     process {
+        Write-Verbose "Get-CISExoOutput: Retuning data for Rec: $Rec"
         switch ($Rec) {
             '1.2.2' {
                 # Test-BlockSharedMailboxSignIn.ps1

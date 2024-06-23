@@ -36,6 +36,7 @@ function Get-CISMSTeamsOutput {
         #>
     }
     process {
+        Write-Verbose "Get-CISMSTeamsOutput: Retuning data for Rec: $Rec"
         switch ($Rec) {
             '8.1.1' {
                 # Test-TeamsExternalFileSharing.ps1
