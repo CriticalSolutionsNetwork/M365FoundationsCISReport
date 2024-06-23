@@ -8,6 +8,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Fixed test 1.3.1 to include notification window for password expiration.
 - Fixed 6.1.1 test definition to include the correct connection.
+- Removed banner from EXO connection step.
 
 ### Added
 
