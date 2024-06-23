@@ -35,7 +35,7 @@ function Test-RestrictTenantCreation {
             # 5.1.2.3 (L1) Ensure 'Restrict non-admin users from creating tenants' is set to 'Yes'
 
             # Retrieve the tenant creation policy
-            $tenantCreationPolicy = Get-MgOutput -Rec $recnum
+            $tenantCreationPolicy = Get-CISMgOutput -Rec $recnum
             $tenantCreationResult = -not $tenantCreationPolicy.AllowedToCreateTenants
 
             # Prepare failure reasons and details based on compliance

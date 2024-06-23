@@ -35,7 +35,7 @@ function Test-BlockMailForwarding {
             # 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
 
             # Step 1: Retrieve the transport rules that redirect messages
-            $transportRules,$nonCompliantSpamPolicies = Get-ExoOutput -Rec $recnum
+            $transportRules,$nonCompliantSpamPolicies = Get-CISExoOutput -Rec $recnum
             $transportForwardingBlocked = $transportRules.Count -eq 0
 
             # Step 2: Check all anti-spam outbound policies

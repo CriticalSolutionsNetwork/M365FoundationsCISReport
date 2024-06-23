@@ -30,7 +30,7 @@ function Test-GlobalAdminsCount {
 
     process {
         try {
-            $globalAdmins = Get-MgOutput -Rec $recnum
+            $globalAdmins = Get-CISMgOutput -Rec $recnum
 
             # Step: Count the number of global admins
             $globalAdminCount = $globalAdmins.Count

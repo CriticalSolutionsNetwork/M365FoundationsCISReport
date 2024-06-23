@@ -28,7 +28,7 @@ function Test-SafeAttachmentsPolicy {
     }
 
     process {
-        $safeAttachmentPolicies = Get-ExoOutput -Rec $recnum
+        $safeAttachmentPolicies = Get-CISExoOutput -Rec $recnum
         if ($safeAttachmentPolicies -ne 1) {
             try {
                 # Check if any Safe Attachments policy is enabled (Condition A)

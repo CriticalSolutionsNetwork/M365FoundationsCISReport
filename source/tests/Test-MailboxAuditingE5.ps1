@@ -35,12 +35,12 @@ function Test-MailboxAuditingE5 {
         $allFailures = @()
         $processedUsers = @{}
         $recnum = "6.1.3"
-        $allUsers = Get-MgOutput -Rec $recnum
+        $allUsers = Get-CISMgOutput -Rec $recnum
     }
 
     process {
         if ($null -ne $allUsers) {
-            $mailboxes = Get-ExoOutput -Rec $recnum
+            $mailboxes = Get-CISExoOutput -Rec $recnum
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {

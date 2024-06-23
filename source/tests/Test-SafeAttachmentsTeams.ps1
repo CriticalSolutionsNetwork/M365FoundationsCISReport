@@ -31,7 +31,7 @@ function Test-SafeAttachmentsTeams {
     }
 
     process {
-        $atpPolicyResult = Get-ExoOutput -Rec $recnum
+        $atpPolicyResult = Get-CISExoOutput -Rec $recnum
         if ($atpPolicyResult -ne 1) {
             try {
                 # Condition A: Check Safe Attachments for SharePoint

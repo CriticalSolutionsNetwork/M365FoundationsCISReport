@@ -38,7 +38,7 @@ function Test-MailTipsEnabled {
             # 6.5.2 (L2) Ensure MailTips are enabled for end users
 
             # Retrieve organization configuration for MailTips settings
-            $orgConfig = Get-ExoOutput -Rec $recnum
+            $orgConfig = Get-CISExoOutput -Rec $recnum
 
             # Check the MailTips settings (Conditions A, B, C, D)
             $allTipsEnabled = $orgConfig.MailTipsAllTipsEnabled -and $orgConfig.MailTipsGroupMetricsEnabled -and $orgConfig.MailTipsLargeAudienceThreshold -eq 25

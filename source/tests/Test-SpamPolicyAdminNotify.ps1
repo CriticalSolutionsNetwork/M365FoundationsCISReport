@@ -38,7 +38,7 @@ function Test-SpamPolicyAdminNotify {
             # 2.1.6 Ensure Exchange Online Spam Policies are set to notify administrators
 
             # Retrieve the default hosted outbound spam filter policy
-            $hostedOutboundSpamFilterPolicy = Get-ExoOutput -Rec $recnum
+            $hostedOutboundSpamFilterPolicy = Get-CISExoOutput -Rec $recnum
 
             # Check if both settings are enabled (Condition A and Condition B for pass)
             $bccSuspiciousOutboundMailEnabled = $hostedOutboundSpamFilterPolicy.BccSuspiciousOutboundMail

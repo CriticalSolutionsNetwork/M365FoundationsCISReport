@@ -4,11 +4,11 @@
     .DESCRIPTION
         This sample function is not exported to the module and only return the data passed as parameter.
     .EXAMPLE
-        $null = Get-ExoOutput -PrivateData 'NOTHING TO SEE HERE'
+        $null = Get-CISExoOutput -PrivateData 'NOTHING TO SEE HERE'
     .PARAMETER PrivateData
         The PrivateData parameter is what will be returned without transformation.
 #>
-function Get-ExoOutput {
+function Get-CISExoOutput {
     [cmdletBinding()]
     [OutputType([string])]
     param(
@@ -293,5 +293,5 @@ function Get-ExoOutput {
     end {
         Write-Verbose "Retuning data for Rec: $Rec"
     }
-} # end function Get-MgOutput
+} # end function Get-CISExoOutput
 

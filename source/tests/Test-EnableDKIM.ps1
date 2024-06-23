@@ -36,7 +36,7 @@ function Test-EnableDKIM {
             # 2.1.9 (L1) Ensure DKIM is enabled for all Exchange Online Domains
 
             # Retrieve DKIM configuration for all domains
-            $dkimConfig = Get-ExoOutput -Rec $recnum
+            $dkimConfig = Get-CISExoOutput -Rec $recnum
             $dkimResult = ($dkimConfig | ForEach-Object { $_.Enabled }) -notcontains $false
             $dkimFailedDomains = $dkimConfig | Where-Object { -not $_.Enabled } | ForEach-Object { $_.Domain }
 

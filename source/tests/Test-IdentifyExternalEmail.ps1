@@ -36,7 +36,7 @@ function Test-IdentifyExternalEmail {
             # 6.2.3 (L1) Ensure email from external senders is identified
 
             # Retrieve external sender tagging configuration
-            $externalInOutlook = Get-ExoOutput -Rec $recnum
+            $externalInOutlook = Get-CISExoOutput -Rec $recnum
             $externalTaggingEnabled = ($externalInOutlook | ForEach-Object { $_.Enabled }) -contains $true
 
             # Prepare failure reasons and details based on compliance

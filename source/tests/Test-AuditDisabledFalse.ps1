@@ -35,7 +35,7 @@ function Test-AuditDisabledFalse {
             # 6.1.1 (L1) Ensure 'AuditDisabled' organizationally is set to 'False'
 
             # Retrieve the AuditDisabled configuration (Condition B)
-            $auditNotDisabled = Get-ExoOutput -Rec $recnum
+            $auditNotDisabled = Get-CISExoOutput -Rec $recnum
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $auditNotDisabled) {

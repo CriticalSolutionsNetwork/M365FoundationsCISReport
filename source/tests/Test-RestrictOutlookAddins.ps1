@@ -36,7 +36,7 @@ function Test-RestrictOutlookAddins {
 
             # Check all mailboxes for custom policies with unallowed add-ins
             # Check Default Role Assignment Policy
-            $customPolicyFailures, $defaultPolicy = Get-ExoOutput -Rec $recnum
+            $customPolicyFailures, $defaultPolicy = Get-CISExoOutput -Rec $recnum
             $defaultPolicyRoles = $defaultPolicy.AssignedRoles | Where-Object { $_ -in $relevantRoles }
 
             # Condition A: Verify that the roles MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are unchecked under Other roles.

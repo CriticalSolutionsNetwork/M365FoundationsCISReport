@@ -38,14 +38,14 @@ function Test-MailboxAuditingE3 {
 
         $allFailures = @()
         $recnum = "6.1.2"
-        $allUsers = Get-MgOutput -Rec $recnum
+        $allUsers = Get-CISMgOutput -Rec $recnum
         $processedUsers = @{}  # Dictionary to track processed users
 
     }
 
     process {
         if ($null -ne $allUsers) {
-            $mailboxes = Get-ExoOutput -Rec $recnum
+            $mailboxes = Get-CISExoOutput -Rec $recnum
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {

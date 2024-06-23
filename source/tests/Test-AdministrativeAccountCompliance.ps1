@@ -17,7 +17,7 @@ function Test-AdministrativeAccountCompliance {
         try {
             # Retrieve admin roles, assignments, and user details including licenses
             Write-Verbose "Retrieving admin roles, assignments, and user details including licenses"
-            $adminRoleAssignments = Get-MgOutput -Rec $recnum
+            $adminRoleAssignments = Get-CISMgOutput -Rec $recnum
 
             $adminRoleUsers = @()
 

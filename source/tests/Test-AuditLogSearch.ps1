@@ -36,7 +36,7 @@ function Test-AuditLogSearch {
         try {
             # 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
 
-            $auditLogResult = Get-ExoOutput -Rec $recnum
+            $auditLogResult = Get-CISExoOutput -Rec $recnum
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $auditLogResult) {

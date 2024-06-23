@@ -42,7 +42,7 @@ function Test-SafeLinksOfficeApps {
     process {
         # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
         # Retrieve all Safe Links policies
-        $misconfiguredDetails = Get-ExoOutput -Rec $recnum
+        $misconfiguredDetails = Get-CISExoOutput -Rec $recnum
         # Misconfigured details returns 1 if EXO Commands needed for the test are not available
         if ($misconfiguredDetails -ne 1) {
             try {

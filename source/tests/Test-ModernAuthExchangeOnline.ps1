@@ -34,7 +34,7 @@ function Test-ModernAuthExchangeOnline {
             # 6.5.1 (L1) Ensure modern authentication for Exchange Online is enabled
 
             # Check modern authentication setting in Exchange Online configuration (Condition A and B)
-            $orgConfig = Get-ExoOutput -Rec $recnum
+            $orgConfig = Get-CISExoOutput -Rec $recnum
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $orgConfig.OAuth2ClientProfileEnabled) {
