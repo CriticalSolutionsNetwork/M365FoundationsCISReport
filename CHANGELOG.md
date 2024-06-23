@@ -8,7 +8,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Fixed test 1.3.1 to include notification window for password expiration.
 - Fixed 6.1.1 test definition to include the correct connection.
-- Removed banner from EXO connection step.
+- Removed banner and warning from EXO and AzureAD connection step.
 
 ### Added
 
@@ -16,6 +16,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - `Get-AdminRoleUserLicense` function to get the license of a user with admin roles for 1.1.1.
 - Skip MSOL connection confirmation to `Get-MFAStatus` function.
 - Get-MgOutput function to get the output of the Microsoft Graph API per test and adjusted tests to utilize.
+- Added `Get-ExoOutput` function to get the output of the Exchange Online API per test and adjusted tests to utilize.
 
 ## [0.1.13] - 2024-06-18
 
