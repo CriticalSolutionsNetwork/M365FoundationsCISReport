@@ -107,15 +107,8 @@ function Test-AdministrativeAccountCompliance {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Handle the error and create a failure result
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 
