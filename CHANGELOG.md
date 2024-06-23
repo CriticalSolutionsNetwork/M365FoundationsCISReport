@@ -18,7 +18,9 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Added `Get-CISMgOutput` function to get the output of the Microsoft Graph API per test and adjusted tests to utilize.
 - Added `Get-CISExoOutput` function to get the output of the Exchange Online API per test and adjusted tests to utilize.
 - Added `Get-CISMSTeamsOutput` function to get the output of the Microsoft Teams API per test and adjusted tests to utilize.
+- Updated Microsoft Graph tests to utilize the new output functions ('1.1.1', '1.1.3', '1.2.1', '1.3.1', '5.1.2.3', '5.1.8.1', '6.1.2', '6.1.3')
 - Updated EXO tests to utilize the new output functions ('1.2.2', '1.3.3', '1.3.6', '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', '6.5.1', '6.5.2', '6.5.3', '8.6.1').
+- Updated MSTeams tests to utilize the new output functions ('8.1.1', '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', '8.5.7', '8.6.1')
 
 ## [0.1.13] - 2024-06-18
 
