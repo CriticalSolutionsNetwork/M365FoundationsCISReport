@@ -7,10 +7,14 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Fixed
 
 - Fixed test 1.3.1 to include notification window for password expiration.
+- Fixed 6.1.1 test definition to include the correct connection.
 
 ### Added
 
 - Added export to excel to `Export-M365SecurityAuditTable` function.
+- `Get-AdminRoleUserLicense` function to get the license of a user with admin roles for 1.1.1.
+- Skip MSOL connection confirmation to `Get-MFAStatus` function.
+- Get-MgOutput function to get the output of the Microsoft Graph API per test and adjusted tests to utilize.
 
 ## [0.1.13] - 2024-06-18
 

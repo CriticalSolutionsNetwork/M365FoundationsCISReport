@@ -30,7 +30,7 @@ function Test-ManagedApprovedPublicGroups {
     process {
         try {
             # Step: Retrieve all groups with visibility set to 'Public'
-            $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
+            $allGroups = Get-MgOutput -Rec $recnum
 
             # Step: Determine failure reasons based on the presence of public groups
             $failureReasons = if ($null -ne $allGroups -and $allGroups.Count -gt 0) {

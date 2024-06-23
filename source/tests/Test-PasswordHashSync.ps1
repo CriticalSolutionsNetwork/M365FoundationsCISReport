@@ -34,7 +34,7 @@ function Test-PasswordHashSync {
             # 5.1.8.1 (L1) Ensure password hash sync is enabled for hybrid deployments
 
             # Retrieve password hash sync status (Condition A and C)
-            $passwordHashSync = Get-MgOrganization | Select-Object -ExpandProperty OnPremisesSyncEnabled
+            $passwordHashSync = Get-MgOutput -Rec $recnum
             $hashSyncResult = $passwordHashSync
 
             # Prepare failure reasons and details based on compliance

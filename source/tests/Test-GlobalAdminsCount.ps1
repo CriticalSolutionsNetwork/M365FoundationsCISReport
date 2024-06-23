@@ -30,11 +30,7 @@ function Test-GlobalAdminsCount {
 
     process {
         try {
-            # Step: Retrieve global admin role
-            $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
-
-            # Step: Retrieve global admin members
-            $globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id
+            $globalAdmins = Get-MgOutput -Rec $recnum
 
             # Step: Count the number of global admins
             $globalAdminCount = $globalAdmins.Count
