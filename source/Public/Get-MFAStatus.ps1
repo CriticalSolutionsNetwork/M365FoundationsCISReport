@@ -33,7 +33,8 @@ function Get-MFAStatus {
     param (
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string]$UserId
+        [string]$UserId,
+        [switch]$SkipMSOLConnectionChecks
     )
 
     begin {
@@ -43,7 +44,9 @@ function Get-MFAStatus {
 
     process {
         if (Get-Module MSOnline){
-            Connect-MsolService
+            if (-not $SkipMSOLConnectionChecks) {
+                Connect-MsolService
+            }
             Write-Host "Finding Azure Active Directory Accounts..."
             # Get all users, excluding guests
             $Users = if ($PSBoundParameters.ContainsKey('UserId')) {
@@ -87,13 +90,15 @@ function Get-MFAStatus {
                     MFAPhoneNumber    = $MFAPhoneNumber
                     PrimarySMTP       = ($PrimarySMTP -join ',')
                     Aliases           = ($Aliases -join ',')
+                    isLicensed        = $User.isLicensed
                 }
 
                 $Report.Add($ReportLine)
             }
 
             Write-Host "Processing complete."
-            return $Report | Select-Object UserPrincipalName, DisplayName, MFAState, MFADefaultMethod, MFAPhoneNumber, PrimarySMTP, Aliases | Sort-Object UserPrincipalName
+            Write-Host "To disconnect from the MsolService close the powershell session or wait for the session to expire."
+            return $Report | Select-Object UserPrincipalName, DisplayName, MFAState, MFADefaultMethod, MFAPhoneNumber, PrimarySMTP, Aliases, isLicensed | Sort-Object UserPrincipalName
         }
         else {
             Write-Host "You must first install MSOL using:`nInstall-Module MSOnline -Scope CurrentUser -Force"
