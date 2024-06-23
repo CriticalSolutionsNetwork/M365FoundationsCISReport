@@ -10,11 +10,9 @@
 #>
 function Get-CISSpoOutput {
     [cmdletBinding()]
-    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
-        [String]
-        $Rec
+        [String]$Rec
     )
     begin {
         # Begin Block #
