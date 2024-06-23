@@ -266,9 +266,7 @@ function Get-CISMSTeamsOutput {
                 $CsTeamsMessagingPolicy = Get-CsTeamsMessagingPolicy -Identity Global | Select-Object -Property AllowSecurityEndUserReporting
                 return $CsTeamsMessagingPolicy
             }
-            default {
-                Write-Output "No matching action found"
-            }
+            default { throw "No match found for test: $Rec" }
         }
     }
     end {

@@ -39,6 +39,11 @@ function Get-CISMgOutput {
     }
     process {
         switch ($rec) {
+            '1.1.1' {
+                # 1.1.1
+                $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
+                return $AdminRoleAssignmentsAndUsers
+            }
             '1.1.3' {
                 # Step: Retrieve global admin role
                 $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
@@ -84,11 +89,7 @@ function Get-CISMgOutput {
                     return $null
                 }
             }
-            Default {
-                # 1.1.1
-                $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
-                return $AdminRoleAssignmentsAndUsers
-            }
+            default { throw "No match found for test: $Rec" }
         }
     }
     end {
