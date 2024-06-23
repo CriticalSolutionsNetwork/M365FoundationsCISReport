@@ -101,9 +101,8 @@ function Connect-M365Suite {
             Write-Host "Connected to the following tenants:" -ForegroundColor Yellow
             foreach ($tenant in $tenantInfo) {
                 Write-Host "Service: $($tenant.Service)" -ForegroundColor Cyan
-                Write-Host "Tenant Name: $($tenant.TenantName)" -ForegroundColor Green
+                Write-Host "Tenant Context: $($tenant.TenantName)`n" -ForegroundColor Green
                 #Write-Host "Tenant ID: $($tenant.TenantID)"
-                Write-Host ""
             }
             $confirmation = Read-Host "Do you want to proceed with these connections? (Y/N)"
             if ($confirmation -notlike 'Y') {
