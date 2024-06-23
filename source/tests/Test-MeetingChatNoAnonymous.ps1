@@ -32,7 +32,7 @@ function Test-MeetingChatNoAnonymous {
             #   - Condition C: Verification using the Teams Admin Center indicates that the meeting chat settings are not configured as recommended.
 
             # Retrieve the Teams meeting policy for meeting chat
-            $CsTeamsMeetingPolicyChat = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property MeetingChatEnabledType
+            $CsTeamsMeetingPolicyChat = Get-CISMSTeamsOutput -Rec $recnum
             # Condition A: Check if the MeetingChatEnabledType is set to 'EnabledExceptAnonymous'
             $chatAnonDisabled = $CsTeamsMeetingPolicyChat.MeetingChatEnabledType -eq 'EnabledExceptAnonymous'
 

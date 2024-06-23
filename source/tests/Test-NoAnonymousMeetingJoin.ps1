@@ -33,7 +33,7 @@ function Test-NoAnonymousMeetingJoin {
 
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
 
-            $teamsMeetingPolicy = Get-CsTeamsMeetingPolicy -Identity Global
+            $teamsMeetingPolicy = Get-CISMSTeamsOutput -Rec $recnum
             $allowAnonymousUsersToJoinMeeting = $teamsMeetingPolicy.AllowAnonymousUsersToJoinMeeting
 
             # Prepare failure reasons and details based on compliance

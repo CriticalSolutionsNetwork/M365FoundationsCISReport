@@ -33,7 +33,7 @@ function Test-DialInBypassLobby {
             #   - Condition C: Individuals who dial in by phone are able to join the meeting directly without waiting in the lobby.
 
             # Retrieve Teams meeting policy for PSTN users
-            $CsTeamsMeetingPolicyPSTN = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowPSTNUsersToBypassLobby
+            $CsTeamsMeetingPolicyPSTN = Get-CISMSTeamsOutput -Rec $recnum
             $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
 
             # Prepare failure reasons and details based on compliance

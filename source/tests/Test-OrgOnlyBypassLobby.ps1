@@ -34,7 +34,7 @@ function Test-OrgOnlyBypassLobby {
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
 
             # Retrieve the Teams meeting policy for lobby bypass settings
-            $CsTeamsMeetingPolicyLobby = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AutoAdmittedUsers
+            $CsTeamsMeetingPolicyLobby = Get-CISMSTeamsOutput -Rec $recnum
             $lobbyBypassRestricted = $CsTeamsMeetingPolicyLobby.AutoAdmittedUsers -eq 'EveryoneInCompanyExcludingGuests'
 
             # Prepare failure reasons and details based on compliance

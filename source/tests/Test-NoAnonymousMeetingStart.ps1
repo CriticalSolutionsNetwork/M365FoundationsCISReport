@@ -34,7 +34,7 @@ function Test-NoAnonymousMeetingStart {
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
 
             # Retrieve the Teams meeting policy for the global scope and check if anonymous users can start meetings
-            $CsTeamsMeetingPolicyAnonymous = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowAnonymousUsersToStartMeeting
+            $CsTeamsMeetingPolicyAnonymous = Get-CISMSTeamsOutput -Rec $recnum
             $anonymousStartDisabled = -not $CsTeamsMeetingPolicyAnonymous.AllowAnonymousUsersToStartMeeting
 
             # Prepare failure reasons and details based on compliance

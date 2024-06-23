@@ -26,9 +26,8 @@ function Test-TeamsExternalFileSharing {
 
             # Assuming that 'approvedProviders' is a list of approved cloud storage service names
             # This list must be defined according to your organization's approved cloud storage services
+            $clientConfig = Get-CISMSTeamsOutput -Rec $recnum
             $approvedProviders = @("AllowDropBox", "AllowBox", "AllowGoogleDrive", "AllowShareFile", "AllowEgnyte")
-            $clientConfig = Get-CsTeamsClientConfiguration
-
             $isCompliant = $true
             $nonCompliantProviders = @()
 

@@ -33,7 +33,7 @@ function Test-BlockChannelEmails {
             #   - Condition C: Verification using PowerShell indicates that the `AllowEmailIntoChannel` setting is enabled.
 
             # Retrieve Teams client configuration
-            $teamsClientConfig = Get-CsTeamsClientConfiguration -Identity Global
+            $teamsClientConfig = Get-CISMSTeamsOutput -Rec $recnum
             $allowEmailIntoChannel = $teamsClientConfig.AllowEmailIntoChannel
 
             # Prepare failure reasons and details based on compliance

@@ -34,7 +34,8 @@ function Test-ExternalNoControl {
             #   - Condition C: Verification using the UI indicates that external participants can give or request control.
 
             # Retrieve Teams meeting policy for external participant control
-            $CsTeamsMeetingPolicyControl = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowExternalParticipantGiveRequestControl
+            $CsTeamsMeetingPolicyControl = Get-CISMSTeamsOutput -Rec $recnum
+            # Check if external participants can give or request control
             $externalControlRestricted = -not $CsTeamsMeetingPolicyControl.AllowExternalParticipantGiveRequestControl
 
             # Prepare failure reasons and details based on compliance

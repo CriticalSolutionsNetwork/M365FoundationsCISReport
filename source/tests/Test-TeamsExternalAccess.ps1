@@ -10,8 +10,6 @@ function Test-TeamsExternalAccess {
         # Dot source the class script if necessary
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-
-        $auditResult = [CISAuditResult]::new()
         $recnum = "8.2.1"
     }
 
@@ -35,7 +33,7 @@ function Test-TeamsExternalAccess {
 
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
 
-            $externalAccessConfig = Get-CsTenantFederationConfiguration
+            $externalAccessConfig = Get-CISMSTeamsOutput -Rec $recnum
 
             $allowedDomainsLimited = $false
             if ($externalAccessConfig.AllowFederatedUsers -and $externalAccessConfig.AllowedDomains -and $externalAccessConfig.AllowedDomains.AllowedDomain.Count -gt 0) {

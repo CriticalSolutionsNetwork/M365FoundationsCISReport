@@ -32,7 +32,7 @@ function Test-OrganizersPresent {
             #   - Condition C: Verification using PowerShell indicates that the `DesignatedPresenterRoleMode` is not set to `OrganizerOnlyUserOverride`.
 
             # Retrieve the Teams meeting policy for presenters
-            $CsTeamsMeetingPolicyPresenters = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property DesignatedPresenterRoleMode
+            $CsTeamsMeetingPolicyPresenters = Get-CISMSTeamsOutput -Rec $recnum
             $presenterRoleRestricted = $CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode -eq 'OrganizerOnlyUserOverride'
 
             # Prepare failure reasons and details based on compliance

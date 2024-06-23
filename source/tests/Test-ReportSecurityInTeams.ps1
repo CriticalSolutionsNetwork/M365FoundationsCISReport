@@ -21,7 +21,7 @@ function Test-ReportSecurityInTeams {
 
             # Retrieve the necessary settings for Teams and Exchange Online
             # Condition A: Ensure the 'Report a security concern' setting in the Teams admin center is set to 'On'.
-            $CsTeamsMessagingPolicy = Get-CsTeamsMessagingPolicy -Identity Global | Select-Object -Property AllowSecurityEndUserReporting
+            $CsTeamsMessagingPolicy = Get-CISMSTeamsOutput -Rec $recnum
             # Condition B: Verify that 'Monitor reported messages in Microsoft Teams' is checked in the Microsoft 365 Defender portal.
             # Condition C: Ensure the 'Send reported messages to' setting in the Microsoft 365 Defender portal is set to 'My reporting mailbox only' with the correct report email addresses.
             $ReportSubmissionPolicy = Get-CISExoOutput -Rec $recnum
