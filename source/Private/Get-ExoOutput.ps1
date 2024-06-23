@@ -27,21 +27,28 @@ function Get-ExoOutput {
     process {
         switch ($Rec) {
             '1.2.2' {
+                # Test-BlockSharedMailboxSignIn.ps1
                 $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
+                # [object[]]
                 return $MBX
             }
             '1.3.3' {
+                # Test-ExternalSharingCalendars.ps1
                 # Step: Retrieve sharing policies related to calendar sharing
                 $sharingPolicies = Get-SharingPolicy | Where-Object { $_.Domains -like '*CalendarSharing*' }
+                # [psobject[]]
                 return $sharingPolicies
             }
             '1.3.6' {
+                # Test-CustomerLockbox.ps1
                 # Step: Retrieve the organization configuration (Condition C: Pass/Fail)
                 $orgConfig = Get-OrganizationConfig | Select-Object CustomerLockBoxEnabled
                 $customerLockboxEnabled = $orgConfig.CustomerLockBoxEnabled
+                # [bool]
                 return $customerLockboxEnabled
             }
             '2.1.1' {
+                # Test-SafeLinksOfficeApps.ps1
                 if (Get-Command Get-SafeLinksPolicy -ErrorAction SilentlyContinue) {
                     # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
                     # Retrieve all Safe Links policies
@@ -67,6 +74,7 @@ function Get-ExoOutput {
                             $misconfiguredDetails += "Policy: $($policy.Name); Failures: $($failures -join ', ')"
                         }
                     }
+                    # [object[]]
                     return $misconfiguredDetails
                 }
                 else {
@@ -74,7 +82,18 @@ function Get-ExoOutput {
                 }
 
             }
-            '2.1.2' { Write-Output "Matched 2.1.2" }
+            '2.1.2' {
+                # Test-CommonAttachmentFilter.ps1
+                # 2.1.2 (L1) Ensure the Common Attachment Types Filter is enabled
+                # Condition A: The Common Attachment Types Filter is enabled in the Microsoft 365 Security & Compliance Center.
+                # Condition B: Using Exchange Online PowerShell, verify that the `EnableFileFilter` property of the default malware filter policy is set to `True`.
+
+                # Retrieve the attachment filter policy
+                $attachmentFilter = Get-MalwareFilterPolicy -Identity Default | Select-Object EnableFileFilter
+                $result = $attachmentFilter.EnableFileFilter
+                # [bool]
+                return $result
+            }
             '2.1.3' { Write-Output "Matched 2.1.3" }
             '2.1.4' { Write-Output "Matched 2.1.4" }
             '2.1.5' { Write-Output "Matched 2.1.5" }
