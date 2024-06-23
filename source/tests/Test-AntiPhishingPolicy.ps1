@@ -34,7 +34,7 @@ function Test-AntiPhishingPolicy {
 
         try {
             # Condition A: Ensure that an anti-phishing policy has been created
-            $antiPhishPolicies = Get-AntiPhishPolicy
+            $antiPhishPolicies = Get-ExoOutput -Rec $recnum
 
             # Condition B: Verify the anti-phishing policy settings using PowerShell
             $validatedPolicies = $antiPhishPolicies | Where-Object {

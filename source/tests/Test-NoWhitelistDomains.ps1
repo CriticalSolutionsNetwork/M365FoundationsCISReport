@@ -38,8 +38,7 @@ function Test-NoWhitelistDomains {
 
             # Retrieve transport rules that whitelist specific domains
             # Condition A: Checking for transport rules that whitelist specific domains
-            $whitelistedRules = Get-TransportRule | Where-Object { $_.SetSCL -eq -1 -and $null -ne $_.SenderDomainIs }
-
+            $whitelistedRules = Get-ExoOutput -Rec $recnum
             # Prepare failure reasons and details based on compliance
             # Condition B: Prepare failure reasons based on the presence of whitelisted rules
             $failureReasons = if ($whitelistedRules) {

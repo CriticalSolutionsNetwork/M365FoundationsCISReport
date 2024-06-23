@@ -38,8 +38,7 @@ function Test-CommonAttachmentFilter {
             # Condition B: Using Exchange Online PowerShell, verify that the `EnableFileFilter` property of the default malware filter policy is set to `True`.
 
             # Retrieve the attachment filter policy
-            $attachmentFilter = Get-MalwareFilterPolicy -Identity Default | Select-Object EnableFileFilter
-            $result = $attachmentFilter.EnableFileFilter
+            $result = Get-ExoOutput -Rec $recnum
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $result) {

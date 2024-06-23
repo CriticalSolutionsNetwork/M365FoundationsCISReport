@@ -36,9 +36,7 @@ function Test-AuditLogSearch {
         try {
             # 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
 
-            # Retrieve the audit log configuration
-            $auditLogConfig = Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled
-            $auditLogResult = $auditLogConfig.UnifiedAuditLogIngestionEnabled
+            $auditLogResult = Get-ExoOutput -Rec $recnum
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $auditLogResult) {

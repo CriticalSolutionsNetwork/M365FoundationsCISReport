@@ -31,12 +31,10 @@ function Test-ModernAuthExchangeOnline {
 
     process {
         try {
-            # Ensuring the ExchangeOnlineManagement module is available
-
             # 6.5.1 (L1) Ensure modern authentication for Exchange Online is enabled
 
             # Check modern authentication setting in Exchange Online configuration (Condition A and B)
-            $orgConfig = Get-OrganizationConfig | Select-Object -Property Name, OAuth2ClientProfileEnabled
+            $orgConfig = Get-ExoOutput -Rec $recnum
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $orgConfig.OAuth2ClientProfileEnabled) {

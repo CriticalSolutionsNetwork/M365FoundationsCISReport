@@ -40,7 +40,7 @@ function Test-MailboxAuditingE5 {
 
     process {
         if ($null -ne $allUsers) {
-            $mailboxes = Get-EXOMailbox -PropertySets Audit
+            $mailboxes = Get-ExoOutput -Rec $recnum
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {

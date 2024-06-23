@@ -35,12 +35,10 @@ function Test-BlockMailForwarding {
             # 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
 
             # Step 1: Retrieve the transport rules that redirect messages
-            $transportRules = Get-TransportRule | Where-Object { $null -ne $_.RedirectMessageTo }
+            $transportRules,$nonCompliantSpamPolicies = Get-ExoOutput -Rec $recnum
             $transportForwardingBlocked = $transportRules.Count -eq 0
 
             # Step 2: Check all anti-spam outbound policies
-            $outboundSpamPolicies = Get-HostedOutboundSpamFilterPolicy
-            $nonCompliantSpamPolicies = $outboundSpamPolicies | Where-Object { $_.AutoForwardingMode -ne 'Off' }
             $nonCompliantSpamPoliciesArray = @($nonCompliantSpamPolicies)
             $spamForwardingBlocked = $nonCompliantSpamPoliciesArray.Count -eq 0
 
@@ -51,7 +49,7 @@ function Test-BlockMailForwarding {
             $failureReasons = @()
             $details = @()
 
-            if ($transportRules.Count -gt 0) {
+            if ($transportRules -ne 1) {
                 # Fail Condition A
                 $failureReasons += "Mail forwarding rules found: $($transportRules.Name -join ', ')"
                 $details += "Transport Rules Details:`nRule Name|Redirects To"

@@ -28,10 +28,9 @@ function Test-SafeAttachmentsPolicy {
     }
 
     process {
-        if (Get-Command Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue) {
+        $safeAttachmentPolicies = Get-ExoOutput -Rec $recnum
+        if ($safeAttachmentPolicies -ne 1) {
             try {
-                # Retrieve all Safe Attachment policies where Enable is set to True
-                $safeAttachmentPolicies = Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue | Where-Object { $_.Enable -eq $true }
                 # Check if any Safe Attachments policy is enabled (Condition A)
                 $result = $null -ne $safeAttachmentPolicies -and $safeAttachmentPolicies.Count -gt 0
 

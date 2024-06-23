@@ -34,7 +34,7 @@ function Test-RestrictStorageProvidersOutlook {
             # 6.5.3 (L2) Ensure additional storage providers are restricted in Outlook on the web
 
             # Retrieve all OwaMailbox policies
-            $owaPolicies = Get-OwaMailboxPolicy
+            $owaPolicies = Get-ExoOutput -Rec $recnum
             # Condition A: Check if AdditionalStorageProvidersAvailable is set to False
             $nonCompliantPolicies = $owaPolicies | Where-Object { $_.AdditionalStorageProvidersAvailable }
 
