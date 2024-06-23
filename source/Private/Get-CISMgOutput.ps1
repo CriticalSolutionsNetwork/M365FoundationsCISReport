@@ -14,11 +14,11 @@ function Get-CISMgOutput {
 
 #>
     [cmdletBinding()]
-    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
-        [String]
-        $Rec
+        [String]$Rec,
+        [Parameter(Mandatory = $false)]
+        [String]$DomainName
     )
 
     begin {
@@ -55,6 +55,15 @@ function Get-CISMgOutput {
             '1.2.1' {
                 $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
                 return $allGroups
+            }
+            '1.3.1' {
+                # Test-PasswordNeverExpirePolicy.ps1
+                $domains = if ($DomainName) {
+                    Get-MgDomain -DomainId $DomainName
+                } else {
+                    Get-MgDomain
+                }
+                return $domains
             }
             '5.1.2.3' {
                 # Retrieve the tenant creation policy
