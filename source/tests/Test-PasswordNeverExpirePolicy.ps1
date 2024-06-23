@@ -39,7 +39,7 @@ function Test-PasswordNeverExpirePolicy {
     process {
         try {
             # Step: Retrieve all domains or a specific domain
-            $domains = Get-CISMgOutput -Rec $recnum -DomainId $DomainName
+            $domains = Get-CISMgOutput -Rec $recnum -DomainName $DomainName
             foreach ($domain in $domains) {
                 $domainName = $domain.Id
                 $isDefault = $domain.IsDefault

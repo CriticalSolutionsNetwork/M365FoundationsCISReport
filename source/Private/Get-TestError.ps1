@@ -27,7 +27,7 @@ function Get-TestError {
     $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $LastError })
     # Call Initialize-CISAuditResult with error parameters
     $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
-    Write-Verbose "An error occurred during the test: `n$LastError" -VerboseAction Continue
+    Write-Verbose "An error occurred during the test: `n$LastError" -Verbose
     return $auditResult
 }
 

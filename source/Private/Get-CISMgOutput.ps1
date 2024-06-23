@@ -60,7 +60,8 @@ function Get-CISMgOutput {
                 # Test-PasswordNeverExpirePolicy.ps1
                 $domains = if ($DomainName) {
                     Get-MgDomain -DomainId $DomainName
-                } else {
+                }
+                else {
                     Get-MgDomain
                 }
                 return $domains
