@@ -23,6 +23,19 @@ function Get-CISMgOutput {
 
     begin {
         # Begin Block #
+        # Tests
+        <#
+            1.1.1
+            1.1.3
+            1.2.1
+            1.3.1
+            5.1.2.3
+            5.1.8.1
+            6.1.2
+            6.1.3
+            # Test number array
+            $testNumbers = @('1.1.1', '1.1.3', '1.2.1', '1.3.1', '5.1.2.3', '5.1.8.1', '6.1.2', '6.1.3')
+        #>
     }
     process {
         switch ($rec) {
