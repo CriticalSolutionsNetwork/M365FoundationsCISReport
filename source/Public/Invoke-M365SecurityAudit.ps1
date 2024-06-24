@@ -248,53 +248,61 @@ function Invoke-M365SecurityAudit {
         $currentTestIndex = 0
 
         # Establishing connections if required
-        $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
-        if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
-            try {
+        try {
+            $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
+            if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
                 Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
                 Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections -SkipConfirmation:$DoNotConfirmConnections
+            }
+        }
+        catch {
+            Write-Host "Connection execution aborted: $_" -ForegroundColor Red
+            break
+        }
 
-                Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue
-                # Import the test functions
-                $testFiles | ForEach-Object {
-                    $currentTestIndex++
-                    Write-Progress -Activity "Loading Test Scripts" -Status "Loading $($currentTestIndex) of $($totalTests): $($_.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
-                    Try {
-                        # Dot source the test function
-                        . $_.FullName
-                    }
-                    Catch {
-                        # Log the error and add the test to the failed tests collection
-                        Write-Error "Failed to load test function $($_.Name): $_"
-                        $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
-                    }
+
+        try {
+            Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue
+            # Import the test functions
+            $testFiles | ForEach-Object {
+                $currentTestIndex++
+                Write-Progress -Activity "Loading Test Scripts" -Status "Loading $($currentTestIndex) of $($totalTests): $($_.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
+                Try {
+                    # Dot source the test function
+                    . $_.FullName
                 }
-
-                $currentTestIndex = 0
-                # Execute each test function from the prepared list
-                foreach ($testFunction in $testFiles) {
-                    $currentTestIndex++
-                    Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
-                    $functionName = $testFunction.BaseName
-                    if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                        $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $M365DomainForPWPolicyTest
-                        # Add the result to the collection
-                        [void]$allAuditResults.Add($auditResult)
-                    }
+                Catch {
+                    # Log the error and add the test to the failed tests collection
+                    Write-Verbose "Failed to load test function $($_.Name): $_" -Verbose
+                    $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
                 }
             }
-            catch {
-                Write-Error "An error occurred: $_"
-            }
-            finally {
-                if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Disconnect")) {
-                    # Clean up sessions
-                    Disconnect-M365Suite -RequiredConnections $requiredConnections
+
+            $currentTestIndex = 0
+            # Execute each test function from the prepared list
+            foreach ($testFunction in $testFiles) {
+                $currentTestIndex++
+                Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
+                $functionName = $testFunction.BaseName
+                if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
+                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $M365DomainForPWPolicyTest
+                    # Add the result to the collection
+                    [void]$allAuditResults.Add($auditResult)
                 }
             }
         }
+        catch {
+            # Log the error and add the test to the failed tests collection
+            Write-Verbose "Invoke-M365SecurityAudit: Failed to load test function $($_.Name): $_" -Verbose
+            $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
+        }
+        finally {
+            if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Disconnect")) {
+                # Clean up sessions
+                Disconnect-M365Suite -RequiredConnections $requiredConnections
+            }
+        }
     }
-
     End {
         if ($PSCmdlet.ShouldProcess("Measure and display audit results for $($totalTests) tests", "Measure")) {
             # Call the private function to calculate and display results
@@ -314,5 +322,6 @@ function Invoke-M365SecurityAudit {
         }
     }
 }
+
 
 
