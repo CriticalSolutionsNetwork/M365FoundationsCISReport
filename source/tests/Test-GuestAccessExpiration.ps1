@@ -34,7 +34,7 @@ function Test-GuestAccessExpiration {
             #   - Condition C: Verification using the SharePoint Admin Center indicates that guest access is not set to expire automatically after the specified number of days.
 
             # Retrieve SharePoint tenant settings related to guest access expiration
-            $SPOTenantGuestAccess = Get-SPOTenant | Select-Object ExternalUserExpirationRequired, ExternalUserExpireInDays
+            $SPOTenantGuestAccess = Get-CISSpoOutput -Rec $recnum
             $isGuestAccessExpirationConfiguredCorrectly = $SPOTenantGuestAccess.ExternalUserExpirationRequired -and $SPOTenantGuestAccess.ExternalUserExpireInDays -le 30
 
             # Prepare failure reasons and details based on compliance
@@ -58,16 +58,8 @@ function Test-GuestAccessExpiration {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

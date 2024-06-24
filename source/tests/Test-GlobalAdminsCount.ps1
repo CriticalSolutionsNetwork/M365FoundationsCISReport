@@ -30,11 +30,7 @@ function Test-GlobalAdminsCount {
 
     process {
         try {
-            # Step: Retrieve global admin role
-            $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
-
-            # Step: Retrieve global admin members
-            $globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id
+            $globalAdmins = Get-CISMgOutput -Rec $recnum
 
             # Step: Count the number of global admins
             $globalAdminCount = $globalAdmins.Count
@@ -69,16 +65,8 @@ function Test-GlobalAdminsCount {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

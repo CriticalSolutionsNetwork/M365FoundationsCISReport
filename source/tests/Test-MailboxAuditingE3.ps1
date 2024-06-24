@@ -29,7 +29,6 @@ function Test-MailboxAuditingE3 {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
 
-        $e3SkuPartNumber = "SPE_E3"
 
         $actionDictionaries = Get-Action -Dictionaries
         # E3 specific actions
@@ -38,15 +37,15 @@ function Test-MailboxAuditingE3 {
         $OwnerActions = $actionDictionaries.OwnerActions.Keys | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }
 
         $allFailures = @()
-        $founde3Sku = Get-MgSubscribedSku -All | Where-Object { $_.SkuPartNumber -eq $e3SkuPartNumber }
-        $processedUsers = @{}  # Dictionary to track processed users
         $recnum = "6.1.2"
+        $allUsers = Get-CISMgOutput -Rec $recnum
+        $processedUsers = @{}  # Dictionary to track processed users
+
     }
 
     process {
-        if ($founde3Sku.Count -ne 0) {
-            $allUsers = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde3Sku.SkuId) )" -All
-            $mailboxes = Get-EXOMailbox -PropertySets Audit
+        if ($null -ne $allUsers) {
+            $mailboxes = Get-CISExoOutput -Rec $recnum
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {

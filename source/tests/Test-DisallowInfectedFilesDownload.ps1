@@ -34,7 +34,7 @@ function Test-DisallowInfectedFilesDownload {
             #   - Condition C: Verification using the PowerShell command indicates that the setting is incorrectly configured.
 
             # Retrieve the SharePoint tenant configuration
-            $SPOTenantDisallowInfectedFileDownload = Get-SPOTenant | Select-Object DisallowInfectedFileDownload
+            $SPOTenantDisallowInfectedFileDownload = Get-CISSpoOutput -Rec $recnum
 
             # Condition A: The `DisallowInfectedFileDownload` setting is set to `True`
             $isDisallowInfectedFileDownloadEnabled = $SPOTenantDisallowInfectedFileDownload.DisallowInfectedFileDownload
@@ -65,16 +65,8 @@ function Test-DisallowInfectedFilesDownload {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

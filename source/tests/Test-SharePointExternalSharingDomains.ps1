@@ -33,7 +33,7 @@ function Test-SharePointExternalSharingDomains {
     process {
         try {
             # 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
-            $SPOTenant = Get-SPOTenant | Select-Object SharingDomainRestrictionMode, SharingAllowedDomainList
+            $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $isDomainRestrictionConfigured = $SPOTenant.SharingDomainRestrictionMode -eq 'AllowList'
 
             # Populate the auditResult object with the required properties
@@ -47,16 +47,8 @@ function Test-SharePointExternalSharingDomains {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

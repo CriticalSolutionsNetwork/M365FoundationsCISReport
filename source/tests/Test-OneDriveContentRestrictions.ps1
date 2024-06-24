@@ -34,7 +34,7 @@ function Test-OneDriveContentRestrictions {
             # 7.2.4 (L2) Ensure OneDrive content sharing is restricted
 
             # Retrieve OneDrive sharing capability settings
-            $SPOTenant = Get-SPOTenant | Select-Object OneDriveSharingCapability
+            $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $isOneDriveSharingRestricted = $SPOTenant.OneDriveSharingCapability -eq 'Disabled'
 
             # Prepare failure reasons and details based on compliance
@@ -63,16 +63,8 @@ function Test-OneDriveContentRestrictions {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

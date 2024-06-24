@@ -34,7 +34,7 @@ function Test-RestrictStorageProvidersOutlook {
             # 6.5.3 (L2) Ensure additional storage providers are restricted in Outlook on the web
 
             # Retrieve all OwaMailbox policies
-            $owaPolicies = Get-OwaMailboxPolicy
+            $owaPolicies = Get-CISExoOutput -Rec $recnum
             # Condition A: Check if AdditionalStorageProvidersAvailable is set to False
             $nonCompliantPolicies = $owaPolicies | Where-Object { $_.AdditionalStorageProvidersAvailable }
 
@@ -67,16 +67,8 @@ function Test-RestrictStorageProvidersOutlook {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

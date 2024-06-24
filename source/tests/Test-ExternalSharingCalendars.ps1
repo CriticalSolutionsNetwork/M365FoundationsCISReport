@@ -31,7 +31,7 @@ function Test-ExternalSharingCalendars {
     process {
         try {
             # Step: Retrieve sharing policies related to calendar sharing
-            $sharingPolicies = Get-SharingPolicy | Where-Object { $_.Domains -like '*CalendarSharing*' }
+            $sharingPolicies = Get-CISExoOutput -Rec $recnum
 
             # Step (Condition A & B: Pass/Fail): Check if calendar sharing is disabled in all applicable policies
             $isExternalSharingDisabled = $true
@@ -70,16 +70,8 @@ function Test-ExternalSharingCalendars {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

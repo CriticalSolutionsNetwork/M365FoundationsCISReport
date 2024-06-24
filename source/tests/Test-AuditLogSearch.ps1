@@ -36,9 +36,7 @@ function Test-AuditLogSearch {
         try {
             # 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
 
-            # Retrieve the audit log configuration
-            $auditLogConfig = Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled
-            $auditLogResult = $auditLogConfig.UnifiedAuditLogIngestionEnabled
+            $auditLogResult = Get-CISExoOutput -Rec $recnum
 
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $auditLogResult) {
@@ -68,16 +66,8 @@ function Test-AuditLogSearch {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

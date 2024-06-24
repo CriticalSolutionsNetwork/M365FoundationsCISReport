@@ -34,7 +34,8 @@ function Test-ExternalNoControl {
             #   - Condition C: Verification using the UI indicates that external participants can give or request control.
 
             # Retrieve Teams meeting policy for external participant control
-            $CsTeamsMeetingPolicyControl = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowExternalParticipantGiveRequestControl
+            $CsTeamsMeetingPolicyControl = Get-CISMSTeamsOutput -Rec $recnum
+            # Check if external participants can give or request control
             $externalControlRestricted = -not $CsTeamsMeetingPolicyControl.AllowExternalParticipantGiveRequestControl
 
             # Prepare failure reasons and details based on compliance
@@ -63,16 +64,8 @@ function Test-ExternalNoControl {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

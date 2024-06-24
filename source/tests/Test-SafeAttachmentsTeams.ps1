@@ -31,18 +31,9 @@ function Test-SafeAttachmentsTeams {
     }
 
     process {
-        if (Get-Command Get-AtpPolicyForO365 -ErrorAction SilentlyContinue) {
+        $atpPolicyResult = Get-CISExoOutput -Rec $recnum
+        if ($atpPolicyResult -ne 1) {
             try {
-                # 2.1.5 (L2) Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled
-                # Retrieve the ATP policies for Office 365 and check Safe Attachments settings
-                $atpPolicies = Get-AtpPolicyForO365
-                # Check if the required ATP policies are enabled
-                $atpPolicyResult = $atpPolicies | Where-Object {
-                    $_.EnableATPForSPOTeamsODB -eq $true -and
-                    $_.EnableSafeDocs -eq $true -and
-                    $_.AllowSafeDocsOpen -eq $false
-                }
-
                 # Condition A: Check Safe Attachments for SharePoint
                 # Condition B: Check Safe Attachments for OneDrive
                 # Condition C: Check Safe Attachments for Microsoft Teams

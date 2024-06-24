@@ -27,9 +27,6 @@ function Test-MailboxAuditingE5 {
         #   - Condition C: AuditDelegate actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, SendAs, SendOnBehalf, SoftDelete, Update, UpdateFolderPermissions, UpdateInboxRules.
         #   - Condition D: AuditOwner actions do not include all of the following: ApplyRecord, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
 
-        $e5SkuPartNumber = "SPE_E5"
-        $founde5Sku = Get-MgSubscribedSku -All | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
-
         $actionDictionaries = Get-Action -Dictionaries
         $AdminActions = $actionDictionaries.AdminActions.Keys
         $DelegateActions = $actionDictionaries.DelegateActions.Keys
@@ -38,12 +35,12 @@ function Test-MailboxAuditingE5 {
         $allFailures = @()
         $processedUsers = @{}
         $recnum = "6.1.3"
+        $allUsers = Get-CISMgOutput -Rec $recnum
     }
 
     process {
-        if (($founde5Sku.count) -ne 0) {
-            $allUsers = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde5Sku.SkuId) )" -All
-            $mailboxes = Get-EXOMailbox -PropertySets Audit
+        if ($null -ne $allUsers) {
+            $mailboxes = Get-CISExoOutput -Rec $recnum
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {

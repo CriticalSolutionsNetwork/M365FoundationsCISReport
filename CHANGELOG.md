@@ -4,6 +4,31 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed test 1.3.1 to include notification window for password expiration.
+- Fixed 6.1.1 test definition to include the correct connection.
+- Removed banner and warning from EXO and AzureAD connection step.
+- Fixed missing CommentBlock for `Remove-RowsWithEmptyCSVStatus` function.
+- Fixed formatting and color for various Write-Host messages.
+
+### Added
+
+- Added export to excel to `Export-M365SecurityAuditTable` function.
+- `Get-AdminRoleUserLicense` function to get the license of a user with admin roles for 1.1.1.
+- Skip MSOL connection confirmation to `Get-MFAStatus` function.
+- Added `Get-CISMgOutput` function to get the output of the Microsoft Graph API per test.
+- Added `Get-CISExoOutput` function to get the output of the Exchange Online API per test.
+- Added `Get-CISMSTeamsOutput` function to get the output of the Microsoft Teams API per test.
+- Added `Get-CISSPOOutput` function to get the output of the SharePoint Online API per test.
+- Added `Get-TestError` function to get the error output of a test.
+- Updated Microsoft Graph tests to utilize the new output functions ('1.1.1', '1.1.3', '1.2.1', '1.3.1', '5.1.2.3', '5.1.8.1', '6.1.2', '6.1.3')
+- Updated EXO tests to utilize the new output functions ('1.2.2', '1.3.3', '1.3.6', '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', '6.5.1', '6.5.2', '6.5.3', '8.6.1').
+- Updated MSTeams tests to utilize the new output functions ('8.1.1', '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', '8.5.7', '8.6.1')
+- Updated SPO tests to utilize the new output functions ('7.2.1', '7.2.2', '7.2.3', '7.2.4', '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.2.10', '7.3.1', '7.3.2', '7.3.4')
+
+## [0.1.13] - 2024-06-18
+
 ### Added
 
 - Added tenant output to connect function.

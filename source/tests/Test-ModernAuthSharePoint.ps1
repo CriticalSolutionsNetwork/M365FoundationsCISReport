@@ -33,7 +33,7 @@ function Test-ModernAuthSharePoint {
     process {
         try {
             # 7.2.1 (L1) Ensure modern authentication for SharePoint applications is required
-            $SPOTenant = Get-SPOTenant | Select-Object -Property LegacyAuthProtocolsEnabled
+            $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $modernAuthForSPRequired = -not $SPOTenant.LegacyAuthProtocolsEnabled
 
             # Prepare failure reasons and details based on compliance
@@ -57,16 +57,8 @@ function Test-ModernAuthSharePoint {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

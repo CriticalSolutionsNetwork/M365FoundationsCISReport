@@ -30,10 +30,11 @@ function Test-BlockSharedMailboxSignIn {
     process {
         try {
             # Step: Retrieve shared mailbox details
-            $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
-
+            $MBX = Get-CISExoOutput -Rec $recnum
+            $objectids = $MBX.ExternalDirectoryObjectId
+            $users = Get-CISAadOutput -Rec $recnum
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
-            $sharedMailboxDetails = $MBX | ForEach-Object { Get-AzureADUser -ObjectId $_.ExternalDirectoryObjectId }
+            $sharedMailboxDetails = $users | Where-Object {$_.objectid -in $objectids}
 
             # Step: Identify enabled mailboxes (Condition B: Pass/Fail)
             $enabledMailboxes = $sharedMailboxDetails | Where-Object { $_.AccountEnabled } | ForEach-Object { $_.DisplayName }
@@ -66,16 +67,8 @@ function Test-BlockSharedMailboxSignIn {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

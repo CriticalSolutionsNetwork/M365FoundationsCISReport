@@ -32,7 +32,7 @@ function Test-MeetingChatNoAnonymous {
             #   - Condition C: Verification using the Teams Admin Center indicates that the meeting chat settings are not configured as recommended.
 
             # Retrieve the Teams meeting policy for meeting chat
-            $CsTeamsMeetingPolicyChat = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property MeetingChatEnabledType
+            $CsTeamsMeetingPolicyChat = Get-CISMSTeamsOutput -Rec $recnum
             # Condition A: Check if the MeetingChatEnabledType is set to 'EnabledExceptAnonymous'
             $chatAnonDisabled = $CsTeamsMeetingPolicyChat.MeetingChatEnabledType -eq 'EnabledExceptAnonymous'
 
@@ -57,16 +57,8 @@ function Test-MeetingChatNoAnonymous {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

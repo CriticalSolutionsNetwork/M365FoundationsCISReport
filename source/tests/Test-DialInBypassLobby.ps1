@@ -33,7 +33,7 @@ function Test-DialInBypassLobby {
             #   - Condition C: Individuals who dial in by phone are able to join the meeting directly without waiting in the lobby.
 
             # Retrieve Teams meeting policy for PSTN users
-            $CsTeamsMeetingPolicyPSTN = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowPSTNUsersToBypassLobby
+            $CsTeamsMeetingPolicyPSTN = Get-CISMSTeamsOutput -Rec $recnum
             $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
 
             # Prepare failure reasons and details based on compliance
@@ -62,16 +62,8 @@ function Test-DialInBypassLobby {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

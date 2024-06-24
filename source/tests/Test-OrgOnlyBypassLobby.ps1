@@ -34,7 +34,7 @@ function Test-OrgOnlyBypassLobby {
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
 
             # Retrieve the Teams meeting policy for lobby bypass settings
-            $CsTeamsMeetingPolicyLobby = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AutoAdmittedUsers
+            $CsTeamsMeetingPolicyLobby = Get-CISMSTeamsOutput -Rec $recnum
             $lobbyBypassRestricted = $CsTeamsMeetingPolicyLobby.AutoAdmittedUsers -eq 'EveryoneInCompanyExcludingGuests'
 
             # Prepare failure reasons and details based on compliance
@@ -66,16 +66,8 @@ function Test-OrgOnlyBypassLobby {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

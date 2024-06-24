@@ -1,120 +1,125 @@
 <#
     .SYNOPSIS
-    Invokes a security audit for Microsoft 365 environments.
+        Invokes a security audit for Microsoft 365 environments.
     .DESCRIPTION
-    The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters. It allows auditing of various configurations and settings within a Microsoft 365 environment, such as compliance with CIS benchmarks.
+        The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters. It allows auditing of various configurations and settings within a Microsoft 365 environment, such as compliance with CIS benchmarks.
     .PARAMETER TenantAdminUrl
-    The URL of the tenant admin. If not specified, none of the SharePoint Online tests will run.
+        The URL of the tenant admin. If not specified, none of the SharePoint Online tests will run.
     .PARAMETER M365DomainForPWPolicyTest
-    The domain name of the Microsoft 365 environment to test. This parameter is not mandatory and by default it will pass/fail all found domains as a group if a specific domain is not specified.
+        The domain name of the Microsoft 365 environment to test. This parameter is not mandatory and by default it will pass/fail all found domains as a group if a specific domain is not specified.
     .PARAMETER ELevel
-    Specifies the E-Level (E3 or E5) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter.
+        Specifies the E-Level (E3 or E5) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter.
     .PARAMETER ProfileLevel
-    Specifies the profile level (L1 or L2) for the audit. This parameter is optional and can be combined with the ELevel parameter.
+        Specifies the profile level (L1 or L2) for the audit. This parameter is optional and can be combined with the ELevel parameter.
     .PARAMETER IncludeIG1
-    If specified, includes tests where IG1 is true.
+        If specified, includes tests where IG1 is true.
     .PARAMETER IncludeIG2
-    If specified, includes tests where IG2 is true.
+        If specified, includes tests where IG2 is true.
     .PARAMETER IncludeIG3
-    If specified, includes tests where IG3 is true.
+        If specified, includes tests where IG3 is true.
     .PARAMETER IncludeRecommendation
-    Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.
+        Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.
     .PARAMETER SkipRecommendation
-    Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
+        Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
     .PARAMETER DoNotConnect
-    If specified, the cmdlet will not establish a connection to Microsoft 365 services.
+        If specified, the cmdlet will not establish a connection to Microsoft 365 services.
     .PARAMETER DoNotDisconnect
-    If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
+        If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
     .PARAMETER NoModuleCheck
-    If specified, the cmdlet will not check for the presence of required modules.
+        If specified, the cmdlet will not check for the presence of required modules.
     .PARAMETER DoNotConfirmConnections
-    If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
+        If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
     .EXAMPLE
-    PS> Invoke-M365SecurityAudit
-    Performs a security audit using default parameters.
-    Output:
-    Status      : Fail
-    ELevel      : E3
-    ProfileLevel: L1
-    Connection  : Microsoft Graph
-    Rec         : 1.1.1
-    Result      : False
-    Details     : Non-compliant accounts:
-                Username        | Roles                  | HybridStatus | Missing Licence
-                user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-    FailureReason: Non-Compliant Accounts: 2
+        PS> Invoke-M365SecurityAudit
+
+        Performs a security audit using default parameters.
+        Output:
+        Status      : Fail
+        ELevel      : E3
+        ProfileLevel: L1
+        Connection  : Microsoft Graph
+        Rec         : 1.1.1
+        Result      : False
+        Details     : Non-compliant accounts:
+                        Username        | Roles                  | HybridStatus | Missing Licence
+                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+        FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-    PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -ELevel "E5" -ProfileLevel "L1"
-    Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
-    Output:
-    Status      : Fail
-    ELevel      : E5
-    ProfileLevel: L1
-    Connection  : Microsoft Graph
-    Rec         : 1.1.1
-    Result      : False
-    Details     : Non-compliant accounts:
-                Username        | Roles                  | HybridStatus | Missing Licence
-                user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-    FailureReason: Non-Compliant Accounts: 2
+        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -ELevel "E5" -ProfileLevel "L1"
+
+        Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
+        Output:
+        Status      : Fail
+        ELevel      : E5
+        ProfileLevel: L1
+        Connection  : Microsoft Graph
+        Rec         : 1.1.1
+        Result      : False
+        Details     : Non-compliant accounts:
+                        Username        | Roles                  | HybridStatus | Missing Licence
+                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+        FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-    PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -IncludeIG1
-    Performs an audit including all tests where IG1 is true.
-    Output:
-    Status      : Fail
-    ELevel      : E3
-    ProfileLevel: L1
-    Connection  : Microsoft Graph
-    Rec         : 1.1.1
-    Result      : False
-    Details     : Non-compliant accounts:
-                Username        | Roles                  | HybridStatus | Missing Licence
-                user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-    FailureReason: Non-Compliant Accounts: 2
+        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -IncludeIG1
+
+        Performs an audit including all tests where IG1 is true.
+        Output:
+        Status      : Fail
+        ELevel      : E3
+        ProfileLevel: L1
+        Connection  : Microsoft Graph
+        Rec         : 1.1.1
+        Result      : False
+        Details     : Non-compliant accounts:
+                        Username        | Roles                  | HybridStatus | Missing Licence
+                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+        FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-    PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
-    Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
-    Output:
-    Status      : Fail
-    ELevel      : E3
-    ProfileLevel: L1
-    Connection  : Microsoft Graph
-    Rec         : 1.1.1
-    Result      : False
-    Details     : Non-compliant accounts:
-                Username        | Roles                  | HybridStatus | Missing Licence
-                user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-    FailureReason: Non-Compliant Accounts: 2
+        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
+        Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
+        Output:
+        Status      : Fail
+        ELevel      : E3
+        ProfileLevel: L1
+        Connection  : Microsoft Graph
+        Rec         : 1.1.1
+        Result      : False
+        Details     : Non-compliant accounts:
+                        Username        | Roles                  | HybridStatus | Missing Licence
+                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+        FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-    PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com"
-    PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
-    Captures the audit results into a variable and exports them to a CSV file.
-    Output:
-    CISAuditResult[]
-    auditResults.csv
+        PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com"
+        PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
+
+        Captures the audit results into a variable and exports them to a CSV file.
+        Output:
+        CISAuditResult[]
+        auditResults.csv
     .EXAMPLE
-    PS> Invoke-M365SecurityAudit -WhatIf
-    Displays what would happen if the cmdlet is run without actually performing the audit.
-    Output:
-    What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
+        PS> Invoke-M365SecurityAudit -WhatIf
+
+        Displays what would happen if the cmdlet is run without actually performing the audit.
+        Output:
+        What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
     .INPUTS
-    None. You cannot pipe objects to Invoke-M365SecurityAudit.
+        None. You cannot pipe objects to Invoke-M365SecurityAudit.
     .OUTPUTS
-    CISAuditResult[]
-    The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
+        CISAuditResult[]
+        The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
     .NOTES
-    - This module is based on CIS benchmarks.
-    - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
-    - Commercial use is not permitted. This module cannot be sold or used for commercial purposes.
-    - Modifications and sharing are allowed under the same license.
-    - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
-    - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
+        - This module is based on CIS benchmarks.
+        - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+        - Commercial use is not permitted. This module cannot be sold or used for commercial purposes.
+        - Modifications and sharing are allowed under the same license.
+        - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
+        - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
     .LINK
-    https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
+        https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
 function Invoke-M365SecurityAudit {
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]
@@ -192,6 +197,7 @@ function Invoke-M365SecurityAudit {
 
         # Check and install required modules if necessary
         if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules: $requiredModulesFormatted", "Check")) {
+            Write-Host "Checking for and installing required modules..." -ForegroundColor DarkMagenta
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
             }
@@ -246,52 +252,59 @@ function Invoke-M365SecurityAudit {
         try {
             $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
             if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
-                Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
+                Write-Host "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -ForegroundColor DarkMagenta
                 Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections -SkipConfirmation:$DoNotConfirmConnections
             }
         }
         catch {
-            Write-Host "Execution aborted: $_" -ForegroundColor Red
+            Write-Host "Connection execution aborted: $_" -ForegroundColor Red
             break
         }
 
 
-
-        Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue
-        # Import the test functions
-        $testFiles | ForEach-Object {
-            $currentTestIndex++
-            Write-Progress -Activity "Loading Test Scripts" -Status "Loading $($currentTestIndex) of $($totalTests): $($_.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
-            Try {
-                # Dot source the test function
-                . $_.FullName
+        try {
+            Write-Host "A total of $($totalTests) tests were selected to run..." -ForegroundColor DarkMagenta
+            # Import the test functions
+            $testFiles | ForEach-Object {
+                $currentTestIndex++
+                Write-Progress -Activity "Loading Test Scripts" -Status "Loading $($currentTestIndex) of $($totalTests): $($_.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
+                Try {
+                    # Dot source the test function
+                    . $_.FullName
+                }
+                Catch {
+                    # Log the error and add the test to the failed tests collection
+                    Write-Verbose "Failed to load test function $($_.Name): $_" -Verbose
+                    $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
+                }
             }
-            Catch {
-                # Log the error and add the test to the failed tests collection
-                Write-Error "Failed to load test function $($_.Name): $_"
-                $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
+
+            $currentTestIndex = 0
+            # Execute each test function from the prepared list
+            foreach ($testFunction in $testFiles) {
+                $currentTestIndex++
+                Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
+                $functionName = $testFunction.BaseName
+                if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
+                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $M365DomainForPWPolicyTest
+                    # Add the result to the collection
+                    [void]$allAuditResults.Add($auditResult)
+                }
             }
         }
-
-        $currentTestIndex = 0
-        # Execute each test function from the prepared list
-        foreach ($testFunction in $testFiles) {
-            $currentTestIndex++
-            Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
-            $functionName = $testFunction.BaseName
-            if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $M365DomainForPWPolicyTest
-                # Add the result to the collection
-                [void]$allAuditResults.Add($auditResult)
+        catch {
+            # Log the error and add the test to the failed tests collection
+            Write-Verbose "Invoke-M365SecurityAudit: Failed to load test function $($_.Name): $_" -Verbose
+            $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
+        }
+        finally {
+            if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Disconnect")) {
+                # Clean up sessions
+                Disconnect-M365Suite -RequiredConnections $requiredConnections
             }
         }
     }
-
     End {
-        if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Disconnect")) {
-            # Clean up sessions
-            Disconnect-M365Suite -RequiredConnections $requiredConnections
-        }
         if ($PSCmdlet.ShouldProcess("Measure and display audit results for $($totalTests) tests", "Measure")) {
             # Call the private function to calculate and display results
             Measure-AuditResult -AllAuditResults $allAuditResults -FailedTests $script:FailedTests
@@ -310,4 +323,6 @@ function Invoke-M365SecurityAudit {
         }
     }
 }
+
+
 

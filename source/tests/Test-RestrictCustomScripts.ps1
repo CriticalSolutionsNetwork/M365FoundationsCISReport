@@ -32,7 +32,7 @@ function Test-RestrictCustomScripts {
             #   - Condition C: Verification using the SharePoint Admin Center indicates that the `DenyAddAndCustomizePages` setting is not enforced.
 
             # Retrieve all site collections and select necessary properties
-            $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
+            $SPOSitesCustomScript = Get-CISSpoOutput -Rec $recnum
 
             # Process URLs to replace 'sharepoint.com' with '<SPUrl>'
             $processedUrls = $SPOSitesCustomScript | ForEach-Object {
@@ -111,16 +111,8 @@ function Test-RestrictCustomScripts {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

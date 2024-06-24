@@ -16,6 +16,8 @@
     The path where the CSV files will be exported.
     .PARAMETER ExportOriginalTests
     Switch to export the original audit results to a CSV file.
+    .PARAMETER ExportToExcel
+    Switch to export the results to an Excel file.
     .INPUTS
     [CISAuditResult[]], [string]
     .OUTPUTS
@@ -69,9 +71,15 @@ function Export-M365SecurityAuditTable {
 
         [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
         [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
-        [switch]$ExportOriginalTests
-    )
+        [switch]$ExportOriginalTests,
 
+        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
+        [switch]$ExportToExcel
+    )
+    if ($ExportToExcel) {
+        Assert-ModuleAvailability -ModuleName ImportExcel -RequiredVersion "7.8.9"
+    }
     if ($PSCmdlet.ParameterSetName -like "ExportAllResultsFromCsv" -or $PSCmdlet.ParameterSetName -eq "OutputObjectFromCsvSingle") {
         $AuditResults = Import-Csv -Path $CsvPath | ForEach-Object {
             $params = @{
@@ -166,7 +174,13 @@ function Export-M365SecurityAuditTable {
                 }
                 else {
                     if (($result.Details -ne "No M365 E3 licenses found.") -and ($result.Details -ne "No M365 E5 licenses found.")) {
-                        $result.Details | Export-Csv -Path $fileName -NoTypeInformation
+                        if ($ExportToExcel) {
+                            $xlsxPath = [System.IO.Path]::ChangeExtension($fileName, '.xlsx')
+                            $result.Details | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
+                        }
+                        else {
+                            $result.Details | Export-Csv -Path $fileName -NoTypeInformation
+                        }
                         $exportedTests += $result.TestNumber
                     }
                 }
@@ -191,7 +205,13 @@ function Export-M365SecurityAuditTable {
             # Check for large details and update the AuditResults array
             $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
             $originalFileName = "$ExportPath\$timestamp`_M365FoundationsAudit.csv"
+            if ($ExportToExcel) {
+                $xlsxPath = [System.IO.Path]::ChangeExtension($originalFileName, '.xlsx')
+                $updatedAuditResults | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
+            }
+            else {
             $updatedAuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
+            }
         }
     }
     elseif ($OutputTestNumber) {

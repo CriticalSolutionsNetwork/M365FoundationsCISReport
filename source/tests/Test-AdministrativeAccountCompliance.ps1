@@ -1,76 +1,59 @@
 function Test-AdministrativeAccountCompliance {
     [CmdletBinding()]
-    param (
-        # Aligned
-        # Parameters can be added if needed
-    )
+    param ()
 
     begin {
         # The following conditions are checked:
         # Condition A: The administrative account is cloud-only (not synced).
         # Condition B: The account is assigned a valid license (e.g., Microsoft Entra ID P1 or P2).
         # Condition C: The administrative account does not have any other application assignments (only valid licenses).
-
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
         $recnum = "1.1.1"
         Write-Verbose "Starting Test-AdministrativeAccountCompliance with Rec: $recnum"
     }
 
     process {
-        try {
-            # Retrieve all admin roles
-            Write-Verbose "Retrieving all admin roles"
-            # Get the DisplayNames of all admin roles
-            $adminRoleNames = (Get-MgDirectoryRole | Where-Object { $null -ne $_.RoleTemplateId }).DisplayName
 
-            # Use the DisplayNames to filter the roles in Get-MgRoleManagementDirectoryRoleDefinition
-            $adminRoles = Get-MgRoleManagementDirectoryRoleDefinition | Where-Object { ($adminRoleNames -contains $_.DisplayName) -and ($_.DisplayName -ne "Directory Synchronization Accounts")}
+        try {
+            # Retrieve admin roles, assignments, and user details including licenses
+            Write-Verbose "Retrieving admin roles, assignments, and user details including licenses"
+            $adminRoleAssignments = Get-CISMgOutput -Rec $recnum
 
             $adminRoleUsers = @()
 
-            # Loop through each admin role to get role assignments and user details
-            foreach ($role in $adminRoles) {
-                Write-Verbose "Processing role: $($role.DisplayName)"
-                $roleAssignments = Get-MgRoleManagementDirectoryRoleAssignment -Filter "roleDefinitionId eq '$($role.Id)'"
+            foreach ($roleName in $adminRoleAssignments.Keys) {
+                $assignments = $adminRoleAssignments[$roleName]
+                foreach ($assignment in $assignments) {
+                    $userDetails = $assignment.UserDetails
+                    $userId = $userDetails.Id
+                    $userPrincipalName = $userDetails.UserPrincipalName
+                    $licenses = $assignment.Licenses
+                    $licenseString = if ($licenses) { ($licenses.SkuPartNumber -join '|') } else { "No Licenses Found" }
 
-                foreach ($assignment in $roleAssignments) {
-                    Write-Verbose "Processing role assignment for principal ID: $($assignment.PrincipalId)"
-                    # Get user details for each principal ID
-                    $userDetails = Get-MgUser -UserId $assignment.PrincipalId -Property "DisplayName, UserPrincipalName, Id, OnPremisesSyncEnabled" -ErrorAction SilentlyContinue
-                    if ($userDetails) {
-                        Write-Verbose "Retrieved user details for: $($userDetails.UserPrincipalName)"
-                        # Get user license details
-                        $licenses = Get-MgUserLicenseDetail -UserId $assignment.PrincipalId -ErrorAction SilentlyContinue
-                        $licenseString = if ($licenses) { ($licenses.SkuPartNumber -join '|') } else { "No Licenses Found" }
+                    # Condition A: Check if the account is cloud-only
+                    $cloudOnlyStatus = if ($userDetails.OnPremisesSyncEnabled) { "Fail" } else { "Pass" }
 
-                        # Condition A: Check if the account is cloud-only
-                        $cloudOnlyStatus = if ($userDetails.OnPremisesSyncEnabled) { "Fail" } else { "Pass" }
+                    # Condition B: Check if the account has valid licenses
+                    $hasValidLicense = $licenses.SkuPartNumber | ForEach-Object { $validLicenses -contains $_ }
+                    $validLicensesStatus = if ($hasValidLicense) { "Pass" } else { "Fail" }
 
-                        # Condition B: Check if the account has valid licenses
-                        $hasValidLicense = $licenses.SkuPartNumber | ForEach-Object { $validLicenses -contains $_ }
-                        $validLicensesStatus = if ($hasValidLicense) { "Pass" } else { "Fail" }
+                    # Condition C: Check if the account has no other licenses
+                    $hasInvalidLicense = $licenses.SkuPartNumber | ForEach-Object { $validLicenses -notcontains $_ }
+                    $invalidLicenses = $licenses.SkuPartNumber | Where-Object { $validLicenses -notcontains $_ }
+                    $applicationAssignmentStatus = if ($hasInvalidLicense) { "Fail" } else { "Pass" }
 
-                        # Condition C: Check if the account has no other licenses
-                        $hasInvalidLicense = $licenses.SkuPartNumber | ForEach-Object { $validLicenses -notcontains $_ }
-                        $invalidLicenses = $licenses.SkuPartNumber | Where-Object { $validLicenses -notcontains $_ }
-                        $applicationAssignmentStatus = if ($hasInvalidLicense) { "Fail" } else { "Pass" }
+                    Write-Verbose "User: $userPrincipalName, Cloud-Only: $cloudOnlyStatus, Valid Licenses: $validLicensesStatus, Invalid Licenses: $($invalidLicenses -join ', ')"
 
-                        Write-Verbose "User: $($userDetails.UserPrincipalName), Cloud-Only: $cloudOnlyStatus, Valid Licenses: $validLicensesStatus, Invalid Licenses: $($invalidLicenses -join ', ')"
-
-                        # Collect user information
-                        $adminRoleUsers += [PSCustomObject]@{
-                            UserName                    = $userDetails.UserPrincipalName
-                            RoleName                    = $role.DisplayName
-                            UserId                      = $userDetails.Id
-                            HybridUser                  = $userDetails.OnPremisesSyncEnabled
-                            Licenses                    = $licenseString
-                            CloudOnlyStatus             = $cloudOnlyStatus
-                            ValidLicensesStatus         = $validLicensesStatus
-                            ApplicationAssignmentStatus = $applicationAssignmentStatus
-                        }
-                    }
-                    else {
-                        Write-Verbose "No user details found for principal ID: $($assignment.PrincipalId)"
+                    # Collect user information
+                    $adminRoleUsers += [PSCustomObject]@{
+                        UserName                    = $userPrincipalName
+                        RoleName                    = $roleName
+                        UserId                      = $userId
+                        HybridUser                  = $userDetails.OnPremisesSyncEnabled
+                        Licenses                    = $licenseString
+                        CloudOnlyStatus             = $cloudOnlyStatus
+                        ValidLicensesStatus         = $validLicensesStatus
+                        ApplicationAssignmentStatus = $applicationAssignmentStatus
                     }
                 }
             }
@@ -124,15 +107,8 @@ function Test-AdministrativeAccountCompliance {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Handle the error and create a failure result
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 

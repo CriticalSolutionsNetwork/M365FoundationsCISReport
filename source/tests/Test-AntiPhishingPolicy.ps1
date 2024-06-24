@@ -34,7 +34,7 @@ function Test-AntiPhishingPolicy {
 
         try {
             # Condition A: Ensure that an anti-phishing policy has been created
-            $antiPhishPolicies = Get-AntiPhishPolicy
+            $antiPhishPolicies = Get-CISExoOutput -Rec $recnum
 
             # Condition B: Verify the anti-phishing policy settings using PowerShell
             $validatedPolicies = $antiPhishPolicies | Where-Object {
@@ -92,16 +92,8 @@ function Test-AntiPhishingPolicy {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
-
-            # Retrieve the description from the test definitions
-            $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
-            $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
-            $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
-            # Call Initialize-CISAuditResult with error parameters
-            $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+            $LastError = $_
+            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
 
