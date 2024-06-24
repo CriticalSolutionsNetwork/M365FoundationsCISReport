@@ -4,6 +4,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+## [0.1.14] - 2024-06-23
+
 ### Fixed
 
 - Fixed test 1.3.1 to include notification window for password expiration.
