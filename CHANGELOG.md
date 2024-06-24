@@ -10,6 +10,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Fixed 6.1.1 test definition to include the correct connection.
 - Removed banner and warning from EXO and AzureAD connection step.
 - Fixed missing CommentBlock for `Remove-RowsWithEmptyCSVStatus` function.
+- Fixed formatting and color for various Write-Host messages.
 
 ### Added
 
