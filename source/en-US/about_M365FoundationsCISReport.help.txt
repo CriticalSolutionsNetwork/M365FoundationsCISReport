@@ -1,24 +1,76 @@
-TOPIC
-    about_M365FoundationsCISReport
+﻿TOPIC
+    about_m365foundationscisreport
 
 SHORT DESCRIPTION
-    Automated assessment of 50 CIS 365 Foundations v3.0.0 benchmark.
+    The `M365FoundationsCISReport` module provides cmdlets for auditing and
+    reporting on the security compliance of Microsoft 365 environments based on
+    CIS benchmarks.
 
 LONG DESCRIPTION
-    Automated assessment of 50 CIS 365 Foundations v3.0.0 benchmark.
+    The `M365FoundationsCISReport` module is designed to help administrators
+    ensure that their Microsoft 365 environments adhere to the security best
+    practices outlined by the Center for Internet Security (CIS). The module
+    includes cmdlets for performing comprehensive security audits, generating
+    detailed reports, and synchronizing audit results with CIS benchmark Excel
+    sheets. It aims to streamline the process of maintaining security compliance
+    and improving the overall security posture of Microsoft 365 environments.
+
+Optional Subtopics
+    AUDITING AND REPORTING
+    The module provides cmdlets that allow for the auditing of various security
+    aspects of Microsoft 365 environments, including user MFA status,
+    administrative role licenses, and more. The results can be exported and
+    analyzed to ensure compliance with CIS benchmarks.
+
+    DATA SYNCHRONIZATION
+    The module includes functionality to synchronize audit results with CIS
+    benchmark data stored in Excel sheets. This ensures that the documentation
+    is always up-to-date with the latest audit findings.
 
 EXAMPLES
-    PS C:\> {{ add examples here }}
+    # Example 1: Exporting a security audit table to a CSV file
+    Export-M365SecurityAuditTable -OutputPath "C:\AuditReports\SecurityAudit.csv"
+    
+    # Example 2: Retrieving licenses for users in administrative roles
+    Get-AdminRoleUserLicense -RoleName "Global Administrator"
+    
+    # Example 3: Getting MFA status of users
+    Get-MFAStatus -UserPrincipalName "user@domain.com"
+    
+    # Example 4: Performing a security audit based on CIS benchmarks
+    Invoke-M365SecurityAudit -OutputPath "C:\AuditReports\AuditResults.xlsx"
+    
+    # Example 5: Removing rows with empty status values from a CSV file
+    Remove-RowsWithEmptyCSVStatus -InputPath "C:\AuditReports\AuditResults.csv" -OutputPath "C:\AuditReports\CleanedResults.csv"
+    
+    # Example 6: Synchronizing CIS benchmark data with audit results
+    Sync-CISExcelAndCsvData -ExcelPath "C:\CISBenchmarks\CISBenchmark.xlsx" -CsvPath "C:\AuditReports\AuditResults.csv"
 
-NOTE:
-    Thank you to all those who contributed to this module, by writing code, sharing opinions, and provided feedback.
+NOTE
+    Ensure that you have the necessary permissions and administrative roles in
+    your Microsoft 365 environment to run these cmdlets. Proper configuration
+    and setup are required for accurate audit results.
 
-TROUBLESHOOTING NOTE:
-    Look out on the Github repository for issues and new releases.
+TROUBLESHOOTING NOTE
+    If you encounter any issues while using the cmdlets, ensure that your
+    environment meets the module prerequisites. Check for any updates or patches
+    that may address known bugs. For issues related to specific cmdlets, refer
+    to the individual help files for troubleshooting tips.
 
 SEE ALSO
-    - {{ Please add Project URI such as github }}}
+    -
+    CIS Benchmarks
+    -
+    Microsoft 365 Security Documentation
+    -
+    PowerShell Documentation
 
 KEYWORDS
-    {{ Add comma separated keywords here }}
+    - Microsoft 365
+    - Security Audit
+    - CIS Benchmarks
+    - Compliance
+    - MFA
+    - User Licenses
+    - Security Reporting
 

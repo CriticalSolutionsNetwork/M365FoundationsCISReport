@@ -15,49 +15,50 @@ Invokes a security audit for Microsoft 365 environments.
 ### Default (Default)
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-M365DomainForPWPolicyTest <String>] [-DoNotConnect]
- [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-ProgressAction <ActionPreference>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ### ELevelFilter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-M365DomainForPWPolicyTest <String>] -ELevel <String>
  -ProfileLevel <String> [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### IG1Filter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-M365DomainForPWPolicyTest <String>] [-IncludeIG1]
- [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### IG2Filter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-M365DomainForPWPolicyTest <String>] [-IncludeIG2]
- [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### IG3Filter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-M365DomainForPWPolicyTest <String>] [-IncludeIG3]
- [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### RecFilter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-M365DomainForPWPolicyTest <String>]
  -IncludeRecommendation <String[]> [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck]
- [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-DoNotConfirmConnections] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### SkipRecFilter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-M365DomainForPWPolicyTest <String>]
  -SkipRecommendation <String[]> [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -126,8 +127,6 @@ FailureReason: Non-Compliant Accounts: 2
 ### EXAMPLE 4
 ```
 Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
-```
-
 Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
 Output:
 Status      : Fail
@@ -141,13 +140,13 @@ Details     : Non-compliant accounts:
                 user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
                 user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
 FailureReason: Non-Compliant Accounts: 2
+```
 
 ### EXAMPLE 5
 ```
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com"
+PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
 ```
-
-PS\> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
 
 Captures the audit results into a variable and exports them to a CSV file.
 Output:
@@ -389,6 +388,21 @@ Prompts you for confirmation before running the cmdlet.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
 
 Required: False
 Position: Named

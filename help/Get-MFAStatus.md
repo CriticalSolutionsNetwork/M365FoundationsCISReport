@@ -13,7 +13,8 @@ Retrieves the MFA (Multi-Factor Authentication) status for Azure Active Director
 ## SYNTAX
 
 ```
-Get-MFAStatus [[-UserId] <String>] [-SkipMSOLConnectionChecks] [<CommonParameters>]
+Get-MFAStatus [[-UserId] <String>] [-SkipMSOLConnectionChecks] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -25,16 +26,14 @@ Optionally, you can specify a single user by their User Principal Name (UPN) to 
 ### EXAMPLE 1
 ```
 Get-MFAStatus
-```
-
 Retrieves the MFA status for all Azure Active Directory users.
+```
 
 ### EXAMPLE 2
 ```
 Get-MFAStatus -UserId "example@domain.com"
-```
-
 Retrieves the MFA status for the specified user with the UPN "example@domain.com".
+```
 
 ## PARAMETERS
 
@@ -65,6 +64,21 @@ Aliases:
 Required: False
 Position: Named
 Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
