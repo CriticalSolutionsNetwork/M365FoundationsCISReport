@@ -197,6 +197,7 @@ function Invoke-M365SecurityAudit {
 
         # Check and install required modules if necessary
         if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules: $requiredModulesFormatted", "Check")) {
+            Write-Host "Checking for and installing required modules..." -ForegroundColor DarkMagenta
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
             }
@@ -251,7 +252,7 @@ function Invoke-M365SecurityAudit {
         try {
             $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
             if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
-                Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -InformationAction Continue
+                Write-Host "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')" -ForegroundColor DarkMagenta
                 Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections -SkipConfirmation:$DoNotConfirmConnections
             }
         }
@@ -262,7 +263,7 @@ function Invoke-M365SecurityAudit {
 
 
         try {
-            Write-Information "A total of $($totalTests) tests were selected to run..." -InformationAction Continue
+            Write-Host "A total of $($totalTests) tests were selected to run..." -ForegroundColor DarkMagenta
             # Import the test functions
             $testFiles | ForEach-Object {
                 $currentTestIndex++

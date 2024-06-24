@@ -19,7 +19,7 @@ function Measure-AuditResult {
 
     # Display the pass percentage to the user
     Write-Host "Audit completed. $passedTests out of $totalTests tests passed." -ForegroundColor Cyan
-    Write-Host "Your passing percentage is $passPercentage%."
+    Write-Host "Your passing percentage is $passPercentage%." -ForegroundColor Magenta
 
     # Display details of failed tests
     if ($FailedTests.Count -gt 0) {
