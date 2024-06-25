@@ -37,6 +37,6 @@ $parameters = @{
     LogPath = ".\log.txt"
     Encoding = [System.Text.Encoding]::UTF8
 }
-Update-MarkdownHelpModule @parameters
-Update-MarkdownHelpModule -Path ".\help" -RefreshModulePage
+Update-MarkdownHelpModule @parameters -Force
+Update-MarkdownHelpModule -Path ".\help" -RefreshModulePage -Force
 New-ExternalHelp -Path ".\help" -OutputPath ".\source\en-US" -force
