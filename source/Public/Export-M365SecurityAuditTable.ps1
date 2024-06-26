@@ -191,7 +191,7 @@ function Export-M365SecurityAuditTable {
         }
         else {
             if ($ExportOriginalTests) {
-                Write-Information "No specified tests were included in the export other than the full audit results." -InformationAction Continue
+                Write-Information "Full audit results exported however, none of the following tests had exports: `n1.1.1, 1.3.1, 6.1.2, 6.1.3, 7.3.4" -InformationAction Continue
             }
             else {
                 Write-Information "No specified tests were included in the export." -InformationAction Continue
@@ -201,9 +201,12 @@ function Export-M365SecurityAuditTable {
         if ($ExportOriginalTests) {
             # Define the test numbers to check
             $TestNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-
-            # Check for large details and update the AuditResults array
-            $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
+            if ($exportedTests.Count -gt 0) {
+                $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
+            }
+            else {
+                $updatedAuditResults = $auditResults
+            }
             $originalFileName = "$ExportPath\$timestamp`_M365FoundationsAudit.csv"
             if ($ExportToExcel) {
                 $xlsxPath = [System.IO.Path]::ChangeExtension($originalFileName, '.xlsx')
