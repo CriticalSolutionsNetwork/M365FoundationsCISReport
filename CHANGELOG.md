@@ -12,7 +12,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Changed
 
-- Changed output of failure reason and details for 8.5.3 to be in line with other tests.
+- Changed output of failure reason and details for 8.5.3 and 8.6.1 to be in line with other tests.
 
 ## [0.1.14] - 2024-06-23
 
