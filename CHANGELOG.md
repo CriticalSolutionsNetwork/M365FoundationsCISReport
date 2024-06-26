@@ -4,6 +4,16 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed test 8.6.1 to include all of the following properties in it's checks and output: `ReportJunkToCustomizedAddress`, `ReportNotJunkToCustomizedAddress`, `ReportPhishToCustomizedAddress`,`ReportJunkAddresses`,`ReportNotJunkAddresses`,`ReportPhishAddresses`,`ReportChatMessageEnabled`,`ReportChatMessageToCustomizedAddressEnabled`
+- Fixed help `about_M365FoundationsCISReport` examples.
+- Fixed `Export-M365SecurityAuditTable` to properly export when nested table tests are not included.
+
+### Changed
+
+- Changed output of failure reason and details for 8.5.3 and 8.6.1 to be in line with other tests.
+
 ## [0.1.14] - 2024-06-23
 
 ### Fixed

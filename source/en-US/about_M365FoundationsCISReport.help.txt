@@ -28,23 +28,23 @@ Optional Subtopics
     is always up-to-date with the latest audit findings.
 
 EXAMPLES
-    # Example 1: Exporting a security audit table to a CSV file
-    Export-M365SecurityAuditTable -OutputPath "C:\AuditReports\SecurityAudit.csv"
+    # Example 1: Performing a security audit based on CIS benchmarks
+    $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com"
     
-    # Example 2: Retrieving licenses for users in administrative roles
-    Get-AdminRoleUserLicense -RoleName "Global Administrator"
+    # Example 2: Exporting a security audit table to a CSV file
+    Export-M365SecurityAuditTable -ExportAllTests -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests
     
-    # Example 3: Getting MFA status of users
-    Get-MFAStatus -UserPrincipalName "user@domain.com"
+    # Example 3: Retrieving licenses for users in administrative roles
+    Get-AdminRoleUserLicense
     
-    # Example 4: Performing a security audit based on CIS benchmarks
-    Invoke-M365SecurityAudit -OutputPath "C:\AuditReports\AuditResults.xlsx"
+    # Example 4: Getting MFA status of users
+    Get-MFAStatus -UserId "user@domain.com"
     
     # Example 5: Removing rows with empty status values from a CSV file
-    Remove-RowsWithEmptyCSVStatus -InputPath "C:\AuditReports\AuditResults.csv" -OutputPath "C:\AuditReports\CleanedResults.csv"
+    Remove-RowsWithEmptyCSVStatus -FilePath "C:\Reports\Report.xlsx" -WorksheetName "Sheet1"
     
     # Example 6: Synchronizing CIS benchmark data with audit results
-    Sync-CISExcelAndCsvData -ExcelPath "C:\CISBenchmarks\CISBenchmark.xlsx" -CsvPath "C:\AuditReports\AuditResults.csv"
+    Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "Combined Profiles"
 
 NOTE
     Ensure that you have the necessary permissions and administrative roles in
