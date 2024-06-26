@@ -4,7 +4,7 @@ Import-Module .\output\module\M365FoundationsCISReport\*\*.psd1
 
 
 <#
-    $ver = "v0.1.14"
+    $ver = "v0.1.15"
     git checkout main
     git pull origin main
     git tag -a $ver -m "Release version $ver refactor Update"
@@ -40,3 +40,25 @@ $parameters = @{
 Update-MarkdownHelpModule @parameters -Force
 Update-MarkdownHelpModule -Path ".\help" -RefreshModulePage -Force
 New-ExternalHelp -Path ".\help" -OutputPath ".\source\en-US" -force
+
+
+
+# Install Secret Management
+Install-Module -Name "Microsoft.PowerShell.SecretManagement", `
+"SecretManagement.JustinGrote.CredMan" -Scope CurrentUser
+
+# Register Vault
+Register-SecretVault -Name ModuleBuildCreds -ModuleName `
+"SecretManagement.JustinGrote.CredMan" -ErrorAction Stop
+
+
+Set-Secret -Name "GalleryApiToken" -Vault ModuleBuildCreds
+Set-Secret -Name "GitHubToken" -Vault ModuleBuildCreds
+
+
+$GalleryApiToken = Get-Secret -Name "GalleryApiToken" -Vault ModuleBuildCreds -AsPlainText
+$GitHubToken = Get-Secret -Name "GitHubToken" -Vault ModuleBuildCreds -AsPlainText
+
+
+$GalleryApiToken
+$GitHubToken
