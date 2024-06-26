@@ -36,32 +36,32 @@ function Test-ReportSecurityInTeams {
             $ReportSubmissionPolicy.ReportChatMessageToCustomizedAddressEnabled -and
             -not $ReportSubmissionPolicy.ReportChatMessageEnabled
 
-            $faildetailstring = @"
+            $detailsString = @"
 The following settings are required for users to report security concerns in Teams:
 
 MS Teams:
 AllowSecurityEndUserReporting: True
 
 EXO:
-ReportJunkToCustomizedAddress               : True
-ReportNotJunkToCustomizedAddress            : True
-ReportPhishToCustomizedAddress              : True
-ReportJunkAddresses                         : <security@contoso.com>
-ReportNotJunkAddresses                      : <security@contoso.com>
-ReportPhishAddresses                        : <security@contoso.com>
-ReportChatMessageEnabled                    : False
-ReportChatMessageToCustomizedAddressEnabled : True
+ReportJunkToCustomizedAddress: True
+ReportNotJunkToCustomizedAddress: True
+ReportPhishToCustomizedAddress: True
+ReportJunkAddresses: <security@contoso.com>
+ReportNotJunkAddresses: <security@contoso.com>
+ReportPhishAddresses: <security@contoso.com>
+ReportChatMessageEnabled: False
+ReportChatMessageToCustomizedAddressEnabled: True
 "@
-            $detailsString = "Users cannot report security concerns in Teams due to one or more incorrect settings:`n`n" +
-            "MSTeams: AllowSecurityEndUserReporting: $($CsTeamsMessagingPolicy.AllowSecurityEndUserReporting); `n" +
-            "EXO: ReportJunkToCustomizedAddress: $($ReportSubmissionPolicy.ReportJunkToCustomizedAddress); `n" +
-            "EXO: ReportNotJunkToCustomizedAddress: $($ReportSubmissionPolicy.ReportNotJunkToCustomizedAddress); `n" +
-            "EXO: ReportPhishToCustomizedAddress: $($ReportSubmissionPolicy.ReportPhishToCustomizedAddress); `n" +
-            "EXO: ReportJunkAddresses: $($ReportSubmissionPolicy.ReportJunkAddresses -join ', '); `n" +
-            "EXO: ReportNotJunkAddresses: $($ReportSubmissionPolicy.ReportNotJunkAddresses -join ', '); `n" +
-            "EXO: ReportPhishAddresses: $($ReportSubmissionPolicy.ReportPhishAddresses -join ', '); `n" +
-            "EXO: ReportChatMessageEnabled: $($ReportSubmissionPolicy.ReportChatMessageEnabled); `n" +
-            "EXO: ReportChatMessageToCustomizedAddressEnabled: $($ReportSubmissionPolicy.ReportChatMessageToCustomizedAddressEnabled); "
+            $faildetailstring = "Users cannot report security concerns in Teams due to one or more  of the found incorrect settings:`n`n" +
+            "MSTeams: `nAllowSecurityEndUserReporting: $($CsTeamsMessagingPolicy.AllowSecurityEndUserReporting); `n`n" +
+            "EXO: `nReportJunkToCustomizedAddress: $($ReportSubmissionPolicy.ReportJunkToCustomizedAddress); `n" +
+            "ReportNotJunkToCustomizedAddress: $($ReportSubmissionPolicy.ReportNotJunkToCustomizedAddress); `n" +
+            "ReportPhishToCustomizedAddress: $($ReportSubmissionPolicy.ReportPhishToCustomizedAddress); `n" +
+            "ReportJunkAddresses: $($ReportSubmissionPolicy.ReportJunkAddresses -join ', '); `n" +
+            "ReportNotJunkAddresses: $($ReportSubmissionPolicy.ReportNotJunkAddresses -join ', '); `n" +
+            "ReportPhishAddresses: $($ReportSubmissionPolicy.ReportPhishAddresses -join ', '); `n" +
+            "ReportChatMessageEnabled: $($ReportSubmissionPolicy.ReportChatMessageEnabled); `n" +
+            "ReportChatMessageToCustomizedAddressEnabled: $($ReportSubmissionPolicy.ReportChatMessageToCustomizedAddressEnabled); "
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $securityReportEnabled) {
                 $detailsString
