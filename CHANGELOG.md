@@ -8,6 +8,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Fixed test 8.6.1 to include all of the following properties in it's checks and output: `ReportJunkToCustomizedAddress`, `ReportNotJunkToCustomizedAddress`, `ReportPhishToCustomizedAddress`,`ReportJunkAddresses`,`ReportNotJunkAddresses`,`ReportPhishAddresses`,`ReportChatMessageEnabled`,`ReportChatMessageToCustomizedAddressEnabled`
 - Fixed help `about_M365FoundationsCISReport` examples.
+- Fixed `Export-M365SecurityAuditTable` to properly export when nested table tests are not included.
 
 ### Changed
 
