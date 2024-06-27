@@ -1,4 +1,4 @@
----
+﻿---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
@@ -110,22 +110,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -OutputTestNumber
-The test number to output as an object.
-Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
-
-```yaml
-Type: String
-Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ExportAllTests
 Switch to export all test results.
 
@@ -136,6 +120,21 @@ Aliases:
 
 Required: True
 Position: 1
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExportOriginalTests
+Switch to export the original audit results to a CSV file.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Aliases:
+
+Required: False
+Position: Named
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -156,8 +155,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExportOriginalTests
-Switch to export the original audit results to a CSV file.
+### -ExportToExcel
+Switch to export the results to an Excel file.
 
 ```yaml
 Type: SwitchParameter
@@ -171,17 +170,18 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExportToExcel
-Switch to export the results to an Excel file.
+### -OutputTestNumber
+The test number to output as an object.
+Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
 
 ```yaml
-Type: SwitchParameter
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Type: String
+Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
 Aliases:
 
-Required: False
-Position: Named
-Default value: False
+Required: True
+Position: 2
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

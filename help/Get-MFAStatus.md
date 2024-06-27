@@ -1,4 +1,4 @@
----
+﻿---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Get-MFAStatus
@@ -37,17 +37,16 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
 
 ## PARAMETERS
 
-### -UserId
-The User Principal Name (UPN) of a specific user to retrieve MFA status for.
-If not provided, the function retrieves MFA status for all users.
+### -ProgressAction
+{{ Fill ProgressAction Description }}
 
 ```yaml
-Type: String
+Type: ActionPreference
 Parameter Sets: (All)
-Aliases:
+Aliases: proga
 
 Required: False
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -68,16 +67,17 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ProgressAction
-{{ Fill ProgressAction Description }}
+### -UserId
+The User Principal Name (UPN) of a specific user to retrieve MFA status for.
+If not provided, the function retrieves MFA status for all users.
 
 ```yaml
-Type: ActionPreference
+Type: String
 Parameter Sets: (All)
-Aliases: proga
+Aliases:
 
 Required: False
-Position: Named
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

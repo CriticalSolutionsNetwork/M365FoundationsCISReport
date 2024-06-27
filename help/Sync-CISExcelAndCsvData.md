@@ -1,4 +1,4 @@
----
+﻿---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
@@ -32,22 +32,6 @@ Updates the 'AuditData' worksheet in 'excel.xlsx' with data from 'data.csv', add
 
 ## PARAMETERS
 
-### -ExcelPath
-Specifies the path to the Excel file to be updated.
-This parameter is mandatory.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -CsvPath
 Specifies the path to the CSV file containing new data.
 This parameter is mandatory.
@@ -64,8 +48,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SheetName
-Specifies the name of the worksheet in the Excel file where data will be merged and updated.
+### -ExcelPath
+Specifies the path to the Excel file to be updated.
 This parameter is mandatory.
 
 ```yaml
@@ -74,7 +58,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 3
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -90,6 +74,22 @@ Aliases: proga
 
 Required: False
 Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SheetName
+Specifies the name of the worksheet in the Excel file where data will be merged and updated.
+This parameter is mandatory.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
