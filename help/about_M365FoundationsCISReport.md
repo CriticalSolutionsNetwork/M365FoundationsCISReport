@@ -33,6 +33,9 @@ Remove-RowsWithEmptyCSVStatus -FilePath "C:\Reports\Report.xlsx" -WorksheetName 
 
 # Example 6: Synchronizing CIS benchmark data with audit results
 Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "Combined Profiles"
+
+# Example 7: Granting Microsoft Graph permissions to the auditor
+Grant-M365SecurityAuditConsent -UserPrincipalNameForConsent 'user@example.com'
 ```
 
 # NOTE

@@ -1,4 +1,4 @@
----
+﻿---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
@@ -164,34 +164,47 @@ What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsof
 
 ## PARAMETERS
 
-### -TenantAdminUrl
-The URL of the tenant admin.
-If not specified, none of the SharePoint Online tests will run.
+### -DoNotConfirmConnections
+If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
 
 ```yaml
-Type: String
+Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -M365DomainForPWPolicyTest
-The domain name of the Microsoft 365 environment to test.
-This parameter is not mandatory and by default it will pass/fail all found domains as a group if a specific domain is not specified.
+### -DoNotConnect
+If specified, the cmdlet will not establish a connection to Microsoft 365 services.
 
 ```yaml
-Type: String
+Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DoNotDisconnect
+If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -199,22 +212,6 @@ Accept wildcard characters: False
 ### -ELevel
 Specifies the E-Level (E3 or E5) for the audit.
 This parameter is optional and can be combined with the ProfileLevel parameter.
-
-```yaml
-Type: String
-Parameter Sets: ELevelFilter
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProfileLevel
-Specifies the profile level (L1 or L2) for the audit.
-This parameter is optional and can be combined with the ELevel parameter.
 
 ```yaml
 Type: String
@@ -289,48 +286,18 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SkipRecommendation
-Specifies specific recommendations to exclude from the audit.
-Accepts an array of recommendation numbers.
+### -M365DomainForPWPolicyTest
+The domain name of the Microsoft 365 environment to test.
+This parameter is not mandatory and by default it will pass/fail all found domains as a group if a specific domain is not specified.
 
 ```yaml
-Type: String[]
-Parameter Sets: SkipRecFilter
+Type: String
+Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DoNotConnect
-If specified, the cmdlet will not establish a connection to Microsoft 365 services.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DoNotDisconnect
-If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -350,29 +317,61 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -DoNotConfirmConnections
-If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
+### -ProfileLevel
+Specifies the profile level (L1 or L2) for the audit.
+This parameter is optional and can be combined with the ELevel parameter.
 
 ```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
+Type: String
+Parameter Sets: ELevelFilter
 Aliases:
 
-Required: False
+Required: True
 Position: Named
-Default value: False
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
+### -ProgressAction
+{{ Fill ProgressAction Description }}
 
 ```yaml
-Type: SwitchParameter
+Type: ActionPreference
 Parameter Sets: (All)
-Aliases: wi
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SkipRecommendation
+Specifies specific recommendations to exclude from the audit.
+Accepts an array of recommendation numbers.
+
+```yaml
+Type: String[]
+Parameter Sets: SkipRecFilter
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TenantAdminUrl
+The URL of the tenant admin.
+If not specified, none of the SharePoint Online tests will run.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
 
 Required: False
 Position: Named
@@ -396,13 +395,14 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ProgressAction
-{{ Fill ProgressAction Description }}
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
 
 ```yaml
-Type: ActionPreference
+Type: SwitchParameter
 Parameter Sets: (All)
-Aliases: proga
+Aliases: wi
 
 Required: False
 Position: Named

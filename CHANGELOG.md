@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Added `Grant-M365SecurityAuditConsent` function to consent to the Microsoft Graph Powershell API for a user.
+
+## [0.1.15] - 2024-06-26
+
 ### Fixed
 
 - Fixed test 8.6.1 to include all of the following properties in it's checks and output: `ReportJunkToCustomizedAddress`, `ReportNotJunkToCustomizedAddress`, `ReportPhishToCustomizedAddress`,`ReportJunkAddresses`,`ReportNotJunkAddresses`,`ReportPhishAddresses`,`ReportChatMessageEnabled`,`ReportChatMessageToCustomizedAddressEnabled`
