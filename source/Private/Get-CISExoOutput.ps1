@@ -65,6 +65,33 @@ function Get-CISExoOutput {
                 # [psobject[]]
                 return $sharingPolicies
             }
+            '1.3.3b' {
+                $mailboxes = Get-Mailbox -ResultSize Unlimited
+                $results = foreach ($mailbox in $mailboxes) {
+                    # Get the name of the default calendar folder (depends on the mailbox's language)
+                    $calendarFolder = [string](Get-ExoMailboxFolderStatistics $mailbox.PrimarySmtpAddress -FolderScope Calendar | Where-Object {$_.FolderType -eq 'Calendar'}).Name
+                    Write-Verbose "Calendar folder for $($mailbox.PrimarySmtpAddress): $calendarFolder"
+                    # Get users calendar folder settings for their default Calendar folder
+                    # calendar has the format identity:\<calendar folder name>
+                    $calendar = Get-MailboxCalendarFolder -Identity "$($mailbox.PrimarySmtpAddress):\$calendarFolder"
+                    #Write-Host "Calendar object for $($mailbox.PrimarySmtpAddress): $calendar"
+                    Write-Verbose "Calendar publishing enabled: $($calendar.PublishEnabled)"
+                    # Check if calendar publishing is enabled and create a custom object
+                    if ($calendar.PublishEnabled) {
+                        [PSCustomObject]@{
+                            PrimarySmtpAddress = $mailbox.PrimarySmtpAddress
+                            CalendarFolder = $calendarFolder
+                            PublishEnabled = $calendar.PublishEnabled
+                            PublishedCalendarUrl = $calendar.PublishedCalendarUrl
+                        }
+                    }
+                }
+                $calendarDetails = @()
+                foreach ($calendar in $results) {
+                    $calendarDetails += "Calendar: $($calendar.PrimarySmtpAddress); URL: $($calendar.PublishedCalendarUrl)"
+                }
+                return $calendarDetails
+            }
             '1.3.6' {
                 # Test-CustomerLockbox.ps1
                 # Step: Retrieve the organization configuration (Condition C: Pass/Fail)
