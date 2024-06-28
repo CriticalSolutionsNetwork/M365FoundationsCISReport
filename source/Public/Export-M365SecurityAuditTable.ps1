@@ -201,12 +201,9 @@ function Export-M365SecurityAuditTable {
         if ($ExportOriginalTests) {
             # Define the test numbers to check
             $TestNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-            if ($exportedTests.Count -gt 0) {
-                $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
-            }
-            else {
-                $updatedAuditResults = $auditResults
-            }
+
+            # Check for large details and update the AuditResults array
+            $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
             $originalFileName = "$ExportPath\$timestamp`_M365FoundationsAudit.csv"
             if ($ExportToExcel) {
                 $xlsxPath = [System.IO.Path]::ChangeExtension($originalFileName, '.xlsx')
