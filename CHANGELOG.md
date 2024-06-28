@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `Get-ExceededLengthResultDetail` function paramter validation for Exported Tests to allow for Null.
+
+## [0.1.16] - 2024-06-26
+
 ### Added
 
 - Added `Grant-M365SecurityAuditConsent` function to consent to the Microsoft Graph Powershell API for a user.
