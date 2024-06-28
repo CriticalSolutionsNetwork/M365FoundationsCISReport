@@ -69,8 +69,8 @@ function Export-M365SecurityAuditTable {
         [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromCsv")]
         [string]$ExportPath,
 
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
+        [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromCsv")]
         [switch]$ExportOriginalTests,
 
         [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
