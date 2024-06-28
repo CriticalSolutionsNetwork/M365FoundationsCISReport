@@ -61,8 +61,8 @@ function Export-M365SecurityAuditTable {
         [ValidateSet("1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4")]
         [string]$OutputTestNumber,
 
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "ExportAllResultsFromCsv")]
+        [Parameter(Mandatory = $false, Position = 0, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $false, Position = 0, ParameterSetName = "ExportAllResultsFromCsv")]
         [switch]$ExportAllTests,
 
         [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromAuditResults")]

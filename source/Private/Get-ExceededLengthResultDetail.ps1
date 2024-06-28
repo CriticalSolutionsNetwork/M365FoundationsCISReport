@@ -9,7 +9,7 @@ function Get-ExceededLengthResultDetail {
         [Parameter(Mandatory = $true, ParameterSetName = 'ReturnExceedingTests')]
         [string[]]$TestNumbersToCheck,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'UpdateArray')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'UpdateArray')]
         [string[]]$ExportedTests,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ReturnExceedingTests')]
