@@ -30,8 +30,7 @@ function Test-BlockSharedMailboxSignIn {
     process {
         try {
             # Step: Retrieve shared mailbox details
-            $MBX = Get-CISExoOutput -Rec $recnum
-            $objectids = $MBX.ExternalDirectoryObjectId
+            $objectids = Get-CISExoOutput -Rec $recnum
             $users = Get-CISAadOutput -Rec $recnum
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
             $sharedMailboxDetails = $users | Where-Object {$_.objectid -in $objectids}
@@ -42,7 +41,7 @@ function Test-BlockSharedMailboxSignIn {
 
             # Step: Determine failure reasons based on enabled mailboxes (Condition A & B: Fail)
             $failureReasons = if (-not $allBlocked) {
-                "Some mailboxes have sign-in enabled: $($enabledMailboxes -join ', ')"
+                "Some mailboxes have sign-in enabled (AccountEnabled:True):`n$($enabledMailboxes -join ', ')"
             }
             else {
                 "N/A"
@@ -53,7 +52,7 @@ function Test-BlockSharedMailboxSignIn {
                 "All shared mailboxes have sign-in blocked."
             }
             else {
-                "Enabled Mailboxes: $($enabledMailboxes -join ', ')"
+                "AccountEnabled set to True Mailboxes: $($enabledMailboxes -join ', ')"
             }
 
             # Step: Create and populate the CISAuditResult object

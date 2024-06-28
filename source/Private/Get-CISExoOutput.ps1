@@ -52,7 +52,11 @@ function Get-CISExoOutput {
                 # Test-BlockSharedMailboxSignIn.ps1
                 $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
                 # [object[]]
-                return $MBX
+                # Example output:
+                # 123e4567-e89b-12d3-a456-426614174000
+                # 987e6543-21ba-12d3-a456-426614174000
+                # abcddcba-98fe-76dc-a456-426614174000
+                return $MBX.ExternalDirectoryObjectId
             }
             '1.3.3' {
                 # Test-ExternalSharingCalendars.ps1
