@@ -11,7 +11,7 @@ function Test-BlockSharedMailboxSignIn {
 
         # Initialization code, if needed
         $recnum = "1.2.2"
-
+        Write-Verbose "Running Test-BlockSharedMailboxSignIn for $recnum..."
         # Conditions for 1.2.2 (L1) Ensure sign-in to shared mailboxes is blocked
         #
         # Validate test for a pass:
@@ -30,7 +30,36 @@ function Test-BlockSharedMailboxSignIn {
     process {
         try {
             # Step: Retrieve shared mailbox details
+            # $objectids Mock Object
+            <#
+                $objectids = @(
+                    "123e4567-e89b-12d3-a456-426614174000",
+                    "987e6543-21ba-12d3-a456-426614174000",
+                    "abcddcba-98fe-76dc-a456-426614174000"
+                )
+            #>
             $objectids = Get-CISExoOutput -Rec $recnum
+            # Step: Retrieve user details from Azure AD
+            # $users Mock Object
+            <#
+                $accountDetails = @(
+                    [PSCustomObject]@{
+                        ObjectId = "123e4567-e89b-12d3-a456-426614174000"
+                        DisplayName = "SMBuser1"
+                        AccountEnabled = $true
+                    },
+                    [PSCustomObject]@{
+                        ObjectId = "987e6543-21ba-12d3-a456-426614174000"
+                        DisplayName = "SMBuser2"
+                        AccountEnabled = $true
+                    },
+                    [PSCustomObject]@{
+                        ObjectId = "abcddcba-98fe-76dc-a456-426614174000"
+                        DisplayName = "SMBuser3"
+                        AccountEnabled = $true
+                    }
+                )
+            #>
             $users = Get-CISAadOutput -Rec $recnum
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
             $sharedMailboxDetails = $users | Where-Object {$_.objectid -in $objectids}
