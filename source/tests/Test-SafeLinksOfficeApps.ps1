@@ -11,7 +11,7 @@ function Test-SafeLinksOfficeApps {
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "2.1.1"
-
+        Write-Verbose "Running Test-SafeLinksOfficeApps for $recnum..."
         <#
         Conditions for 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
 
@@ -49,7 +49,7 @@ function Test-SafeLinksOfficeApps {
                 # Prepare the final result
                 # Condition B: Ensuring no misconfigurations
                 $result = $misconfiguredDetails.Count -eq 0
-                $details = if ($result) { "All Safe Links policies are correctly configured." } else { $misconfiguredDetails -join ' | ' }
+                $details = if ($result) { "All Safe Links policies are correctly configured." } else { $misconfiguredDetails -join '`n' }
                 $failureReasons = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
 
                 # Create and populate the CISAuditResult object

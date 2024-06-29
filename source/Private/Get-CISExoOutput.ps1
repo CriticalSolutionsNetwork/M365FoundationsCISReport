@@ -161,12 +161,41 @@ function Get-CISExoOutput {
                 if (Get-Command Get-SafeLinksPolicy -ErrorAction SilentlyContinue) {
                     # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
                     # Retrieve all Safe Links policies
+                    # $policies Mock Object:
+                    <#
+                        $policies = @(
+                            [PSCustomObject]@{
+                                Name = "PolicyOne"
+                                EnableSafeLinksForEmail = $true
+                                EnableSafeLinksForTeams = $true
+                                EnableSafeLinksForOffice = $true
+                                TrackClicks = $true
+                                AllowClickThrough = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = "PolicyTwo"
+                                EnableSafeLinksForEmail = $true
+                                EnableSafeLinksForTeams = $true
+                                EnableSafeLinksForOffice = $true
+                                TrackClicks = $true
+                                AllowClickThrough = $true
+                            },
+                            [PSCustomObject]@{
+                                Name = "PolicyThree"
+                                EnableSafeLinksForEmail = $true
+                                EnableSafeLinksForTeams = $true
+                                EnableSafeLinksForOffice = $true
+                                TrackClicks = $true
+                                AllowClickThrough = $false
+                            }
+                        )
+                    #>
                     $policies = Get-SafeLinksPolicy
                     # Initialize the details collection
                     $misconfiguredDetails = @()
                     foreach ($policy in $policies) {
                         # Get the detailed configuration of each policy
-                        $policyDetails = Get-SafeLinksPolicy -Identity $policy.Name
+                        $policyDetails = $policy #Get-SafeLinksPolicy -Identity $policy.Name
                         # Check each required property and record failures
                         # Condition A: Checking policy settings
                         $failures = @()
