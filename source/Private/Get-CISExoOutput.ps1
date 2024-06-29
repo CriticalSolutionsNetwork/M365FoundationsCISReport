@@ -52,24 +52,72 @@ function Get-CISExoOutput {
                 # Test-BlockSharedMailboxSignIn.ps1
                 $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
                 # [object[]]
-                # Example output:
-                # 123e4567-e89b-12d3-a456-426614174000
-                # 987e6543-21ba-12d3-a456-426614174000
-                # abcddcba-98fe-76dc-a456-426614174000
+                # $MBX example output:
+                <#
+                    $MBX = @(
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser1@domain.com"
+                            ExternalDirectoryObjectId = "123e4567-e89b-12d3-a456-426614174000"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser2@domain.com"
+                            ExternalDirectoryObjectId = "987e6543-21ba-12d3-a456-426614174000"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser3@domain.com"
+                            ExternalDirectoryObjectId = "abcddcba-98fe-76dc-a456-426614174000"
+                        }
+                    )
+                #>
                 return $MBX.ExternalDirectoryObjectId
             }
             '1.3.3' {
                 # Test-ExternalSharingCalendars.ps1
                 # Step: Retrieve sharing policies related to calendar sharing
+                # $sharingPolicies Mock Object
+                <#
+                    $sharingPolicies = [PSCustomObject]@{
+                        Name = "Default Sharing Policy"
+                        Domains = @("Anonymous:CalendarSharingFreeBusySimple")
+                        Enabled = $true
+                        Default = $true
+                    }
+                #>
                 $sharingPolicies = Get-SharingPolicy | Where-Object { $_.Domains -like '*CalendarSharing*' }
                 # [psobject[]]
                 return $sharingPolicies
             }
             '1.3.3b' {
                 $mailboxes = Get-Mailbox -ResultSize Unlimited
+                <#
+                    $mailboxes = @(
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser1@domain.com"
+                            ExternalDirectoryObjectId = "123e4567-e89b-12d3-a456-426614174000"
+                            PrimarySmtpAddress = "SMBuser1@domain.com"
+                            PublishEnabled       = $False
+                            PublishedCalendarUrl = "https://example.com/calendar/smbuser1"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser2@domain.com"
+                            ExternalDirectoryObjectId = "987e6543-21ba-12d3-a456-426614174000"
+                            PrimarySmtpAddress = "SMBuser2@domain.com"
+                            PublishEnabled       = $False
+                            PublishedCalendarUrl = "https://example.com/calendar/smbuser2"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser3@domain.com"
+                            ExternalDirectoryObjectId = "abcddcba-98fe-76dc-a456-426614174000"
+                            PrimarySmtpAddress = "SMBuser3@domain.com"
+                            PublishEnabled       = $False
+                            PublishedCalendarUrl = "https://example.com/calendar/smbuser3"
+                        }
+                    )
+                #>
                 $results = foreach ($mailbox in $mailboxes) {
                     # Get the name of the default calendar folder (depends on the mailbox's language)
-                    $calendarFolder = [string](Get-ExoMailboxFolderStatistics $mailbox.PrimarySmtpAddress -FolderScope Calendar | Where-Object {$_.FolderType -eq 'Calendar'}).Name
+                    # Return single string Ex: return "Calendar" x 3 in array
+                    $calendarFolder = [string](Get-EXOMailboxFolderStatistics $mailbox.PrimarySmtpAddress -Folderscope Calendar | Where-Object { $_.FolderType -eq 'Calendar' }).Name
                     Write-Verbose "Calendar folder for $($mailbox.PrimarySmtpAddress): $calendarFolder"
                     # Get users calendar folder settings for their default Calendar folder
                     # calendar has the format identity:\<calendar folder name>
@@ -79,9 +127,9 @@ function Get-CISExoOutput {
                     # Check if calendar publishing is enabled and create a custom object
                     if ($calendar.PublishEnabled) {
                         [PSCustomObject]@{
-                            PrimarySmtpAddress = $mailbox.PrimarySmtpAddress
-                            CalendarFolder = $calendarFolder
-                            PublishEnabled = $calendar.PublishEnabled
+                            PrimarySmtpAddress   = $mailbox.PrimarySmtpAddress
+                            CalendarFolder       = $calendarFolder
+                            PublishEnabled       = $calendar.PublishEnabled
                             PublishedCalendarUrl = $calendar.PublishedCalendarUrl
                         }
                     }
@@ -315,7 +363,7 @@ function Get-CISExoOutput {
                 # Retrieve the necessary settings for Teams and Exchange Online
                 # Condition B: Verify that 'Monitor reported messages in Microsoft Teams' is checked in the Microsoft 365 Defender portal.
                 # Condition C: Ensure the 'Send reported messages to' setting in the Microsoft 365 Defender portal is set to 'My reporting mailbox only' with the correct report email addresses.
-                $ReportSubmissionPolicy = Get-ReportSubmissionPolicy | Select-Object -Property ReportJunkToCustomizedAddress, ReportNotJunkToCustomizedAddress, ReportPhishToCustomizedAddress,ReportJunkAddresses,ReportNotJunkAddresses,ReportPhishAddresses,ReportChatMessageEnabled,ReportChatMessageToCustomizedAddressEnabled
+                $ReportSubmissionPolicy = Get-ReportSubmissionPolicy | Select-Object -Property ReportJunkToCustomizedAddress, ReportNotJunkToCustomizedAddress, ReportPhishToCustomizedAddress, ReportJunkAddresses, ReportNotJunkAddresses, ReportPhishAddresses, ReportChatMessageEnabled, ReportChatMessageToCustomizedAddressEnabled
                 return $ReportSubmissionPolicy
             }
             default { throw "No match found for test: $Rec" }

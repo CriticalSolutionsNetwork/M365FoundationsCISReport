@@ -33,7 +33,7 @@ function Test-ExternalSharingCalendars {
             # Step: Retrieve sharing policies related to calendar sharing
             # $sharingPolicies Mock Object
             <#
-                $mockPolicy = [PSCustomObject]@{
+                $sharingPolicies = [PSCustomObject]@{
                     Name = "Default Sharing Policy"
                     Domains = @("Anonymous:CalendarSharingFreeBusySimple")
                     Enabled = $true
@@ -53,18 +53,18 @@ function Test-ExternalSharingCalendars {
             # Retrieve calendars with publishing enabled (from 1.3.3b)
             # $calendarDetails Mock Object
             <#
-                $mailboxDetails = @(
+                $calendarDetails = @(
                     [PSCustomObject]@{
-                        Calendar = "user1@example.com"
-                        URL = "https://example.com/calendar/user1"
+                        Calendar = "SMBuser1@domain.com"
+                        URL = "https://example.com/calendar/smbuser1"
                     },
                     [PSCustomObject]@{
-                        Calendar = "user2@example.com"
-                        URL = "https://example.com/calendar/user2"
+                        Calendar = "SMBuser2@domain.com"
+                        URL = "https://example.com/calendar/smbuser2"
                     },
                     [PSCustomObject]@{
-                        Calendar = "user3@example.com"
-                        URL = "https://example.com/calendar/user3"
+                        Calendar = "SMBuser4@domain.com"
+                        URL = "https://example.com/calendar/smbuser3"
                     }
                 )
             #>
