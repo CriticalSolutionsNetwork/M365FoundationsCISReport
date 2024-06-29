@@ -349,7 +349,46 @@ function Get-CISExoOutput {
             }
             '2.1.7' {
                 # Test-AntiPhishingPolicy.ps1
-                # Condition A: Ensure that an anti-phishing policy has been created
+                <#
+                    $antiPhishPolicies = @(
+                        [PSCustomObject]@{
+                            Identity = "Strict Preset Security Policy"
+                            Enabled = $true
+                            PhishThresholdLevel = 4
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = "John Doe;jdoe@contoso.net, Jane Does;janedoe@contoso.net"
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Office365 AntiPhish Default"
+                            Enabled = $true
+                            PhishThresholdLevel = 2
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = $null  # Assuming it targets all users as it's the default
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Admin"
+                            Enabled = $true
+                            PhishThresholdLevel = 2
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = $null  # Assuming it targets all users
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Standard Preset Security Policy"
+                            Enabled = $true
+                            PhishThresholdLevel = 3
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = $null  # Assuming it targets all users
+                        }
+                    )
+                #>
                 $antiPhishPolicies = Get-AntiPhishPolicy
                 return $antiPhishPolicies
             }

@@ -1,5 +1,5 @@
 
-function Is-PolicyCompliant {
+function Test-PhishPolicyCompliance {
     param ($policy)
     return ($policy.Enabled -eq $true -and
         $policy.PhishThresholdLevel -ge 2 -and
@@ -8,24 +8,7 @@ function Is-PolicyCompliant {
         $policy.EnableSpoofIntelligence -eq $true)
 }
 
-function Get-PolicyDetails {
-    param (
-        [Parameter(Mandatory = $true)]
-        [pscustomobject]$policy,
 
-        [Parameter(Mandatory = $true)]
-        [bool]$isCompliant
-    )
-
-    return "Policy: $($policy.Identity)`n" +
-    "Enabled: $($policy.Enabled)`n" +
-    "PhishThresholdLevel: $($policy.PhishThresholdLevel)`n" +
-    "MailboxIntelligenceProtection: $($policy.EnableMailboxIntelligenceProtection)`n" +
-    "MailboxIntelligence: $($policy.EnableMailboxIntelligence)`n" +
-    "SpoofIntelligence: $($policy.EnableSpoofIntelligence)`n" +
-    "TargetedUsersToProtect: $($policy.TargetedUsersToProtect -join ', ')`n" +
-    "IsCompliant: $isCompliant"
-}
 
 function Test-AntiPhishingPolicy {
     [CmdletBinding()]
@@ -81,7 +64,7 @@ function Test-AntiPhishingPolicy {
                 Write-Verbose "Evaluating policy: $($strictPolicy.Identity)"
                 $policiesEvaluated += $strictPolicy.Identity
                 # Check if policy is compliant
-                $isCompliant = Is-PolicyCompliant -policy $strictPolicy
+                $isCompliant = Test-PhishPolicyCompliance -policy $strictPolicy
                 # Log failure reasons for non-compliant policies
                 if (-not $isCompliant) {
                     $failureReasons += "Policy $($strictPolicy.Identity) does not meet compliance criteria."
@@ -89,7 +72,7 @@ function Test-AntiPhishingPolicy {
                     $FailedTests += $strictPolicy.Identity
                 }
                 # Compile details of each policy using the new function
-                $details += Get-PolicyDetails -policy $strictPolicy -isCompliant $isCompliant
+                $details += Get-PhishPolicyDetail -policy $strictPolicy -isCompliant $isCompliant
                 # Check if policy is Strict and covers all users
                 if ($isCompliant) {
                     $PassedTests += $strictPolicy.Identity
@@ -111,7 +94,7 @@ function Test-AntiPhishingPolicy {
                 Write-Verbose "Evaluating policy: $($standardPolicy.Identity)"
                 $policiesEvaluated += $standardPolicy.Identity
                 # Check if policy is compliant
-                $isCompliant = Is-PolicyCompliant -policy $standardPolicy
+                $isCompliant = Test-PhishPolicyCompliance -policy $standardPolicy
                 # Log failure reasons for non-compliant policies
                 if (-not $isCompliant) {
                     $failureReasons += "$($standardPolicy.Identity) does not meet compliance criteria."
@@ -119,7 +102,7 @@ function Test-AntiPhishingPolicy {
                     $FailedTests += $standardPolicy.Identity
                 }
                 # Compile details of each policy using the new function
-                $details += Get-PolicyDetails -policy $standardPolicy -isCompliant $isCompliant
+                $details += Get-PhishPolicyDetail -policy $standardPolicy -isCompliant $isCompliant
                 # Check if policy is Strict and covers all users
                 if ($isCompliant) {
                     Write-Verbose "$($standardPolicy.Identity) is compliant."
@@ -138,8 +121,8 @@ function Test-AntiPhishingPolicy {
             }
             elseif ($null -ne $standardPolicy) {
                 Write-Verbose "$($standardPolicy.Identity) was not evaluated."
-                $isCompliant = Is-PolicyCompliant -policy $standardPolicy
-                $details += Get-PolicyDetails -policy $standardPolicy -isCompliant $isCompliant
+                $isCompliant = Test-PhishPolicyCompliance -policy $standardPolicy
+                $details += Get-PhishPolicyDetail -policy $standardPolicy -isCompliant $isCompliant
                 $details += "Is Full Coverage Policy: $($false)`n`n"
             }
             # Step 5: Check Custom Policies if no full coverage from Strict or Standard
@@ -149,7 +132,7 @@ function Test-AntiPhishingPolicy {
                         Write-Verbose "Evaluating policy: $($policy.Identity)"
                         $policiesEvaluated += $policy.Identity
                         # Check if policy is compliant
-                        $isCompliant = Is-PolicyCompliant -policy $policy
+                        $isCompliant = Test-PhishPolicyCompliance -policy $policy
                         # Log failure reasons for non-compliant policies
                         if (-not $isCompliant) {
                             $failureReasons += "$($policy.Identity) Policy does not meet compliance criteria."
@@ -157,7 +140,7 @@ function Test-AntiPhishingPolicy {
                             $FailedTests += $policy.Identity
                         }
                         # Compile details of each policy using the new function
-                        $details += Get-PolicyDetails -policy $policy -isCompliant $isCompliant
+                        $details += Get-PhishPolicyDetail -policy $policy -isCompliant $isCompliant
                         # Check if policy is Custom and covers all users
                         if ($isCompliant) {
                             Write-Verbose "$($policy.Identity) is compliant."
@@ -176,8 +159,8 @@ function Test-AntiPhishingPolicy {
                     }
                     elseif ($compliantPolicy) {
                         Write-Verbose "$($policy.Identity) was not evaluated."
-                        $isCompliant = Is-PolicyCompliant -policy $policy
-                        $details += Get-PolicyDetails -policy $policy -isCompliant $isCompliant
+                        $isCompliant = Test-PhishPolicyCompliance -policy $policy
+                        $details += Get-PhishPolicyDetail -policy $policy -isCompliant $isCompliant
                         $details += "Is Full Coverage Policy: $($false)`n`n"
                     }
                 }
@@ -185,8 +168,8 @@ function Test-AntiPhishingPolicy {
             elseif ($null -ne $customPolicies ) {
                 foreach ($policy in $customPolicies) {
                     Write-Verbose "$($policy.Identity) was not evaluated."
-                    $isCompliant = Is-PolicyCompliant -policy $policy
-                    $details += Get-PolicyDetails -policy $policy -isCompliant $isCompliant
+                    $isCompliant = Test-PhishPolicyCompliance -policy $policy
+                    $details += Get-PhishPolicyDetail -policy $policy -isCompliant $isCompliant
                     $details += "Is Full Coverage Policy: $($false)`n`n"
                 }
             }
@@ -195,7 +178,7 @@ function Test-AntiPhishingPolicy {
                 Write-Verbose "Evaluating policy: $($defaultPolicy.Identity)"
                 $policiesEvaluated += $defaultPolicy.Identity
                 # Check if policy is compliant
-                $isCompliant = Is-PolicyCompliant -policy $defaultPolicy
+                $isCompliant = Test-PhishPolicyCompliance -policy $defaultPolicy
                 # Log failure reasons for non-compliant policies
                 if (-not $isCompliant) {
                     $failureReasons += "$($defaultPolicy.Identity) Policy does not meet compliance criteria."
@@ -203,7 +186,7 @@ function Test-AntiPhishingPolicy {
                     $FailedTests += $defaultPolicy.Identity
                 }
                 # Compile details of each policy using the new function
-                $details += Get-PolicyDetails -policy $defaultPolicy -isCompliant $isCompliant
+                $details += Get-PhishPolicyDetail -policy $defaultPolicy -isCompliant $isCompliant
                 # Check if policy is Default and covers all users
                 if ($isCompliant) {
                     Write-Verbose "$($defaultPolicy.Identity) is compliant."
@@ -222,20 +205,23 @@ function Test-AntiPhishingPolicy {
             }
             elseif ($null -ne $defaultPolicy) {
                 Write-Verbose "$($defaultPolicy.Identity) was not evaluated."
-                $isCompliant = Is-PolicyCompliant -policy $defaultPolicy
-                $details += Get-PolicyDetails -policy $defaultPolicy -isCompliant $isCompliant
+                $isCompliant = Test-PhishPolicyCompliance -policy $defaultPolicy
+                $details += Get-PhishPolicyDetail -policy $defaultPolicy -isCompliant $isCompliant
                 $details += "Is Full Coverage Policy: $($false)`n`n"
             }
-            # Need new steps for below:
+            # Determine overall compliance based on the evaluations
             $isOverallCompliant = $hasFullCoveragePolicy -and $null -ne $compliantPolicy
+            # Prepare result details
             $resultDetails = if ($isOverallCompliant) {
                 "Compliant Policy: $($compliantPolicy.Identity)`nDetails:`n" + ($details -join "`n")
             }
             else {
                 "Non-Compliant or No Policy Fully Covers All Users.`nDetails:`n" + ($details -join "`n")
             }
-
+            # Verbose output for the overall compliance
+            Write-Verbose "Overall Compliance: $isOverallCompliant"
             $VerbosePreference = "SilentlyContinue"
+            # Prepare the parameters for the audit result
             $params = @{
                 Rec           = $recnum
                 Result        = $isOverallCompliant
@@ -243,6 +229,7 @@ function Test-AntiPhishingPolicy {
                 Details       = $resultDetails
                 FailureReason = if (-not $isOverallCompliant) { $failureReasons -join "`n" } else { "All settings are correct based on the highest precedence policy that applies to all users." }
             }
+            # Initialize the audit result
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
