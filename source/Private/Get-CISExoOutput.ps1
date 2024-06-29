@@ -237,6 +237,21 @@ function Get-CISExoOutput {
                 # Test-NotifyMalwareInternal.ps1
                 # 2.1.3 Ensure notifications for internal users sending malware is Enabled
                 # Retrieve all 'Custom' malware filter policies and check notification settings
+                # $malwareNotifications Mock Object
+                <#
+                    $malwareNotifications = @(
+                        [PSCustomObject]@{
+                            Identity = "Default"
+                            EnableInternalSenderAdminNotifications = $true
+                            RecommendedPolicyType = "Custom"
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Anti-malware-Policy"
+                            EnableInternalSenderAdminNotifications = $true
+                            RecommendedPolicyType = "Custom"
+                        }
+                    )
+                #>
                 $malwareNotifications = Get-MalwareFilterPolicy | Where-Object { $_.RecommendedPolicyType -eq 'Custom' }
                 # [object[]]
                 return $malwareNotifications
