@@ -261,6 +261,18 @@ function Get-CISExoOutput {
                 if (Get-Command Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue) {
                     # Retrieve all Safe Attachment policies where Enable is set to True
                     # Check if ErrorAction needed below
+                    # $safeAttachmentPolicies Mock Object:
+                    <#
+                        $safeAttachmentPolicies = @(
+                            [PSCustomObject]@{
+                                Policy        = "Strict Preset Security Policy"
+                                Action        = "Block"
+                                QuarantineTag = "AdminOnlyAccessPolicy"
+                                Redirect      = $false
+                                Enabled       = $true
+                            }
+                        )
+                    #>
                     $safeAttachmentPolicies = Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue | Where-Object { $_.Enable -eq $true }
                     # [object[]]
                     return $safeAttachmentPolicies
