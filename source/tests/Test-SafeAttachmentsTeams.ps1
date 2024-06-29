@@ -49,7 +49,7 @@ function Test-SafeAttachmentsTeams {
                 # Condition C: Check Safe Attachments for Microsoft Teams
                 # Determine the result based on the ATP policy settings
                 $result = $null -ne $atpPolicyResult
-                $atpPolicyResult | Where-Object { $_.Identity -eq "Default" }
+                #$atpPolicyResult | Where-Object { $_.Identity -eq "Default" }
                 if ($result) {
                     $detailpass = [PSCustomObject]@{
                         Name                    = $atpPolicyResult.Name
