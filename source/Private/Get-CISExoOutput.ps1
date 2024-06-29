@@ -288,6 +288,17 @@ function Get-CISExoOutput {
                     # Retrieve the ATP policies for Office 365 and check Safe Attachments settings
                     $atpPolicies = Get-AtpPolicyForO365
                     # Check if the required ATP policies are enabled
+                    # $atpPolicyResult Mock Object:
+                    <#
+                        $atpPolicyResult = @(
+                            [PSCustomObject]@{
+                                Name                   = "Default"
+                                EnableATPForSPOTeamsODB = $true
+                                EnableSafeDocs         = $true
+                                AllowSafeDocsOpen      = $false
+                            }
+                        )
+                    #>
                     $atpPolicyResult = $atpPolicies | Where-Object {
                         $_.EnableATPForSPOTeamsODB -eq $true -and
                         $_.EnableSafeDocs -eq $true -and
