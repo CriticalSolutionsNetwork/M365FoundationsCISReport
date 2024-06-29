@@ -1,15 +1,3 @@
-
-function Test-PhishPolicyCompliance {
-    param ($policy)
-    return ($policy.Enabled -eq $true -and
-        $policy.PhishThresholdLevel -ge 2 -and
-        $policy.EnableMailboxIntelligenceProtection -eq $true -and
-        $policy.EnableMailboxIntelligence -eq $true -and
-        $policy.EnableSpoofIntelligence -eq $true)
-}
-
-
-
 function Test-AntiPhishingPolicy {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
@@ -18,7 +6,7 @@ function Test-AntiPhishingPolicy {
     begin {
         $recnum = "2.1.7"
         Write-Verbose "Running Test-AntiPhishingPolicy for $recnum..."
-        . .\source\Classes\CISAuditResult.ps1
+        #. .\source\Classes\CISAuditResult.ps1
         <#
         Conditions for 2.1.7 (L1) Ensure robust anti-phishing policies are enforced
         Validate test for a pass:
@@ -38,9 +26,9 @@ function Test-AntiPhishingPolicy {
     process {
         try {
             # Step 1: Retrieve all anti-phishing policies
-            $VerbosePreference = "Continue"
+            #$VerbosePreference = "Continue"
             Write-Verbose "Retrieving all anti-phishing policies..."
-            #$antiPhishPolicies = Get-CISExoOutput -Rec $recnum
+            $antiPhishPolicies = Get-CISExoOutput -Rec $recnum
 
             # Step 2: Initialize variables to track compliance and details
             $compliantPolicy = $null
@@ -220,14 +208,14 @@ function Test-AntiPhishingPolicy {
             }
             # Verbose output for the overall compliance
             Write-Verbose "Overall Compliance: $isOverallCompliant"
-            $VerbosePreference = "SilentlyContinue"
+            #$VerbosePreference = "SilentlyContinue"
             # Prepare the parameters for the audit result
             $params = @{
                 Rec           = $recnum
                 Result        = $isOverallCompliant
                 Status        = if ($isOverallCompliant) { "Pass" } else { "Fail" }
                 Details       = $resultDetails
-                FailureReason = if (-not $isOverallCompliant) { $failureReasons -join "`n" } else { "All settings are correct based on the highest precedence policy that applies to all users." }
+                FailureReason = if (-not $isOverallCompliant) { $failureReasons -join "`n" } else { "None: All settings are correct based on the highest precedence policy that applies to all users." }
             }
             # Initialize the audit result
             $auditResult = Initialize-CISAuditResult @params
