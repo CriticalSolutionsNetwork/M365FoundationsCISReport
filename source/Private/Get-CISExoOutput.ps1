@@ -313,9 +313,39 @@ function Get-CISExoOutput {
             }
             '2.1.6' {
                 # Test-SpamPolicyAdminNotify.ps1
-                # Retrieve the default hosted outbound spam filter policy
-                $hostedOutboundSpamFilterPolicy = Get-HostedOutboundSpamFilterPolicy | Where-Object { $_.IsDefault -eq $true }
-                return $hostedOutboundSpamFilterPolicy
+                # Retrieve the hosted outbound spam filter policies
+                # $spamPolicies Mock Object:
+                <#
+                    # Mock data representing multiple spam filter policies
+                    $spamPolicies = @(
+                        [PSCustomObject]@{
+                            Name                                       = "Default"
+                            IsDefault                                  = $true
+                            NotifyOutboundSpam                         = $true
+                            BccSuspiciousOutboundMail                  = $true
+                            NotifyOutboundSpamRecipients               = "admin@example.com"
+                            BccSuspiciousOutboundAdditionalRecipients  = "bccadmin@example.com"
+                        },
+                        [PSCustomObject]@{
+                            Name                                       = "Custom Policy 1"
+                            IsDefault                                  = $false
+                            NotifyOutboundSpam                         = $false
+                            BccSuspiciousOutboundMail                  = $true
+                            NotifyOutboundSpamRecipients               = ""
+                            BccSuspiciousOutboundAdditionalRecipients  = ""
+                        },
+                        [PSCustomObject]@{
+                            Name                                       = "Custom Policy 2"
+                            IsDefault                                  = $false
+                            NotifyOutboundSpam                         = $true
+                            BccSuspiciousOutboundMail                  = $false
+                            NotifyOutboundSpamRecipients               = "notify@example.com"
+                            BccSuspiciousOutboundAdditionalRecipients  = "bccnotify@example.com"
+                        }
+                    )
+                #>
+                $spamPolicies = Get-HostedOutboundSpamFilterPolicy
+                return $spamPolicies
             }
             '2.1.7' {
                 # Test-AntiPhishingPolicy.ps1
