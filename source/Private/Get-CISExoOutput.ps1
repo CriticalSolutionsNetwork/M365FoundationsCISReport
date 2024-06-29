@@ -222,6 +222,12 @@ function Get-CISExoOutput {
                 # Condition A: The Common Attachment Types Filter is enabled in the Microsoft 365 Security & Compliance Center.
                 # Condition B: Using Exchange Online PowerShell, verify that the `EnableFileFilter` property of the default malware filter policy is set to `True`.
                 # Retrieve the attachment filter policy
+                # $attachmentFilter Mock Object
+                <#
+                    $attachmentFilter = [PSCustomObject]@{
+                        EnableFileFilter = $true
+                    }
+                #>
                 $attachmentFilter = Get-MalwareFilterPolicy -Identity Default | Select-Object EnableFileFilter
                 $result = $attachmentFilter.EnableFileFilter
                 # [bool]
