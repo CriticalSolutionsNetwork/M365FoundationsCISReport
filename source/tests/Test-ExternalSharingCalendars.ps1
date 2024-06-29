@@ -12,7 +12,7 @@ function Test-ExternalSharingCalendars {
 
         # Initialization code, if needed
         $recnum = "1.3.3"
-        Write-Verbose "Running Test-ExternalSharingCalendars Rec#: $recnum"
+        Write-Verbose "Running Test-ExternalSharingCalendars for $recnum..."
         # Conditions for 1.3.3 (L2) Ensure 'External sharing' of calendars is not available (Automated)
         #
         # Validate test for a pass:
