@@ -52,7 +52,7 @@ function Get-CISExoOutput {
                 # Test-BlockSharedMailboxSignIn.ps1
                 $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
                 # [object[]]
-                # $MBX example output:
+                # $MBX mock object:
                 <#
                     $MBX = @(
                         [PSCustomObject]@{
@@ -88,7 +88,7 @@ function Get-CISExoOutput {
                 return $sharingPolicies
             }
             '1.3.3b' {
-                $mailboxes = Get-Mailbox -ResultSize Unlimited
+                # $mailboxes Mock Object
                 <#
                     $mailboxes = @(
                         [PSCustomObject]@{
@@ -114,6 +114,7 @@ function Get-CISExoOutput {
                         }
                     )
                 #>
+                $mailboxes = Get-Mailbox -ResultSize Unlimited
                 $results = foreach ($mailbox in $mailboxes) {
                     # Get the name of the default calendar folder (depends on the mailbox's language)
                     # Return single string Ex: return "Calendar" x 3 in array
@@ -143,6 +144,13 @@ function Get-CISExoOutput {
             '1.3.6' {
                 # Test-CustomerLockbox.ps1
                 # Step: Retrieve the organization configuration (Condition C: Pass/Fail)
+                # $orgConfig Mock Object:
+                <#
+                    # return $orgConfig
+                    $orgConfig = [PSCustomObject]@{
+                        CustomerLockBoxEnabled = $true
+                    }
+                #>
                 $orgConfig = Get-OrganizationConfig | Select-Object CustomerLockBoxEnabled
                 $customerLockboxEnabled = $orgConfig.CustomerLockBoxEnabled
                 # [bool]
