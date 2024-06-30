@@ -246,8 +246,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `MeetingChatEnabledType` setting in Teams is not set to `EnabledExceptAnonymous`.
                 #   - Condition B: The setting for meeting chat allows chat for anonymous users.
                 #   - Condition C: Verification using the Teams Admin Center indicates that the meeting chat settings are not configured as recommended.
-
                 # Retrieve the Teams meeting policy for meeting chat
+                # $CsTeamsMeetingPolicyChat Mock Object
+                <#
+                    $CsTeamsMeetingPolicyChat = [PSCustomObject]@{
+                        MeetingChatEnabledType           = "Enabled"
+                    }
+                #>
                 $CsTeamsMeetingPolicyChat = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property MeetingChatEnabledType
                 return $CsTeamsMeetingPolicyChat
             }

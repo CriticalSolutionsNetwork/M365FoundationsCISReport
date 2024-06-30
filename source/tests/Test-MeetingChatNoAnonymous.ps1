@@ -5,14 +5,12 @@ function Test-MeetingChatNoAnonymous {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.5"
     }
-
     process {
         try {
             # 8.5.5 (L2) Ensure meeting chat does not allow anonymous users
@@ -30,22 +28,24 @@ function Test-MeetingChatNoAnonymous {
             #   - Condition A: The `MeetingChatEnabledType` setting in Teams is not set to `EnabledExceptAnonymous`.
             #   - Condition B: The setting for meeting chat allows chat for anonymous users.
             #   - Condition C: Verification using the Teams Admin Center indicates that the meeting chat settings are not configured as recommended.
-
             # Retrieve the Teams meeting policy for meeting chat
+            # $CsTeamsMeetingPolicyChat Mock Object
+            <#
+                $CsTeamsMeetingPolicyChat = [PSCustomObject]@{
+                    MeetingChatEnabledType           = "Enabled"
+                }
+            #>
             $CsTeamsMeetingPolicyChat = Get-CISMSTeamsOutput -Rec $recnum
             # Condition A: Check if the MeetingChatEnabledType is set to 'EnabledExceptAnonymous'
             $chatAnonDisabled = $CsTeamsMeetingPolicyChat.MeetingChatEnabledType -eq 'EnabledExceptAnonymous'
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($chatAnonDisabled) {
                 "N/A"
             }
             else {
-                "Meeting chat allows anonymous users"
+                "Meeting chat allows anonymous users. User the following command to remediate:`nSet-CsTeamsMeetingPolicy -Identity Global -MeetingChatEnabledType `"EnabledExceptAnonymous`""
             }
-
             $details = "MeetingChatEnabledType is set to $($CsTeamsMeetingPolicyChat.MeetingChatEnabledType)"
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -61,7 +61,6 @@ function Test-MeetingChatNoAnonymous {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult
