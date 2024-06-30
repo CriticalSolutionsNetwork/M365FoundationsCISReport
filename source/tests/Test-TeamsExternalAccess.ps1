@@ -10,6 +10,7 @@ function Test-TeamsExternalAccess {
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.2.1"
+        Write-Verbose "Running Test-TeamsExternalAccess for $recnum..."
     }
     process {
         try {

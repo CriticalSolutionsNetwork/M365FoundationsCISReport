@@ -135,7 +135,6 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: `AllowAnonymousUsersToJoinMeeting` is not set to `False`.
                 #   - Condition B: Verification using the UI shows that `Anonymous users can join a meeting` is not set to `Off` in the Global meeting policy.
                 #   - Condition C: PowerShell command output indicates that anonymous users are allowed to join meetings.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
                 # $teamsMeetingPolicy Mock Object
                 <#

@@ -10,6 +10,7 @@ function Test-OrganizersPresent {
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.6"
+        Write-Verbose "Running Test-OrganizersPresent for $recnum..."
     }
     process {
         try {

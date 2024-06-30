@@ -5,16 +5,14 @@ function Test-DialInBypassLobby {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.4"
+        Write-Verbose "Running Test-DialInBypassLobby for $recnum..."
     }
-
     process {
-
         try {
             # 8.5.4 (L1) Ensure users dialing in can't bypass the lobby
             #
@@ -40,7 +38,6 @@ function Test-DialInBypassLobby {
             #>
             $CsTeamsMeetingPolicyPSTN = Get-CISMSTeamsOutput -Rec $recnum
             $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $PSTNBypassDisabled) {
                 "Users dialing in can bypass the lobby"
@@ -48,14 +45,12 @@ function Test-DialInBypassLobby {
             else {
                 "N/A"
             }
-
             $details = if ($PSTNBypassDisabled) {
                 "AllowPSTNUsersToBypassLobby is set to False"
             }
             else {
                 "AllowPSTNUsersToBypassLobby is set to True"
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -71,7 +66,6 @@ function Test-DialInBypassLobby {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

@@ -10,6 +10,7 @@ function Test-NoAnonymousMeetingJoin {
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.1"
+        Write-Verbose "Running Test-NoAnonymousMeetingJoin for $recnum..."
     }
     process {
         try {

@@ -10,18 +10,17 @@ function Test-TeamsExternalFileSharing {
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.1.1"
+        Write-Verbose "Running Test-TeamsExternalFileSharing for $recnum..."
     }
     process {
         try {
             # 8.1.1 (L2) Ensure external file sharing in Teams is enabled for only approved cloud storage services
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
             # Condition A: The `AllowDropbox` setting is set to `False`.
             # Condition B: The `AllowBox` setting is set to `False`.
             # Condition C: The `AllowGoogleDrive` setting is set to `False`.
             # Condition D: The `AllowShareFile` setting is set to `False`.
             # Condition E: The `AllowEgnyte` setting is set to `False`.
-
             # Assuming that 'approvedProviders' is a list of approved cloud storage service names
             # This list must be defined according to your organization's approved cloud storage services
             # Retrieve the current Teams client configuration

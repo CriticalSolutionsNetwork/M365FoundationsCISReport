@@ -5,14 +5,13 @@ function Test-OrgOnlyBypassLobby {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.3"
+        Write-Verbose "Running Test-OrgOnlyBypassLobby for $recnum..."
     }
-
     process {
         try {
             # 8.5.3 (L1) Ensure only people in my org can bypass the lobby
