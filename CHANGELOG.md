@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed parameter validation for new parameters in `Invoke-M365SecurityAudit` function.
+
+## [0.1.19] - 2024-06-30
+
 ### Added
 
 - Added `ApprovedCloudStorageProviders` parameter to `Invoke-M365SecurityAudit` to allow for testing of approved cloud storage providers for 8.1.1.
