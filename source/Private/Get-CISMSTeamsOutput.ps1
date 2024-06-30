@@ -92,9 +92,29 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AllowTeamsConsumer` setting is not `False`.
                 #   - Condition B: The `AllowPublicUsers` setting is not `False`.
                 #   - Condition C: The `AllowFederatedUsers` setting is `True` and the `AllowedDomains` contains unauthorized domain names or is not configured correctly.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+                # $externalAccessConfig Mock Object
+                <#
+                    $externalAccessConfig = [PSCustomObject]@{
+                        Identity                                    = 'Global'
+                        AllowedDomains                              = 'AllowAllKnownDomains'
+                        BlockedDomains                              = @()
+                        AllowFederatedUsers                         = $true
+                        AllowPublicUsers                            = $true
+                        AllowTeamsConsumer                          = $true
+                        AllowTeamsConsumerInbound                   = $true
+                    }
+                    $ApprovedFederatedDomains = @('msn.com', 'google.com')
+                    $externalAccessConfig = [PSCustomObject]@{
+                        Identity                                    = 'Global'
+                        AllowedDomains                              = @('msn.com', 'google.com')
+                        BlockedDomains                              = @()
+                        AllowFederatedUsers                         = $true
+                        AllowPublicUsers                            = $false
+                        AllowTeamsConsumer                          = $false
+                        AllowTeamsConsumerInbound                   = $true
+                    }
+                #>
                 $externalAccessConfig = Get-CsTenantFederationConfiguration
                 return $externalAccessConfig
             }
@@ -117,7 +137,12 @@ function Get-CISMSTeamsOutput {
                 #   - Condition C: PowerShell command output indicates that anonymous users are allowed to join meetings.
 
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+                # $teamsMeetingPolicy Mock Object
+                <#
+                    $teamsMeetingPolicy = [PSCustomObject]@{
+                        AllowAnonymousUsersToJoinMeeting            = $true
+                    }
+                #>
                 $teamsMeetingPolicy = Get-CsTeamsMeetingPolicy -Identity Global
                 return $teamsMeetingPolicy
             }
