@@ -299,8 +299,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AllowExternalParticipantGiveRequestControl` setting in Teams is not set to `False`.
                 #   - Condition B: The setting is verified through the Microsoft Teams admin center or via PowerShell command.
                 #   - Condition C: Verification using the UI indicates that external participants can give or request control.
-
                 # Retrieve Teams meeting policy for external participant control
+                # $CsTeamsMeetingPolicyControl Mock Object
+                <#
+                    $CsTeamsMeetingPolicyControl = [PSCustomObject]@{
+                        AllowExternalParticipantGiveRequestControl           = $true
+                    }
+                #>
                 $CsTeamsMeetingPolicyControl = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowExternalParticipantGiveRequestControl
                 return $CsTeamsMeetingPolicyControl
             }

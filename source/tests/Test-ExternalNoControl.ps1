@@ -5,17 +5,14 @@ function Test-ExternalNoControl {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         # . .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "8.5.7"
+        Write-Verbose "Running Test-ExternalNoControl for $recnum..."
     }
-
     process {
-
         try {
             # 8.5.7 (L1) Ensure external participants can't give or request control
             #
@@ -32,12 +29,16 @@ function Test-ExternalNoControl {
             #   - Condition A: The `AllowExternalParticipantGiveRequestControl` setting in Teams is not set to `False`.
             #   - Condition B: The setting is verified through the Microsoft Teams admin center or via PowerShell command.
             #   - Condition C: Verification using the UI indicates that external participants can give or request control.
-
             # Retrieve Teams meeting policy for external participant control
+            # $CsTeamsMeetingPolicyControl Mock Object
+            <#
+                $CsTeamsMeetingPolicyControl = [PSCustomObject]@{
+                    AllowExternalParticipantGiveRequestControl           = $true
+                }
+            #>
             $CsTeamsMeetingPolicyControl = Get-CISMSTeamsOutput -Rec $recnum
             # Check if external participants can give or request control
             $externalControlRestricted = -not $CsTeamsMeetingPolicyControl.AllowExternalParticipantGiveRequestControl
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $externalControlRestricted) {
                 "External participants can give or request control"
@@ -45,14 +46,12 @@ function Test-ExternalNoControl {
             else {
                 "N/A"
             }
-
             $details = if ($externalControlRestricted) {
                 "AllowExternalParticipantGiveRequestControl is set to False"
             }
             else {
                 "AllowExternalParticipantGiveRequestControl is set to True"
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec            = $recnum
@@ -68,7 +67,6 @@ function Test-ExternalNoControl {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult
