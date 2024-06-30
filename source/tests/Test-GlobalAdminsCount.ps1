@@ -4,7 +4,6 @@ function Test-GlobalAdminsCount {
     param (
         # Define your parameters here if needed
     )
-
     begin {
                 # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
@@ -23,23 +22,19 @@ function Test-GlobalAdminsCount {
         #   - Condition A: The number of global admins is less than 2.
         #   - Condition B: The number of global admins is more than 4.
         #   - Condition C: Any discrepancies or errors in retrieving the list of global admin usernames.
-
         # Initialization code, if needed
         $recnum = "1.1.3"
+        Write-Verbose "Starting Test-GlobalAdminsCount with Rec: $recnum"
     }
-
     process {
         try {
             $globalAdmins = Get-CISMgOutput -Rec $recnum
-
             # Step: Count the number of global admins
             $globalAdminCount = $globalAdmins.Count
-
             # Step: Retrieve and format the usernames of global admins
             $globalAdminUsernames = ($globalAdmins | ForEach-Object {
                 "$($_.AdditionalProperties["displayName"]) ($($_.AdditionalProperties["userPrincipalName"]))"
             }) -join ', '
-
             # Step: Determine failure reasons based on global admin count
             $failureReasons = if ($globalAdminCount -lt 2) {
                 "Less than 2 global admins: $globalAdminUsernames"
@@ -50,10 +45,8 @@ function Test-GlobalAdminsCount {
             else {
                 "N/A"
             }
-
             # Step: Prepare details for the audit result
             $details = "Count: $globalAdminCount; Users: $globalAdminUsernames"
-
             # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -69,7 +62,6 @@ function Test-GlobalAdminsCount {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

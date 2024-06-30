@@ -5,7 +5,6 @@ function Test-PasswordHashSync {
         # Aligned
         # Parameters can be added if needed
     )
-
     begin {
         # Conditions for 5.1.8.1 (L1) Ensure password hash sync is enabled for hybrid deployments
         #
@@ -22,21 +21,18 @@ function Test-PasswordHashSync {
         #   - Condition A: Password hash sync is not enabled in the Azure AD Connect tool on the on-premises server.
         #   - Condition B: Password hash sync is not verified as enabled in the Azure AD Connect Sync section in the Microsoft Entra admin center.
         #   - Condition C: Using Microsoft Graph PowerShell, the verification command returns no result indicating that password sync is not enabled for the on-premises AD.
-
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "5.1.8.1"
+        Write-Verbose "Starting Test-PasswordHashSync with Rec: $recnum"
     }
-
     process {
         try {
             # 5.1.8.1 (L1) Ensure password hash sync is enabled for hybrid deployments
-
             # Retrieve password hash sync status (Condition A and C)
             $passwordHashSync = Get-CISMgOutput -Rec $recnum
             $hashSyncResult = $passwordHashSync
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $hashSyncResult) {
                 "Password hash sync for hybrid deployments is not enabled"
@@ -44,9 +40,7 @@ function Test-PasswordHashSync {
             else {
                 "N/A"
             }
-
             $details = "OnPremisesSyncEnabled: $($passwordHashSync)"
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -62,7 +56,6 @@ function Test-PasswordHashSync {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

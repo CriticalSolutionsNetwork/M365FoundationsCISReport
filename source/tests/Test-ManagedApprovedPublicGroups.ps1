@@ -4,14 +4,12 @@ function Test-ManagedApprovedPublicGroups {
     param (
         # Parameters can be added if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "1.2.1"
-
+        Write-Verbose "Starting Test-ManagedApprovedPublicGroups with Rec: $recnum"
         # Conditions for 1.2.1 (L2) Ensure that only organizationally managed/approved public groups exist (Automated)
         #
         # Validate test for a pass:
@@ -26,12 +24,10 @@ function Test-ManagedApprovedPublicGroups {
         #   - Condition A: One or more groups have the status 'Public' in the privacy column on the Active teams and groups page.
         #   - Condition B: Using Microsoft Graph PowerShell, one or more groups return a status of 'Public' when checked.
     }
-
     process {
         try {
             # Step: Retrieve all groups with visibility set to 'Public'
             $allGroups = Get-CISMgOutput -Rec $recnum
-
             # Step: Determine failure reasons based on the presence of public groups
             $failureReasons = if ($null -ne $allGroups -and $allGroups.Count -gt 0) {
                 "There are public groups present that are not organizationally managed/approved."
@@ -39,7 +35,6 @@ function Test-ManagedApprovedPublicGroups {
             else {
                 "N/A"
             }
-
             # Step: Prepare details for the audit result
             $details = if ($null -eq $allGroups -or $allGroups.Count -eq 0) {
                 "No public groups found."
@@ -48,7 +43,6 @@ function Test-ManagedApprovedPublicGroups {
                 $groupDetails = $allGroups | ForEach-Object { $_.DisplayName + " (" + $_.Visibility + ")" }
                 "Public groups found: $($groupDetails -join ', ')"
             }
-
             # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -64,7 +58,6 @@ function Test-ManagedApprovedPublicGroups {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult
