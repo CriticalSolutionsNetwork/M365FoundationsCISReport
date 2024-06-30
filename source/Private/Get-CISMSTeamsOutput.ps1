@@ -49,6 +49,7 @@ function Get-CISMSTeamsOutput {
 
                 # Assuming that 'approvedProviders' is a list of approved cloud storage service names
                 # This list must be defined according to your organization's approved cloud storage services
+                # Add option for approved providers.
                 $clientConfig = Get-CsTeamsClientConfiguration
                 return $clientConfig
             }
