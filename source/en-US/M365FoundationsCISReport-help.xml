@@ -909,6 +909,30 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedCloudStorageProviders</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>@()</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedFederatedDomains</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>DoNotConnect</maml:name>
           <maml:description>
             <maml:para>If specified, the cmdlet will not establish a connection to Microsoft 365 services.</maml:para>
@@ -1011,6 +1035,30 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
             <maml:uri />
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedCloudStorageProviders</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>@()</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedFederatedDomains</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>DoNotConnect</maml:name>
@@ -1117,6 +1165,30 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedCloudStorageProviders</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>@()</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedFederatedDomains</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>DoNotConnect</maml:name>
           <maml:description>
             <maml:para>If specified, the cmdlet will not establish a connection to Microsoft 365 services.</maml:para>
@@ -1219,6 +1291,30 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
             <maml:uri />
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedCloudStorageProviders</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>@()</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedFederatedDomains</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>DoNotConnect</maml:name>
@@ -1326,6 +1422,30 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedCloudStorageProviders</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>@()</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedFederatedDomains</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>DoNotConnect</maml:name>
           <maml:description>
             <maml:para>If specified, the cmdlet will not establish a connection to Microsoft 365 services.</maml:para>
@@ -1422,6 +1542,30 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
           <maml:name>SkipRecommendation</maml:name>
           <maml:description>
             <maml:para>Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedCloudStorageProviders</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>@()</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ApprovedFederatedDomains</maml:name>
+          <maml:description>
+            <maml:para>Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1599,6 +1743,30 @@ Retrieves the MFA status for the specified user with the UPN "example@domain.com
         <maml:name>SkipRecommendation</maml:name>
         <maml:description>
           <maml:para>Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>ApprovedCloudStorageProviders</maml:name>
+        <maml:description>
+          <maml:para>Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>@()</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>ApprovedFederatedDomains</maml:name>
+        <maml:description>
+          <maml:para>Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
