@@ -1,4 +1,4 @@
-﻿---
+---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
@@ -14,7 +14,7 @@ Synchronizes and updates data in an Excel worksheet with new information from a 
 
 ```
 Sync-CISExcelAndCsvData [[-ExcelPath] <String>] [[-CsvPath] <String>] [[-SheetName] <String>]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -32,22 +32,6 @@ Updates the 'AuditData' worksheet in 'excel.xlsx' with data from 'data.csv', add
 
 ## PARAMETERS
 
-### -CsvPath
-Specifies the path to the CSV file containing new data.
-This parameter is mandatory.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ExcelPath
 Specifies the path to the Excel file to be updated.
 This parameter is mandatory.
@@ -64,16 +48,17 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ProgressAction
-{{ Fill ProgressAction Description }}
+### -CsvPath
+Specifies the path to the CSV file containing new data.
+This parameter is mandatory.
 
 ```yaml
-Type: ActionPreference
+Type: String
 Parameter Sets: (All)
-Aliases: proga
+Aliases:
 
 Required: False
-Position: Named
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

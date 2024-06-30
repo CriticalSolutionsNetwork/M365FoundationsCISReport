@@ -13,7 +13,7 @@ Retrieves user licenses and roles for administrative accounts from Microsoft 365
 ## SYNTAX
 
 ```
-Get-AdminRoleUserLicense [-SkipGraphConnection] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Get-AdminRoleUserLicense [-SkipGraphConnection] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -37,21 +37,6 @@ Get-AdminRoleUserLicense -SkipGraphConnection
 This example retrieves all administrative role users along with their licenses without attempting to connect to Microsoft Graph, assuming that the connection is already established.
 
 ## PARAMETERS
-
-### -ProgressAction
-{{ Fill ProgressAction Description }}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -SkipGraphConnection
 A switch parameter that, when set, skips the connection to Microsoft Graph if already established.

@@ -4,23 +4,20 @@ function Test-BlockMailForwarding {
     param (
         # Parameters can be added if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "6.2.1"
-
+        Write-Verbose "Running Test-BlockMailForwarding for $recnum..."
         <#
         Conditions for 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
-
         Validate test for a pass:
         - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
         - Specific conditions to check:
           - Condition A: Transport rules do not forward email to external domains.
           - Condition B: Anti-spam outbound policy is configured to disable automatic email forwarding to external domains.
           - Condition C: No exceptions to the forwarding rules unless explicitly defined by organizational policy.
-
         Validate test for a fail:
         - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
         - Specific conditions to check:
@@ -29,26 +26,20 @@ function Test-BlockMailForwarding {
           - Condition C: Unapproved exceptions to the forwarding rules are present.
         #>
     }
-
     process {
         try {
             # 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
-
             # Step 1: Retrieve the transport rules that redirect messages
             $transportRules,$nonCompliantSpamPolicies = Get-CISExoOutput -Rec $recnum
             $transportForwardingBlocked = $transportRules.Count -eq 0
-
             # Step 2: Check all anti-spam outbound policies
             $nonCompliantSpamPoliciesArray = @($nonCompliantSpamPolicies)
             $spamForwardingBlocked = $nonCompliantSpamPoliciesArray.Count -eq 0
-
             # Determine overall compliance
             $forwardingBlocked = $transportForwardingBlocked -and $spamForwardingBlocked
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = @()
             $details = @()
-
             if ($transportRules -ne 1) {
                 # Fail Condition A
                 $failureReasons += "Mail forwarding rules found: $($transportRules.Name -join ', ')"
@@ -58,7 +49,6 @@ function Test-BlockMailForwarding {
                 }
                 $details += "`n"
             }
-
             if ($nonCompliantSpamPoliciesArray.Count -gt 0) {
                 # Fail Condition B
                 $failureReasons += "Outbound spam policies allowing automatic forwarding found."
@@ -67,7 +57,6 @@ function Test-BlockMailForwarding {
                     "$($_.Name)|$($_.AutoForwardingMode)"
                 }
             }
-
             if ($failureReasons.Count -eq 0) {
                 $failureReasons = "N/A"
                 $details = "Both transport rules and outbound spam policies are configured correctly to block forwarding."
@@ -76,7 +65,6 @@ function Test-BlockMailForwarding {
                 $failureReasons = $failureReasons -join " | "
                 $details = $details -join "`n"
             }
-
             # Populate the audit result
             $params = @{
                 Rec           = $recnum
@@ -92,7 +80,6 @@ function Test-BlockMailForwarding {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

@@ -1,4 +1,4 @@
----
+﻿---
 Module Name: M365FoundationsCISReport
 Module Guid: 0d064bfb-d1ce-484b-a173-993b55984dc9
 Download Help Link: {{Please enter Link manually}}
@@ -19,6 +19,9 @@ Retrieves user licenses and roles for administrative accounts from Microsoft 365
 
 ### [Get-MFAStatus](Get-MFAStatus.md)
 Retrieves the MFA (Multi-Factor Authentication) status for Azure Active Directory users.
+
+### [Grant-M365SecurityAuditConsent](Grant-M365SecurityAuditConsent.md)
+Grants Microsoft Graph permissions for an auditor.
 
 ### [Invoke-M365SecurityAudit](Invoke-M365SecurityAudit.md)
 Invokes a security audit for Microsoft 365 environments.

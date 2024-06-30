@@ -5,11 +5,9 @@ function Test-SafeAttachmentsTeams {
         # Aligned
         # Parameters can be added if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Conditions for 2.1.5 (L2) Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled
         #
         # Validate test for a pass:
@@ -25,35 +23,60 @@ function Test-SafeAttachmentsTeams {
         #   - Condition A: Safe Attachments for SharePoint is not enabled.
         #   - Condition B: Safe Attachments for OneDrive is not enabled.
         #   - Condition C: Safe Attachments for Microsoft Teams is not enabled.
-
         # Initialization code, if needed
         $recnum = "2.1.5"
+        Write-Verbose "Running Test-SafeAttachmentsTeams for $recnum..."
     }
-
     process {
+        # $atpPolicyResult Mock Object
+        <#
+            $atpPolicyResult = @(
+                [PSCustomObject]@{
+                    Name                   = "Default"
+                    EnableATPForSPOTeamsODB = $true
+                    EnableSafeDocs         = $true
+                    AllowSafeDocsOpen      = $false
+                }
+            )
+        #>
         $atpPolicyResult = Get-CISExoOutput -Rec $recnum
         if ($atpPolicyResult -ne 1) {
             try {
                 # Condition A: Check Safe Attachments for SharePoint
                 # Condition B: Check Safe Attachments for OneDrive
                 # Condition C: Check Safe Attachments for Microsoft Teams
-
                 # Determine the result based on the ATP policy settings
                 $result = $null -ne $atpPolicyResult
+                #$atpPolicyResult | Where-Object { $_.Identity -eq "Default" }
+                if ($result) {
+                    $detailpass = [PSCustomObject]@{
+                        Name                    = $atpPolicyResult.Name
+                        EnableATPForSPOTeamsODB = $atpPolicyResult.EnableATPForSPOTeamsODB
+                        EnableSafeDocs          = $atpPolicyResult.EnableSafeDocs
+                        AllowSafeDocsOpen       = $atpPolicyResult.AllowSafeDocsOpen
+                    }
+                    $detailsString = $detailpass | ForEach-Object {
+                        @"
+Name: $($_.Name)
+EnableATPForSPOTeamsODB: $($_.EnableATPForSPOTeamsODB)
+EnableSafeDocs: $($_.EnableSafeDocs)
+AllowSafeDocsOpen: $($_.AllowSafeDocsOpen)
+`n
+"@
+                    }
+                }
                 $details = if ($result) {
-                    "ATP for SharePoint, OneDrive, and Teams is enabled with correct settings."
+                    $detailsString
                 }
                 else {
                     "ATP for SharePoint, OneDrive, and Teams is not enabled with correct settings."
                 }
-
                 $failureReasons = if ($result) {
                     "N/A"
                 }
                 else {
                     "ATP policy for SharePoint, OneDrive, and Microsoft Teams is not correctly configured."
                 }
-
                 # Create and populate the CISAuditResult object
                 $params = @{
                     Rec           = $recnum
@@ -66,13 +89,10 @@ function Test-SafeAttachmentsTeams {
             }
             catch {
                 Write-Error "An error occurred during the test: $_"
-
                 # Retrieve the description from the test definitions
                 $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
                 $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
                 $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
                 # Call Initialize-CISAuditResult with error parameters
                 $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
             }
@@ -88,7 +108,6 @@ function Test-SafeAttachmentsTeams {
             $auditResult = Initialize-CISAuditResult @params
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

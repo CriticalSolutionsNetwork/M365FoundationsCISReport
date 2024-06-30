@@ -5,7 +5,6 @@ function Test-RestrictStorageProvidersOutlook {
         # Aligned
         # Parameters can be added here if needed
     )
-
     begin {
         <#
         # 6.5.3 (L2) Ensure additional storage providers are restricted in Outlook on the web
@@ -22,25 +21,21 @@ function Test-RestrictStorageProvidersOutlook {
         #   - Condition A: Using PowerShell, verify that `AdditionalStorageProvidersAvailable` is not set to `False` in the OwaMailboxPolicy.
         #   - Condition B: Ensure that the command `Get-OwaMailboxPolicy | Format-Table Name, AdditionalStorageProvidersAvailable` does not return `False`.
         #>
-
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "6.5.3"
+        Write-Verbose "Running Test-RestrictStorageProvidersOutlook for $recnum..."
     }
-
     process {
         try {
             # 6.5.3 (L2) Ensure additional storage providers are restricted in Outlook on the web
-
             # Retrieve all OwaMailbox policies
             $owaPolicies = Get-CISExoOutput -Rec $recnum
             # Condition A: Check if AdditionalStorageProvidersAvailable is set to False
             $nonCompliantPolicies = $owaPolicies | Where-Object { $_.AdditionalStorageProvidersAvailable }
-
             # Determine compliance
             $allPoliciesRestricted = $nonCompliantPolicies.Count -eq 0
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($allPoliciesRestricted) {
                 "N/A"
@@ -48,14 +43,12 @@ function Test-RestrictStorageProvidersOutlook {
             else {
                 "One or more OwaMailbox policies allow AdditionalStorageProvidersAvailable."
             }
-
             $details = if ($allPoliciesRestricted) {
                 "All OwaMailbox policies restrict AdditionalStorageProvidersAvailable"
             }
             else {
                 "Non-compliant OwaMailbox policies: $($nonCompliantPolicies.Name -join ', ')"
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -71,7 +64,6 @@ function Test-RestrictStorageProvidersOutlook {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

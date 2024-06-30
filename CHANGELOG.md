@@ -4,6 +4,22 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Added `Get-PhishPolicyDetail` and `Test-PhishPolicyCompliance` private functions to help test for phishing policy compliance.
+
+### Fixed
+
+- Fixed various EXO test to be more accurate and include more properties in the output.
+
+#### Changed
+
+- Changed main function parameter for Domain to `DomainName`.
+
+
+
+## [0.1.17] - 2024-06-28
+
 ### Fixed
 
 - Fixed `Get-ExceededLengthResultDetail` function paramter validation for Exported Tests to allow for Null.

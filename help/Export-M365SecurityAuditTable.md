@@ -1,4 +1,4 @@
-﻿---
+---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
@@ -15,25 +15,24 @@ Exports M365 security audit results to a CSV file or outputs a specific test res
 ### OutputObjectFromAuditResultsSingle
 ```
 Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-OutputTestNumber] <String>
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+ [<CommonParameters>]
 ```
 
 ### ExportAllResultsFromAuditResults
 ```
 Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-ExportAllTests] -ExportPath <String>
- [-ExportOriginalTests] [-ExportToExcel] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+ [-ExportOriginalTests] [-ExportToExcel] [<CommonParameters>]
 ```
 
 ### OutputObjectFromCsvSingle
 ```
-Export-M365SecurityAuditTable [-CsvPath] <String> [-OutputTestNumber] <String>
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Export-M365SecurityAuditTable [-CsvPath] <String> [-OutputTestNumber] <String> [<CommonParameters>]
 ```
 
 ### ExportAllResultsFromCsv
 ```
 Export-M365SecurityAuditTable [-CsvPath] <String> [-ExportAllTests] -ExportPath <String> [-ExportOriginalTests]
- [-ExportToExcel] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+ [-ExportToExcel] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -110,6 +109,22 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -OutputTestNumber
+The test number to output as an object.
+Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
+
+```yaml
+Type: String
+Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
+Aliases:
+
+Required: True
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -ExportAllTests
 Switch to export all test results.
 
@@ -118,23 +133,8 @@ Type: SwitchParameter
 Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
 Aliases:
 
-Required: True
-Position: 1
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExportOriginalTests
-Switch to export the original audit results to a CSV file.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
-Aliases:
-
 Required: False
-Position: Named
+Position: 1
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -155,6 +155,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -ExportOriginalTests
+Switch to export the original audit results to a CSV file.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Aliases:
+
+Required: True
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -ExportToExcel
 Switch to export the results to an Excel file.
 
@@ -166,37 +181,6 @@ Aliases:
 Required: False
 Position: Named
 Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -OutputTestNumber
-The test number to output as an object.
-Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
-
-```yaml
-Type: String
-Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-{{ Fill ProgressAction Description }}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

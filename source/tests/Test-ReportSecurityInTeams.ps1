@@ -5,20 +5,17 @@ function Test-ReportSecurityInTeams {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "8.6.1"
+        Write-Verbose "Running Test-ReportSecurityInTeams for $recnum..."
     }
-
     process {
         try {
             # Test-ReportSecurityInTeams.ps1
             # 8.6.1 (L1) Ensure users can report security concerns in Teams
-
             # Retrieve the necessary settings for Teams and Exchange Online
             # Condition A: Ensure the 'Report a security concern' setting in the Teams admin center is set to 'On'.
             $CsTeamsMessagingPolicy = Get-CISMSTeamsOutput -Rec $recnum
@@ -35,7 +32,6 @@ function Test-ReportSecurityInTeams {
             $null -ne $ReportSubmissionPolicy.ReportPhishAddresses -and
             $ReportSubmissionPolicy.ReportChatMessageToCustomizedAddressEnabled -and
             -not $ReportSubmissionPolicy.ReportChatMessageEnabled
-
             $detailsString = @"
 The following settings are required for users to report security concerns in Teams:
 
@@ -75,7 +71,6 @@ ReportChatMessageToCustomizedAddressEnabled: True
             else {
                 $faildetailstring
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -91,7 +86,6 @@ ReportChatMessageToCustomizedAddressEnabled: True
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

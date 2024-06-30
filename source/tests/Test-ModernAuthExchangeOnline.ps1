@@ -5,11 +5,9 @@ function Test-ModernAuthExchangeOnline {
         # Aligned
         # Define your parameters here
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Conditions for 6.5.1 (L1) Ensure modern authentication for Exchange Online is enabled
         #
         # Validate test for a pass:
@@ -25,17 +23,14 @@ function Test-ModernAuthExchangeOnline {
         #   - Condition A: Modern authentication for Exchange Online is not enabled.
         #   - Condition B: Exchange Online clients do not use modern authentication to log in to Microsoft 365 mailboxes.
         #   - Condition C: Users of older email clients, such as Outlook 2013 and Outlook 2016, are still able to authenticate to Exchange using Basic Authentication.
-
         $recnum = "6.5.1"
+        Write-Verbose "Running Test-ModernAuthExchangeOnline for $recnum..."
     }
-
     process {
         try {
             # 6.5.1 (L1) Ensure modern authentication for Exchange Online is enabled
-
             # Check modern authentication setting in Exchange Online configuration (Condition A and B)
             $orgConfig = Get-CISExoOutput -Rec $recnum
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $orgConfig.OAuth2ClientProfileEnabled) {
                 "Modern authentication is disabled"
@@ -43,10 +38,8 @@ function Test-ModernAuthExchangeOnline {
             else {
                 "N/A"
             }
-
             # Details include the current setting (Condition A and B)
             $details = "OAuth2ClientProfileEnabled: $($orgConfig.OAuth2ClientProfileEnabled) for Organization: $($orgConfig.Name)"
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -56,15 +49,12 @@ function Test-ModernAuthExchangeOnline {
                 FailureReason = $failureReasons
             }
             $auditResult = Initialize-CISAuditResult @params
-
         }
         catch {
             $LastError = $_
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
-
     }
-
     end {
         # Return the audit result
         return $auditResult

@@ -52,18 +52,105 @@ function Get-CISExoOutput {
                 # Test-BlockSharedMailboxSignIn.ps1
                 $MBX = Get-EXOMailbox -RecipientTypeDetails SharedMailbox
                 # [object[]]
-                return $MBX
+                # $MBX mock object:
+                <#
+                    $MBX = @(
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser1@domain.com"
+                            ExternalDirectoryObjectId = "123e4567-e89b-12d3-a456-426614174000"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser2@domain.com"
+                            ExternalDirectoryObjectId = "987e6543-21ba-12d3-a456-426614174000"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser3@domain.com"
+                            ExternalDirectoryObjectId = "abcddcba-98fe-76dc-a456-426614174000"
+                        }
+                    )
+                #>
+                return $MBX.ExternalDirectoryObjectId
             }
             '1.3.3' {
                 # Test-ExternalSharingCalendars.ps1
                 # Step: Retrieve sharing policies related to calendar sharing
+                # $sharingPolicies Mock Object
+                <#
+                    $sharingPolicies = [PSCustomObject]@{
+                        Name = "Default Sharing Policy"
+                        Domains = @("Anonymous:CalendarSharingFreeBusySimple")
+                        Enabled = $true
+                        Default = $true
+                    }
+                #>
                 $sharingPolicies = Get-SharingPolicy | Where-Object { $_.Domains -like '*CalendarSharing*' }
                 # [psobject[]]
                 return $sharingPolicies
             }
+            '1.3.3b' {
+                # $mailboxes Mock Object
+                <#
+                    $mailboxes = @(
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser1@domain.com"
+                            ExternalDirectoryObjectId = "123e4567-e89b-12d3-a456-426614174000"
+                            PrimarySmtpAddress = "SMBuser1@domain.com"
+                            PublishEnabled       = $False
+                            PublishedCalendarUrl = "https://example.com/calendar/smbuser1"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser2@domain.com"
+                            ExternalDirectoryObjectId = "987e6543-21ba-12d3-a456-426614174000"
+                            PrimarySmtpAddress = "SMBuser2@domain.com"
+                            PublishEnabled       = $False
+                            PublishedCalendarUrl = "https://example.com/calendar/smbuser2"
+                        },
+                        [PSCustomObject]@{
+                            UserPrincipalName = "SMBuser3@domain.com"
+                            ExternalDirectoryObjectId = "abcddcba-98fe-76dc-a456-426614174000"
+                            PrimarySmtpAddress = "SMBuser3@domain.com"
+                            PublishEnabled       = $False
+                            PublishedCalendarUrl = "https://example.com/calendar/smbuser3"
+                        }
+                    )
+                #>
+                $mailboxes = Get-Mailbox -ResultSize Unlimited
+                $results = foreach ($mailbox in $mailboxes) {
+                    # Get the name of the default calendar folder (depends on the mailbox's language)
+                    # Return single string Ex: return "Calendar" x 3 in array
+                    $calendarFolder = [string](Get-EXOMailboxFolderStatistics $mailbox.PrimarySmtpAddress -Folderscope Calendar | Where-Object { $_.FolderType -eq 'Calendar' }).Name
+                    Write-Verbose "Calendar folder for $($mailbox.PrimarySmtpAddress): $calendarFolder"
+                    # Get users calendar folder settings for their default Calendar folder
+                    # calendar has the format identity:\<calendar folder name>
+                    $calendar = Get-MailboxCalendarFolder -Identity "$($mailbox.PrimarySmtpAddress):\$calendarFolder"
+                    #Write-Host "Calendar object for $($mailbox.PrimarySmtpAddress): $calendar"
+                    Write-Verbose "Calendar publishing enabled: $($calendar.PublishEnabled)"
+                    # Check if calendar publishing is enabled and create a custom object
+                    if ($calendar.PublishEnabled) {
+                        [PSCustomObject]@{
+                            PrimarySmtpAddress   = $mailbox.PrimarySmtpAddress
+                            CalendarFolder       = $calendarFolder
+                            PublishEnabled       = $calendar.PublishEnabled
+                            PublishedCalendarUrl = $calendar.PublishedCalendarUrl
+                        }
+                    }
+                }
+                $calendarDetails = @()
+                foreach ($calendar in $results) {
+                    $calendarDetails += "Calendar: $($calendar.PrimarySmtpAddress); URL: $($calendar.PublishedCalendarUrl)"
+                }
+                return $calendarDetails
+            }
             '1.3.6' {
                 # Test-CustomerLockbox.ps1
                 # Step: Retrieve the organization configuration (Condition C: Pass/Fail)
+                # $orgConfig Mock Object:
+                <#
+                    # return $orgConfig
+                    $orgConfig = [PSCustomObject]@{
+                        CustomerLockBoxEnabled = $true
+                    }
+                #>
                 $orgConfig = Get-OrganizationConfig | Select-Object CustomerLockBoxEnabled
                 $customerLockboxEnabled = $orgConfig.CustomerLockBoxEnabled
                 # [bool]
@@ -74,12 +161,41 @@ function Get-CISExoOutput {
                 if (Get-Command Get-SafeLinksPolicy -ErrorAction SilentlyContinue) {
                     # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
                     # Retrieve all Safe Links policies
+                    # $policies Mock Object:
+                    <#
+                        $policies = @(
+                            [PSCustomObject]@{
+                                Name = "PolicyOne"
+                                EnableSafeLinksForEmail = $true
+                                EnableSafeLinksForTeams = $true
+                                EnableSafeLinksForOffice = $true
+                                TrackClicks = $true
+                                AllowClickThrough = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = "PolicyTwo"
+                                EnableSafeLinksForEmail = $true
+                                EnableSafeLinksForTeams = $true
+                                EnableSafeLinksForOffice = $true
+                                TrackClicks = $true
+                                AllowClickThrough = $true
+                            },
+                            [PSCustomObject]@{
+                                Name = "PolicyThree"
+                                EnableSafeLinksForEmail = $true
+                                EnableSafeLinksForTeams = $true
+                                EnableSafeLinksForOffice = $true
+                                TrackClicks = $true
+                                AllowClickThrough = $false
+                            }
+                        )
+                    #>
                     $policies = Get-SafeLinksPolicy
                     # Initialize the details collection
                     $misconfiguredDetails = @()
                     foreach ($policy in $policies) {
                         # Get the detailed configuration of each policy
-                        $policyDetails = Get-SafeLinksPolicy -Identity $policy.Name
+                        $policyDetails = $policy #Get-SafeLinksPolicy -Identity $policy.Name
                         # Check each required property and record failures
                         # Condition A: Checking policy settings
                         $failures = @()
@@ -106,6 +222,12 @@ function Get-CISExoOutput {
                 # Condition A: The Common Attachment Types Filter is enabled in the Microsoft 365 Security & Compliance Center.
                 # Condition B: Using Exchange Online PowerShell, verify that the `EnableFileFilter` property of the default malware filter policy is set to `True`.
                 # Retrieve the attachment filter policy
+                # $attachmentFilter Mock Object
+                <#
+                    $attachmentFilter = [PSCustomObject]@{
+                        EnableFileFilter = $true
+                    }
+                #>
                 $attachmentFilter = Get-MalwareFilterPolicy -Identity Default | Select-Object EnableFileFilter
                 $result = $attachmentFilter.EnableFileFilter
                 # [bool]
@@ -115,6 +237,21 @@ function Get-CISExoOutput {
                 # Test-NotifyMalwareInternal.ps1
                 # 2.1.3 Ensure notifications for internal users sending malware is Enabled
                 # Retrieve all 'Custom' malware filter policies and check notification settings
+                # $malwareNotifications Mock Object
+                <#
+                    $malwareNotifications = @(
+                        [PSCustomObject]@{
+                            Identity = "Default"
+                            EnableInternalSenderAdminNotifications = $true
+                            RecommendedPolicyType = "Custom"
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Anti-malware-Policy"
+                            EnableInternalSenderAdminNotifications = $true
+                            RecommendedPolicyType = "Custom"
+                        }
+                    )
+                #>
                 $malwareNotifications = Get-MalwareFilterPolicy | Where-Object { $_.RecommendedPolicyType -eq 'Custom' }
                 # [object[]]
                 return $malwareNotifications
@@ -124,6 +261,18 @@ function Get-CISExoOutput {
                 if (Get-Command Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue) {
                     # Retrieve all Safe Attachment policies where Enable is set to True
                     # Check if ErrorAction needed below
+                    # $safeAttachmentPolicies Mock Object:
+                    <#
+                        $safeAttachmentPolicies = @(
+                            [PSCustomObject]@{
+                                Policy        = "Strict Preset Security Policy"
+                                Action        = "Block"
+                                QuarantineTag = "AdminOnlyAccessPolicy"
+                                Redirect      = $false
+                                Enabled       = $true
+                            }
+                        )
+                    #>
                     $safeAttachmentPolicies = Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue | Where-Object { $_.Enable -eq $true }
                     # [object[]]
                     return $safeAttachmentPolicies
@@ -139,6 +288,17 @@ function Get-CISExoOutput {
                     # Retrieve the ATP policies for Office 365 and check Safe Attachments settings
                     $atpPolicies = Get-AtpPolicyForO365
                     # Check if the required ATP policies are enabled
+                    # $atpPolicyResult Mock Object:
+                    <#
+                        $atpPolicyResult = @(
+                            [PSCustomObject]@{
+                                Name                   = "Default"
+                                EnableATPForSPOTeamsODB = $true
+                                EnableSafeDocs         = $true
+                                AllowSafeDocsOpen      = $false
+                            }
+                        )
+                    #>
                     $atpPolicyResult = $atpPolicies | Where-Object {
                         $_.EnableATPForSPOTeamsODB -eq $true -and
                         $_.EnableSafeDocs -eq $true -and
@@ -153,13 +313,82 @@ function Get-CISExoOutput {
             }
             '2.1.6' {
                 # Test-SpamPolicyAdminNotify.ps1
-                # Retrieve the default hosted outbound spam filter policy
-                $hostedOutboundSpamFilterPolicy = Get-HostedOutboundSpamFilterPolicy | Where-Object { $_.IsDefault -eq $true }
-                return $hostedOutboundSpamFilterPolicy
+                # Retrieve the hosted outbound spam filter policies
+                # $spamPolicies Mock Object:
+                <#
+                    # Mock data representing multiple spam filter policies
+                    $spamPolicies = @(
+                        [PSCustomObject]@{
+                            Name                                       = "Default"
+                            IsDefault                                  = $true
+                            NotifyOutboundSpam                         = $true
+                            BccSuspiciousOutboundMail                  = $true
+                            NotifyOutboundSpamRecipients               = "admin@example.com"
+                            BccSuspiciousOutboundAdditionalRecipients  = "bccadmin@example.com"
+                        },
+                        [PSCustomObject]@{
+                            Name                                       = "Custom Policy 1"
+                            IsDefault                                  = $false
+                            NotifyOutboundSpam                         = $false
+                            BccSuspiciousOutboundMail                  = $true
+                            NotifyOutboundSpamRecipients               = ""
+                            BccSuspiciousOutboundAdditionalRecipients  = ""
+                        },
+                        [PSCustomObject]@{
+                            Name                                       = "Custom Policy 2"
+                            IsDefault                                  = $false
+                            NotifyOutboundSpam                         = $true
+                            BccSuspiciousOutboundMail                  = $false
+                            NotifyOutboundSpamRecipients               = "notify@example.com"
+                            BccSuspiciousOutboundAdditionalRecipients  = "bccnotify@example.com"
+                        }
+                    )
+                #>
+                $spamPolicies = Get-HostedOutboundSpamFilterPolicy
+                return $spamPolicies
             }
             '2.1.7' {
                 # Test-AntiPhishingPolicy.ps1
-                # Condition A: Ensure that an anti-phishing policy has been created
+                <#
+                    $antiPhishPolicies = @(
+                        [PSCustomObject]@{
+                            Identity = "Strict Preset Security Policy"
+                            Enabled = $true
+                            PhishThresholdLevel = 4
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = "John Doe;jdoe@contoso.net, Jane Does;janedoe@contoso.net"
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Office365 AntiPhish Default"
+                            Enabled = $true
+                            PhishThresholdLevel = 2
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = $null  # Assuming it targets all users as it's the default
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Admin"
+                            Enabled = $true
+                            PhishThresholdLevel = 2
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = $null  # Assuming it targets all users
+                        },
+                        [PSCustomObject]@{
+                            Identity = "Standard Preset Security Policy"
+                            Enabled = $true
+                            PhishThresholdLevel = 3
+                            EnableMailboxIntelligenceProtection = $true
+                            EnableMailboxIntelligence = $true
+                            EnableSpoofIntelligence = $true
+                            TargetedUsersToProtect = $null  # Assuming it targets all users
+                        }
+                    )
+                #>
                 $antiPhishPolicies = Get-AntiPhishPolicy
                 return $antiPhishPolicies
             }
@@ -284,7 +513,7 @@ function Get-CISExoOutput {
                 # Retrieve the necessary settings for Teams and Exchange Online
                 # Condition B: Verify that 'Monitor reported messages in Microsoft Teams' is checked in the Microsoft 365 Defender portal.
                 # Condition C: Ensure the 'Send reported messages to' setting in the Microsoft 365 Defender portal is set to 'My reporting mailbox only' with the correct report email addresses.
-                $ReportSubmissionPolicy = Get-ReportSubmissionPolicy | Select-Object -Property ReportJunkToCustomizedAddress, ReportNotJunkToCustomizedAddress, ReportPhishToCustomizedAddress,ReportJunkAddresses,ReportNotJunkAddresses,ReportPhishAddresses,ReportChatMessageEnabled,ReportChatMessageToCustomizedAddressEnabled
+                $ReportSubmissionPolicy = Get-ReportSubmissionPolicy | Select-Object -Property ReportJunkToCustomizedAddress, ReportNotJunkToCustomizedAddress, ReportPhishToCustomizedAddress, ReportJunkAddresses, ReportNotJunkAddresses, ReportPhishAddresses, ReportChatMessageEnabled, ReportChatMessageToCustomizedAddressEnabled
                 return $ReportSubmissionPolicy
             }
             default { throw "No match found for test: $Rec" }
