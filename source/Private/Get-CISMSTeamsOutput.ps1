@@ -163,9 +163,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AllowAnonymousUsersToStartMeeting` setting in the Teams admin center is not set to `False`.
                 #   - Condition B: The setting for anonymous users and dial-in callers starting a meeting allows them to bypass the lobby.
                 #   - Condition C: Verification using the UI indicates that the setting `Anonymous users and dial-in callers can start a meeting` is not set to `Off`.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+                # $teamsMeetingPolicy Mock Object
+                <#
+                    $CsTeamsMeetingPolicyAnonymous = [PSCustomObject]@{
+                        AllowAnonymousUsersToStartMeeting           = $true
+                    }
+                #>
                 # Retrieve the Teams meeting policy for the global scope and check if anonymous users can start meetings
                 $CsTeamsMeetingPolicyAnonymous = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowAnonymousUsersToStartMeeting
                 return $CsTeamsMeetingPolicyAnonymous
