@@ -31,8 +31,13 @@ function Test-DialInBypassLobby {
             #   - Condition A: The `AllowPSTNUsersToBypassLobby` setting in the Global Teams meeting policy is not set to `False`.
             #   - Condition B: Verification using the UI in the Microsoft Teams admin center shows that "People dialing in can't bypass the lobby" is not set to `Off`.
             #   - Condition C: Individuals who dial in by phone are able to join the meeting directly without waiting in the lobby.
-
             # Retrieve Teams meeting policy for PSTN users
+            # $CsTeamsMeetingPolicyPSTN Mock Object
+            <#
+                $CsTeamsMeetingPolicyPSTN = [PSCustomObject]@{
+                    AllowPSTNUsersToBypassLobby           = $true
+                }
+            #>
             $CsTeamsMeetingPolicyPSTN = Get-CISMSTeamsOutput -Rec $recnum
             $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
 
