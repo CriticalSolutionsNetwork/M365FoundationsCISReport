@@ -6,7 +6,7 @@ function Invoke-TestFunction {
         [Parameter(Mandatory = $false)]
         [string]$DomainName,
         [Parameter(Mandatory = $false)]
-        [string[]]$ApprovedCloudStorageProvider
+        [string[]]$ApprovedCloudStorageProviders
     )
 
     $functionName = $FunctionFile.BaseName
@@ -17,8 +17,8 @@ function Invoke-TestFunction {
     if ('DomainName' -in $functionCmd.Parameters.Keys) {
         $paramList.DomainName = $DomainName
     }
-    if ('ApprovedCloudStorageProvider' -in $functionCmd.Parameters.Keys) {
-        $paramList.ApprovedCloudStorageProvider = $ApprovedCloudStorageProvider
+    if ('ApprovedCloudStorageProviders' -in $functionCmd.Parameters.Keys) {
+        $paramList.ApprovedCloudStorageProviders = $ApprovedCloudStorageProviders
     }
     # Use splatting to pass parameters
     Write-Verbose "Running $functionName..."

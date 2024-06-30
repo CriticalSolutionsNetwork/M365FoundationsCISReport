@@ -21,7 +21,7 @@
         Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.
     .PARAMETER SkipRecommendation
         Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
-    .PARAMETER ApprovedCloudStorageProvider
+    .PARAMETER ApprovedCloudStorageProviders
         Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
     .PARAMETER DoNotConnect
         If specified, the cmdlet will not establish a connection to Microsoft 365 services.
@@ -185,7 +185,7 @@ function Invoke-M365SecurityAudit {
         [ValidateSet(
             'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
         )]
-        [string[]]$ApprovedCloudStorageProvider = @(),
+        [string[]]$ApprovedCloudStorageProviders = @(),
 
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not establish a connection to Microsoft 365 services.")]
         [switch]$DoNotConnect,
@@ -300,7 +300,7 @@ function Invoke-M365SecurityAudit {
                 Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
                 $functionName = $testFunction.BaseName
                 if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName -ApprovedCloudStorageProvider $ApprovedCloudStorageProvider
+                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName -ApprovedCloudStorageProviders $ApprovedCloudStorageProviders
                     # Add the result to the collection
                     [void]$allAuditResults.Add($auditResult)
                 }

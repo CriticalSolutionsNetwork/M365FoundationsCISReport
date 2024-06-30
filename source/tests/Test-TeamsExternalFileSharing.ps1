@@ -3,7 +3,7 @@ function Test-TeamsExternalFileSharing {
     [OutputType([CISAuditResult])]
     param (
         [Parameter(Mandatory = $false)]
-        [string[]]$ApprovedCloudStorageProvider
+        [string[]]$ApprovedCloudStorageProviders
     )
     begin {
         # Dot source the class script if necessary
@@ -34,10 +34,10 @@ function Test-TeamsExternalFileSharing {
             #$clientconfig.AllowDropBox = $false
             # Define all possible cloud storage providers
             $allProviders = @("AllowDropBox", "AllowBox", "AllowGoogleDrive", "AllowShareFile", "AllowEgnyte")
-            # If ApprovedCloudStorageProvider is provided, map it to the corresponding settings
-            if ($PSBoundParameters.ContainsKey('ApprovedCloudStorageProvider')) {
+            # If ApprovedCloudStorageProviders is provided, map it to the corresponding settings
+            if ($PSBoundParameters.ContainsKey('ApprovedCloudStorageProviders')) {
                 $approvedProviders = @()
-                foreach ($provider in $ApprovedCloudStorageProvider) {
+                foreach ($provider in $ApprovedCloudStorageProviders) {
                     $approvedProviders += "Allow$provider"
                 }
             } else {
@@ -53,8 +53,8 @@ function Test-TeamsExternalFileSharing {
                 }
             }
             $basePassDetails = "All cloud storage services are approved providers"
-            if ($ApprovedCloudStorageProvider) {
-                $basePassDetails = "Approved cloud storage services: $($ApprovedCloudStorageProvider -join ', ')"
+            if ($ApprovedCloudStorageProviders) {
+                $basePassDetails = "Approved cloud storage services: $($ApprovedCloudStorageProviders -join ', ')"
             }
             # Create an instance of CISAuditResult and populate it
             $params = @{
