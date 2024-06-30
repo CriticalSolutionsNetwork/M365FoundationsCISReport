@@ -5,7 +5,6 @@ function Test-CommonAttachmentFilter {
         # Aligned
         # Parameters can be added if needed
     )
-
     begin {
         <#
             Conditions for 2.1.2 (L1) Ensure the Common Attachment Types Filter is enabled

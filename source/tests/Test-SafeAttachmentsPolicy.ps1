@@ -2,7 +2,6 @@ function Test-SafeAttachmentsPolicy {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
     param ()
-
     begin {
         $recnum = "2.1.4"
         Write-Verbose "Running Test-SafeAttachmentsPolicy for $recnum..."
@@ -13,7 +12,6 @@ function Test-SafeAttachmentsPolicy {
                 - Check if the policy's action is set to 'Block'.
                 - Confirm the QuarantineTag is set to 'AdminOnlyAccessPolicy'.
                 - Verify that the Redirect setting is disabled.
-
             Validate test for a fail:
                 - If the highest priority Safe Attachments policy's action is not set to 'Block'.
                 - If the QuarantineTag is not set to 'AdminOnlyAccessPolicy'.
@@ -55,11 +53,11 @@ function Test-SafeAttachmentsPolicy {
                 # The result is a pass if there are no failure reasons
                 $result = $failureReasons.Count -eq 0
                 $details = [PSCustomObject]@{
-                    Policy          = $highestPriorityPolicy.Identity
-                    Action          = $highestPriorityPolicy.Action
-                    QuarantineTag   = $highestPriorityPolicy.QuarantineTag
-                    Redirect        = $highestPriorityPolicy.Redirect
-                    Enabled         = $highestPriorityPolicy.Enable
+                    Policy        = $highestPriorityPolicy.Identity
+                    Action        = $highestPriorityPolicy.Action
+                    QuarantineTag = $highestPriorityPolicy.QuarantineTag
+                    Redirect      = $highestPriorityPolicy.Redirect
+                    Enabled       = $highestPriorityPolicy.Enable
                 }
                 # Format details for output manually
                 $detailsString = "Policy|Action|QuarantineTag|Redirect|Enabled`n" + ($details |

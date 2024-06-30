@@ -5,11 +5,9 @@ function Test-ExternalSharingCalendars {
         # Aligned
         # Parameters can be added if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "1.3.3"
         Write-Verbose "Running Test-ExternalSharingCalendars for $recnum..."
@@ -27,7 +25,6 @@ function Test-ExternalSharingCalendars {
         #   - Condition A: In the Microsoft 365 admin center, external calendar sharing is enabled.
         #   - Condition B: Using the Exchange Online PowerShell Module, the `OrganizationConfig` property `ExternalSharingEnabled` is set to `True`.
     }
-
     process {
         try {
             # Step: Retrieve sharing policies related to calendar sharing
@@ -87,7 +84,6 @@ function Test-ExternalSharingCalendars {
             else {
                 "Enabled Sharing Policies:`n$($sharingPolicyDetails -join ', ')"
             }
-
             # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -103,7 +99,6 @@ function Test-ExternalSharingCalendars {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

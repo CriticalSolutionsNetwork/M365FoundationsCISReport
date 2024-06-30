@@ -5,16 +5,14 @@ function Test-RestrictOutlookAddins {
         # Aligned
         # Parameters could include credentials or other necessary data
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code
         $defaultPolicyFailureDetails = @()
         $relevantRoles = @('My Custom Apps', 'My Marketplace Apps', 'My ReadWriteMailbox Apps')
         $recnum = "6.3.1"
-
+        Write-Verbose "Running Test-RestrictOutlookAddins for $recnum..."
         # Conditions for 6.3.1 (L2) Ensure users installing Outlook add-ins is not allowed
         #
         # Validate test for a pass:
@@ -29,21 +27,17 @@ function Test-RestrictOutlookAddins {
         #   - Condition A: One or more of the roles MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are checked under Other roles.
         #   - Condition B: Using PowerShell, verify that MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are assigned to users.
     }
-
     process {
         try {
             # 6.3.1 (L2) Ensure users installing Outlook add-ins is not allowed
-
             # Check all mailboxes for custom policies with unallowed add-ins
             # Check Default Role Assignment Policy
             $customPolicyFailures, $defaultPolicy = Get-CISExoOutput -Rec $recnum
             $defaultPolicyRoles = $defaultPolicy.AssignedRoles | Where-Object { $_ -in $relevantRoles }
-
             # Condition A: Verify that the roles MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are unchecked under Other roles.
             if ($defaultPolicyRoles) {
                 $defaultPolicyFailureDetails = $defaultPolicyRoles
             }
-
             # Prepare result details string
             $detailsString = ""
             if ($customPolicyFailures) {
@@ -53,7 +47,6 @@ function Test-RestrictOutlookAddins {
             else {
                 $detailsString += "Custom Policy Failures: None | "
             }
-
             $detailsString += "Default Role Assignment Policy: "
             if ($defaultPolicyFailureDetails) {
                 $detailsString += ($defaultPolicyFailureDetails -join ', ')
@@ -61,10 +54,8 @@ function Test-RestrictOutlookAddins {
             else {
                 $detailsString += "Compliant"
             }
-
             # Determine result based on findings
             $isCompliant = -not ($customPolicyFailures -or $defaultPolicyFailureDetails)
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -80,7 +71,6 @@ function Test-RestrictOutlookAddins {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

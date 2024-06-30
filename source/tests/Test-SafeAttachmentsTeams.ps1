@@ -8,7 +8,6 @@ function Test-SafeAttachmentsTeams {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Conditions for 2.1.5 (L2) Ensure Safe Attachments for SharePoint, OneDrive, and Microsoft Teams is Enabled
         #
         # Validate test for a pass:
@@ -24,7 +23,6 @@ function Test-SafeAttachmentsTeams {
         #   - Condition A: Safe Attachments for SharePoint is not enabled.
         #   - Condition B: Safe Attachments for OneDrive is not enabled.
         #   - Condition C: Safe Attachments for Microsoft Teams is not enabled.
-
         # Initialization code, if needed
         $recnum = "2.1.5"
         Write-Verbose "Running Test-SafeAttachmentsTeams for $recnum..."

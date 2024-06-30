@@ -5,15 +5,12 @@ function Test-MailTipsEnabled {
         # Aligned
         # Parameters can be added if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-
-        $auditResult = [CISAuditResult]::new()
         $recnum = "6.5.2"
-
+        Write-Verbose "Running Test-MailTipsEnabled for $recnum..."
         # Conditions for 6.5.2 (L2) Ensure MailTips are enabled for end users
         #
         # Validate test for a pass:
@@ -32,18 +29,14 @@ function Test-MailTipsEnabled {
         #   - Condition C: MailTipsGroupMetricsEnabled is not set to True.
         #   - Condition D: MailTipsLargeAudienceThreshold is not set to an acceptable value (default is 25).
     }
-
     process {
         try {
             # 6.5.2 (L2) Ensure MailTips are enabled for end users
-
             # Retrieve organization configuration for MailTips settings
             $orgConfig = Get-CISExoOutput -Rec $recnum
-
             # Check the MailTips settings (Conditions A, B, C, D)
             $allTipsEnabled = $orgConfig.MailTipsAllTipsEnabled -and $orgConfig.MailTipsGroupMetricsEnabled -and $orgConfig.MailTipsLargeAudienceThreshold -eq 25
             $externalRecipientsTipsEnabled = $orgConfig.MailTipsExternalRecipientsTipsEnabled
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not ($allTipsEnabled -and $externalRecipientsTipsEnabled)) {
                 "One or more MailTips settings are not configured as required."
@@ -51,14 +44,12 @@ function Test-MailTipsEnabled {
             else {
                 "N/A"
             }
-
             $details = if ($allTipsEnabled -and $externalRecipientsTipsEnabled) {
                 "MailTipsAllTipsEnabled: $($orgConfig.MailTipsAllTipsEnabled); MailTipsExternalRecipientsTipsEnabled: $($orgConfig.MailTipsExternalRecipientsTipsEnabled); MailTipsGroupMetricsEnabled: $($orgConfig.MailTipsGroupMetricsEnabled); MailTipsLargeAudienceThreshold: $($orgConfig.MailTipsLargeAudienceThreshold)"
             }
             else {
                 "One or more MailTips settings are not configured as required."
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -74,7 +65,6 @@ function Test-MailTipsEnabled {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

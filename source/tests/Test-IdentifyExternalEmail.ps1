@@ -9,10 +9,9 @@ function Test-IdentifyExternalEmail {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "6.2.3"
-
+        Write-Verbose "Running Test-IdentifyExternalEmail for $recnum..."
         # Conditions for 6.2.3 (L1) Ensure email from external senders is identified
         #
         # Validate test for a pass:
@@ -29,16 +28,12 @@ function Test-IdentifyExternalEmail {
         #   - Condition B: The BypassAllowList contains unauthorized email addresses.
         #   - Condition C: External sender tag does not appear in email messages received from external sources.
     }
-
     process {
-
         try {
             # 6.2.3 (L1) Ensure email from external senders is identified
-
             # Retrieve external sender tagging configuration
             $externalInOutlook = Get-CISExoOutput -Rec $recnum
             $externalTaggingEnabled = ($externalInOutlook | ForEach-Object { $_.Enabled }) -contains $true
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $externalTaggingEnabled) {
                 # Condition A: External tagging is not enabled using PowerShell for all identities.
@@ -47,10 +42,8 @@ function Test-IdentifyExternalEmail {
             else {
                 "N/A"
             }
-
             # Details for external tagging configuration
             $details = "Enabled: $($externalTaggingEnabled); AllowList: $($externalInOutlook.AllowList)"
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -66,7 +59,6 @@ function Test-IdentifyExternalEmail {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

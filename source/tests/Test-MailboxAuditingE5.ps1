@@ -4,11 +4,9 @@ function Test-MailboxAuditingE5 {
     param (
         # Parameters can be added if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Conditions for 6.1.3 (L1) Ensure mailbox auditing for E5 users is Enabled
         #
         # Validate test for a pass:
@@ -26,18 +24,16 @@ function Test-MailboxAuditingE5 {
         #   - Condition B: AuditAdmin actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SendAs, SendOnBehalf, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
         #   - Condition C: AuditDelegate actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, SendAs, SendOnBehalf, SoftDelete, Update, UpdateFolderPermissions, UpdateInboxRules.
         #   - Condition D: AuditOwner actions do not include all of the following: ApplyRecord, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
-
         $actionDictionaries = Get-Action -Dictionaries
         $AdminActions = $actionDictionaries.AdminActions.Keys
         $DelegateActions = $actionDictionaries.DelegateActions.Keys
         $OwnerActions = $actionDictionaries.OwnerActions.Keys
-
         $allFailures = @()
         $processedUsers = @{}
         $recnum = "6.1.3"
+        Write-Verbose "Running Test-MailboxAuditingE5 for $recnum..."
         $allUsers = Get-CISMgOutput -Rec $recnum
     }
-
     process {
         if ($null -ne $allUsers) {
             $mailboxes = Get-CISExoOutput -Rec $recnum
@@ -47,14 +43,11 @@ function Test-MailboxAuditingE5 {
                         Write-Verbose "Skipping already processed user: $($user.UserPrincipalName)"
                         continue
                     }
-
                     $mailbox = $mailboxes | Where-Object { $_.UserPrincipalName -eq $user.UserPrincipalName }
                     $userUPN = $user.UserPrincipalName
-
                     $missingAdminActions = @()
                     $missingDelegateActions = @()
                     $missingOwnerActions = @()
-
                     if ($mailbox.AuditEnabled) {
                         # Validate Admin actions
                         foreach ($action in $AdminActions) {
@@ -74,7 +67,6 @@ function Test-MailboxAuditingE5 {
                                 $missingOwnerActions += (Get-Action -Actions $action -ActionType "Owner") # Condition D
                             }
                         }
-
                         if ($missingAdminActions.Count -gt 0 -or $missingDelegateActions.Count -gt 0 -or $missingOwnerActions.Count -gt 0) {
                             $allFailures += "$userUPN|True|$($missingAdminActions -join ',')|$($missingDelegateActions -join ',')|$($missingOwnerActions -join ',')"
                         }
@@ -82,11 +74,9 @@ function Test-MailboxAuditingE5 {
                     else {
                         $allFailures += "$userUPN|False|||" # Condition A for fail
                     }
-
                     # Mark the user as processed
                     $processedUsers[$user.UserPrincipalName] = $true
                 }
-
                 # Prepare failure reasons and details based on compliance
                 if ($allFailures.Count -eq 0) {
                     $failureReasons = "N/A"
@@ -113,13 +103,10 @@ function Test-MailboxAuditingE5 {
             }
             catch {
                 Write-Error "An error occurred during the test: $_"
-
                 # Retrieve the description from the test definitions
                 $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
                 $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-
                 $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
-
                 # Call Initialize-CISAuditResult with error parameters
                 $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
             }
@@ -135,15 +122,12 @@ function Test-MailboxAuditingE5 {
             $auditResult = Initialize-CISAuditResult @params
         }
     }
-
     end {
         $detailsLength = $details.Length
         Write-Verbose "Character count of the details: $detailsLength"
-
         if ($detailsLength -gt 32767) {
             Write-Verbose "Warning: The character count exceeds the limit for Excel cells."
         }
-
         return $auditResult
     }
 }

@@ -2,7 +2,6 @@ function Test-AntiPhishingPolicy {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
     param ()
-
     begin {
         $recnum = "2.1.7"
         Write-Verbose "Running Test-AntiPhishingPolicy for $recnum..."
@@ -22,14 +21,12 @@ function Test-AntiPhishingPolicy {
                 - Condition B: Critical security features like Spoof Intelligence or Mailbox Intelligence are disabled in the relevant policies.
         #>
     }
-
     process {
         try {
             # Step 1: Retrieve all anti-phishing policies
             #$VerbosePreference = "Continue"
             Write-Verbose "Retrieving all anti-phishing policies..."
             $antiPhishPolicies = Get-CISExoOutput -Rec $recnum
-
             # Step 2: Initialize variables to track compliance and details
             $compliantPolicy = $null
             $details = @()
@@ -38,15 +35,12 @@ function Test-AntiPhishingPolicy {
             $policiesEvaluated = @()
             $PassedTests = @()
             $FailedTests = @()
-
             Write-Verbose "Evaluating each policy for compliance..."
-
             # Separate policies based on type
             $strictPolicy = $antiPhishPolicies | Where-Object { $_.Identity -match "Strict Preset Security Policy" }
             $standardPolicy = $antiPhishPolicies | Where-Object { $_.Identity -match "Standard Preset Security Policy" }
             $customPolicies = $antiPhishPolicies | Where-Object { -not ($_.Identity -match "Strict Preset Security Policy" -or $_.Identity -match "Standard Preset Security Policy" -or $_.IsDefault) }
             $defaultPolicy = $antiPhishPolicies | Where-Object { $_.IsDefault }
-
             # Step 3: Check for Strict Preset Security Policy
             if ($null -ne $strictPolicy) {
                 Write-Verbose "Evaluating policy: $($strictPolicy.Identity)"
@@ -225,7 +219,6 @@ function Test-AntiPhishingPolicy {
             $auditResult = Get-TestError -LastError $_ -recnum $recnum
         }
     }
-
     end {
         return $auditResult
     }

@@ -8,7 +8,6 @@ function Test-BlockSharedMailboxSignIn {
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "1.2.2"
         Write-Verbose "Running Test-BlockSharedMailboxSignIn for $recnum..."
@@ -26,7 +25,6 @@ function Test-BlockSharedMailboxSignIn {
         #   - Condition A: One or more shared mailboxes have the "Sign-in blocked" option enabled in the properties pane on the Microsoft 365 admin center.
         #   - Condition B: Using PowerShell, the `AccountEnabled` property for one or more shared mailboxes is set to `True`.
     }
-
     process {
         try {
             # Step: Retrieve shared mailbox details
@@ -63,11 +61,9 @@ function Test-BlockSharedMailboxSignIn {
             $users = Get-CISAadOutput -Rec $recnum
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
             $sharedMailboxDetails = $users | Where-Object {$_.objectid -in $objectids}
-
             # Step: Identify enabled mailboxes (Condition B: Pass/Fail)
             $enabledMailboxes = $sharedMailboxDetails | Where-Object { $_.AccountEnabled } | ForEach-Object { $_.DisplayName }
             $allBlocked = $enabledMailboxes.Count -eq 0
-
             # Step: Determine failure reasons based on enabled mailboxes (Condition A & B: Fail)
             $failureReasons = if (-not $allBlocked) {
                 "Some mailboxes have sign-in enabled (AccountEnabled:True):`n$($enabledMailboxes -join ', ')"
@@ -75,7 +71,6 @@ function Test-BlockSharedMailboxSignIn {
             else {
                 "N/A"
             }
-
             # Step: Prepare details for the audit result (Condition A & B: Pass/Fail)
             $details = if ($allBlocked) {
                 "All shared mailboxes have sign-in blocked."
@@ -83,7 +78,6 @@ function Test-BlockSharedMailboxSignIn {
             else {
                 "AccountEnabled set to True Mailboxes: $($enabledMailboxes -join ', ')"
             }
-
             # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -99,7 +93,6 @@ function Test-BlockSharedMailboxSignIn {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

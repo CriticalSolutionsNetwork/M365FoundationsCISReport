@@ -2,7 +2,6 @@ function Test-SpamPolicyAdminNotify {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
     param ()
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
