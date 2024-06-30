@@ -7,6 +7,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Added
 
 - Added `ApprovedCloudStorageProviders` parameter to `Invoke-M365SecurityAudit` to allow for testing of approved cloud storage providers for 8.1.1.
+- Added `ApprovedFederatedDomains` parameter to `Invoke-M365SecurityAudit` to allow for testing of approved federated domains for 8.5.1.
 
 ## [0.1.18] - 2024-06-29
 
