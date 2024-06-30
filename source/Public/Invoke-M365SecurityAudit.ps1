@@ -132,30 +132,23 @@ function Invoke-M365SecurityAudit {
         [Parameter(Mandatory = $false, HelpMessage = "The SharePoint tenant admin URL, which should end with '-admin.sharepoint.com'. If not specified none of the Sharepoint Online tests will run.")]
         [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
         [string]$TenantAdminUrl,
-
         [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration and DKIM Config for tests '1.3.1' and 2.1.9. The domain name of your organization, e.g., 'example.com'.")]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
         [string]$DomainName,
-
         # E-Level with optional ProfileLevel selection
         [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter', HelpMessage = "Specifies the E-Level (E3 or E5) for the audit.")]
         [ValidateSet('E3', 'E5')]
         [string]$ELevel,
-
         [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter', HelpMessage = "Specifies the profile level (L1 or L2) for the audit.")]
         [ValidateSet('L1', 'L2')]
         [string]$ProfileLevel,
-
         # IG Filters, one at a time
         [Parameter(Mandatory = $true, ParameterSetName = 'IG1Filter', HelpMessage = "Includes tests where IG1 is true.")]
         [switch]$IncludeIG1,
-
         [Parameter(Mandatory = $true, ParameterSetName = 'IG2Filter', HelpMessage = "Includes tests where IG2 is true.")]
         [switch]$IncludeIG2,
-
         [Parameter(Mandatory = $true, ParameterSetName = 'IG3Filter', HelpMessage = "Includes tests where IG3 is true.")]
         [switch]$IncludeIG3,
-
         # Inclusion of specific recommendation numbers
         [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter', HelpMessage = "Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.")]
         [ValidateSet(
@@ -168,7 +161,6 @@ function Invoke-M365SecurityAudit {
                 '8.5.7', '8.6.1'
         )]
         [string[]]$IncludeRecommendation,
-
         # Exclusion of specific recommendation numbers
         [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter', HelpMessage = "Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.")]
         [ValidateSet(
@@ -181,26 +173,21 @@ function Invoke-M365SecurityAudit {
                 '8.5.7', '8.6.1'
         )]
         [string[]]$SkipRecommendation,
-
         # Common parameters for all parameter sets
         [Parameter(Mandatory = $false, HelpMessage = "Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.")]
         [ValidateSet(
             'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
         )]
         [string[]]$ApprovedCloudStorageProviders = @(),
-
         [Parameter(Mandatory = $false, HelpMessage = "Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.")]
+        [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
         [string[]]$ApprovedFederatedDomains,
-
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not establish a connection to Microsoft 365 services.")]
         [switch]$DoNotConnect,
-
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not disconnect from Microsoft 365 services after execution.")]
         [switch]$DoNotDisconnect,
-
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not check for the presence of required modules.")]
         [switch]$NoModuleCheck,
-
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.")]
         [switch]$DoNotConfirmConnections
     )
@@ -210,10 +197,8 @@ function Invoke-M365SecurityAudit {
         }
         # Ensure required modules are installed
         $requiredModules = Get-RequiredModule -AuditFunction
-
         # Format the required modules list
         $requiredModulesFormatted = Format-RequiredModuleList -RequiredModules $requiredModules
-
         # Check and install required modules if necessary
         if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Check for required modules: $requiredModulesFormatted", "Check")) {
             Write-Host "Checking for and installing required modules..." -ForegroundColor DarkMagenta
@@ -221,13 +206,11 @@ function Invoke-M365SecurityAudit {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
             }
         }
-
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath "helper\TestDefinitions.csv"
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
         # Load the Test Definitions into the script scope for use in other functions
         $script:TestDefinitionsObject = $testDefinitions
-
         # Apply filters based on parameter sets
         $params = @{
             TestDefinitions       = $testDefinitions
@@ -256,17 +239,14 @@ function Invoke-M365SecurityAudit {
         # Initialize a collection to hold failed test details
         $script:FailedTests = [System.Collections.ArrayList]::new()
     } # End Begin
-
     Process {
         $allAuditResults = [System.Collections.ArrayList]::new() # Initialize a collection to hold all results
         # Dynamically dot-source the test scripts
         $testsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "tests"
         $testFiles = Get-ChildItem -Path $testsFolderPath -Filter "Test-*.ps1" |
         Where-Object { $testsToLoad -contains $_.BaseName }
-
         $totalTests = $testFiles.Count
         $currentTestIndex = 0
-
         # Establishing connections if required
         try {
             $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
@@ -279,8 +259,6 @@ function Invoke-M365SecurityAudit {
             Write-Host "Connection execution aborted: $_" -ForegroundColor Red
             break
         }
-
-
         try {
             Write-Host "A total of $($totalTests) tests were selected to run..." -ForegroundColor DarkMagenta
             # Import the test functions
@@ -297,7 +275,6 @@ function Invoke-M365SecurityAudit {
                     $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
                 }
             }
-
             $currentTestIndex = 0
             # Execute each test function from the prepared list
             foreach ($testFunction in $testFiles) {
@@ -330,7 +307,6 @@ function Invoke-M365SecurityAudit {
             # Return all collected audit results
             # Define the test numbers to check
             $TestNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-
             # Check for large details in the audit results
             $exceedingTests = Get-ExceededLengthResultDetail -AuditResults $allAuditResults -TestNumbersToCheck $TestNumbersToCheck -ReturnExceedingTestsOnly -DetailsLengthLimit 30000
             if ($exceedingTests.Count -gt 0) {
@@ -342,6 +318,3 @@ function Invoke-M365SecurityAudit {
         }
     }
 }
-
-
-
