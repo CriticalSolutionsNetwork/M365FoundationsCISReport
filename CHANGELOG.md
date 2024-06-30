@@ -6,7 +6,13 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Fixed
 
-- Fixed parameter validation for new parameters in `Invoke-M365SecurityAudit` function.
+- Formatting for MgGraph tests.
+
+## [0.1.20] - 2024-06-30
+
+### Fixed
+
+- Fixed parameter validation for new parameters in `Invoke-M365SecurityAudit` function
 
 ## [0.1.19] - 2024-06-30
 

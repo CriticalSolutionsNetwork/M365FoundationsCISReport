@@ -42,10 +42,12 @@ function Get-CISMgOutput {
         switch ($rec) {
             '1.1.1' {
                 # 1.1.1
+                # Test-AdministrativeAccountCompliance
                 $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
                 return $AdminRoleAssignmentsAndUsers
             }
             '1.1.3' {
+                # Test-GlobalAdminsCount
                 # Step: Retrieve global admin role
                 $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
                 # Step: Retrieve global admin members
@@ -53,6 +55,7 @@ function Get-CISMgOutput {
                 return $globalAdmins
             }
             '1.2.1' {
+                # Test-ManagedApprovedPublicGroups
                 $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
                 return $allGroups
             }
@@ -67,16 +70,19 @@ function Get-CISMgOutput {
                 return $domains
             }
             '5.1.2.3' {
+                # Test-RestrictTenantCreation
                 # Retrieve the tenant creation policy
                 $tenantCreationPolicy = (Get-MgPolicyAuthorizationPolicy).DefaultUserRolePermissions | Select-Object AllowedToCreateTenants
                 return $tenantCreationPolicy
             }
             '5.1.8.1' {
+                # Test-PasswordHashSync
                 # Retrieve password hash sync status (Condition A and C)
                 $passwordHashSync = Get-MgOrganization | Select-Object -ExpandProperty OnPremisesSyncEnabled
                 return $passwordHashSync
             }
             '6.1.2' {
+                # Test-MailboxAuditingE3
                 $tenantSkus = Get-MgSubscribedSku -All
                 $e3SkuPartNumber = "SPE_E3"
                 $founde3Sku = $tenantSkus | Where-Object { $_.SkuPartNumber -eq $e3SkuPartNumber }
@@ -89,6 +95,7 @@ function Get-CISMgOutput {
                 }
             }
             '6.1.3' {
+                # Test-MailboxAuditingE5
                 $tenantSkus = Get-MgSubscribedSku -All
                 $e5SkuPartNumber = "SPE_E5"
                 $founde5Sku = $tenantSkus | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
