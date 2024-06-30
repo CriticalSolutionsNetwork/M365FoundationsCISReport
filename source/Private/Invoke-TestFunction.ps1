@@ -3,9 +3,12 @@ function Invoke-TestFunction {
     param (
         [Parameter(Mandatory = $true)]
         [PSObject]$FunctionFile,
-
         [Parameter(Mandatory = $false)]
-        [string]$DomainName
+        [string]$DomainName,
+        [Parameter(Mandatory = $false)]
+        [string[]]$ApprovedCloudStorageProviders,
+        [Parameter(Mandatory = $false)]
+        [string[]]$ApprovedFederatedDomains
     )
 
     $functionName = $FunctionFile.BaseName
@@ -16,7 +19,12 @@ function Invoke-TestFunction {
     if ('DomainName' -in $functionCmd.Parameters.Keys) {
         $paramList.DomainName = $DomainName
     }
-
+    if ('ApprovedCloudStorageProviders' -in $functionCmd.Parameters.Keys) {
+        $paramList.ApprovedCloudStorageProviders = $ApprovedCloudStorageProviders
+    }
+    if ('ApprovedFederatedDomains' -in $functionCmd.Parameters.Keys) {
+        $paramList.ApprovedFederatedDomains = $ApprovedFederatedDomains
+    }
     # Use splatting to pass parameters
     Write-Verbose "Running $functionName..."
     try {

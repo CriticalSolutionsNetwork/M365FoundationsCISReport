@@ -49,6 +49,7 @@ function Get-CISMSTeamsOutput {
 
                 # Assuming that 'approvedProviders' is a list of approved cloud storage service names
                 # This list must be defined according to your organization's approved cloud storage services
+                # Add option for approved providers.
                 $clientConfig = Get-CsTeamsClientConfiguration
                 return $clientConfig
             }
@@ -91,9 +92,29 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AllowTeamsConsumer` setting is not `False`.
                 #   - Condition B: The `AllowPublicUsers` setting is not `False`.
                 #   - Condition C: The `AllowFederatedUsers` setting is `True` and the `AllowedDomains` contains unauthorized domain names or is not configured correctly.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+                # $externalAccessConfig Mock Object
+                <#
+                    $externalAccessConfig = [PSCustomObject]@{
+                        Identity                                    = 'Global'
+                        AllowedDomains                              = 'AllowAllKnownDomains'
+                        BlockedDomains                              = @()
+                        AllowFederatedUsers                         = $true
+                        AllowPublicUsers                            = $true
+                        AllowTeamsConsumer                          = $true
+                        AllowTeamsConsumerInbound                   = $true
+                    }
+                    $ApprovedFederatedDomains = @('msn.com', 'google.com')
+                    $externalAccessConfig = [PSCustomObject]@{
+                        Identity                                    = 'Global'
+                        AllowedDomains                              = @('msn.com', 'google.com')
+                        BlockedDomains                              = @()
+                        AllowFederatedUsers                         = $true
+                        AllowPublicUsers                            = $false
+                        AllowTeamsConsumer                          = $false
+                        AllowTeamsConsumerInbound                   = $true
+                    }
+                #>
                 $externalAccessConfig = Get-CsTenantFederationConfiguration
                 return $externalAccessConfig
             }
@@ -114,9 +135,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: `AllowAnonymousUsersToJoinMeeting` is not set to `False`.
                 #   - Condition B: Verification using the UI shows that `Anonymous users can join a meeting` is not set to `Off` in the Global meeting policy.
                 #   - Condition C: PowerShell command output indicates that anonymous users are allowed to join meetings.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+                # $teamsMeetingPolicy Mock Object
+                <#
+                    $teamsMeetingPolicy = [PSCustomObject]@{
+                        AllowAnonymousUsersToJoinMeeting            = $true
+                    }
+                #>
                 $teamsMeetingPolicy = Get-CsTeamsMeetingPolicy -Identity Global
                 return $teamsMeetingPolicy
             }
@@ -137,9 +162,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AllowAnonymousUsersToStartMeeting` setting in the Teams admin center is not set to `False`.
                 #   - Condition B: The setting for anonymous users and dial-in callers starting a meeting allows them to bypass the lobby.
                 #   - Condition C: Verification using the UI indicates that the setting `Anonymous users and dial-in callers can start a meeting` is not set to `Off`.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
+                # $CsTeamsMeetingPolicyAnonymous Mock Object
+                <#
+                    $CsTeamsMeetingPolicyAnonymous = [PSCustomObject]@{
+                        AllowAnonymousUsersToStartMeeting           = $true
+                    }
+                #>
                 # Retrieve the Teams meeting policy for the global scope and check if anonymous users can start meetings
                 $CsTeamsMeetingPolicyAnonymous = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowAnonymousUsersToStartMeeting
                 return $CsTeamsMeetingPolicyAnonymous
@@ -161,10 +190,14 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AutoAdmittedUsers` setting in the Teams meeting policy is not set to `EveryoneInCompanyExcludingGuests`.
                 #   - Condition B: The setting for "Who can bypass the lobby" is not configured to "People in my org" using the UI.
                 #   - Condition C: Verification using the Microsoft Teams admin center indicates that the meeting join & lobby settings are not configured as recommended.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
                 # Retrieve the Teams meeting policy for lobby bypass settings
+                # $CsTeamsMeetingPolicyLobby Mock Object
+                <#
+                    $CsTeamsMeetingPolicyLobby = [PSCustomObject]@{
+                        AutoAdmittedUsers           = "OrganizerOnly"
+                    }
+                #>
                 $CsTeamsMeetingPolicyLobby = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AutoAdmittedUsers
                 return $CsTeamsMeetingPolicyLobby
             }
@@ -185,8 +218,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AllowPSTNUsersToBypassLobby` setting in the Global Teams meeting policy is not set to `False`.
                 #   - Condition B: Verification using the UI in the Microsoft Teams admin center shows that "People dialing in can't bypass the lobby" is not set to `Off`.
                 #   - Condition C: Individuals who dial in by phone are able to join the meeting directly without waiting in the lobby.
-
                 # Retrieve Teams meeting policy for PSTN users
+                # $CsTeamsMeetingPolicyPSTN Mock Object
+                <#
+                    $CsTeamsMeetingPolicyPSTN = [PSCustomObject]@{
+                        AllowPSTNUsersToBypassLobby           = $true
+                    }
+                #>
                 $CsTeamsMeetingPolicyPSTN = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowPSTNUsersToBypassLobby
                 return $CsTeamsMeetingPolicyPSTN
             }
@@ -207,8 +245,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `MeetingChatEnabledType` setting in Teams is not set to `EnabledExceptAnonymous`.
                 #   - Condition B: The setting for meeting chat allows chat for anonymous users.
                 #   - Condition C: Verification using the Teams Admin Center indicates that the meeting chat settings are not configured as recommended.
-
                 # Retrieve the Teams meeting policy for meeting chat
+                # $CsTeamsMeetingPolicyChat Mock Object
+                <#
+                    $CsTeamsMeetingPolicyChat = [PSCustomObject]@{
+                        MeetingChatEnabledType           = "Enabled"
+                    }
+                #>
                 $CsTeamsMeetingPolicyChat = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property MeetingChatEnabledType
                 return $CsTeamsMeetingPolicyChat
             }
@@ -229,8 +272,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `DesignatedPresenterRoleMode` setting in the Teams meeting policy is not set to `OrganizerOnlyUserOverride`.
                 #   - Condition B: Verification using the Teams admin center indicates that the setting "Who can present" is not configured to "Only organizers and co-organizers".
                 #   - Condition C: Verification using PowerShell indicates that the `DesignatedPresenterRoleMode` is not set to `OrganizerOnlyUserOverride`.
-
                 # Retrieve the Teams meeting policy for presenters
+                # $CsTeamsMeetingPolicyPresenters Mock Object
+                <#
+                    $CsTeamsMeetingPolicyPresenters = [PSCustomObject]@{
+                        DesignatedPresenterRoleMode           = "Enabled"
+                    }
+                #>
                 $CsTeamsMeetingPolicyPresenters = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property DesignatedPresenterRoleMode
                 return $CsTeamsMeetingPolicyPresenters
             }
@@ -251,17 +299,27 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AllowExternalParticipantGiveRequestControl` setting in Teams is not set to `False`.
                 #   - Condition B: The setting is verified through the Microsoft Teams admin center or via PowerShell command.
                 #   - Condition C: Verification using the UI indicates that external participants can give or request control.
-
                 # Retrieve Teams meeting policy for external participant control
+                # $CsTeamsMeetingPolicyControl Mock Object
+                <#
+                    $CsTeamsMeetingPolicyControl = [PSCustomObject]@{
+                        AllowExternalParticipantGiveRequestControl           = $true
+                    }
+                #>
                 $CsTeamsMeetingPolicyControl = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AllowExternalParticipantGiveRequestControl
                 return $CsTeamsMeetingPolicyControl
             }
             '8.6.1' {
                 # Test-ReportSecurityInTeams.ps1
                 # 8.6.1 (L1) Ensure users can report security concerns in Teams
-
                 # Retrieve the necessary settings for Teams and Exchange Online
                 # Condition A: Ensure the 'Report a security concern' setting in the Teams admin center is set to 'On'.
+                # $CsTeamsMessagingPolicy Mock Object
+                <#
+                    $CsTeamsMessagingPolicy = [PSCustomObject]@{
+                        AllowSecurityEndUserReporting           = $true
+                    }
+                #>
                 $CsTeamsMessagingPolicy = Get-CsTeamsMessagingPolicy -Identity Global | Select-Object -Property AllowSecurityEndUserReporting
                 return $CsTeamsMessagingPolicy
             }

@@ -513,6 +513,19 @@ function Get-CISExoOutput {
                 # Retrieve the necessary settings for Teams and Exchange Online
                 # Condition B: Verify that 'Monitor reported messages in Microsoft Teams' is checked in the Microsoft 365 Defender portal.
                 # Condition C: Ensure the 'Send reported messages to' setting in the Microsoft 365 Defender portal is set to 'My reporting mailbox only' with the correct report email addresses.
+                # $ReportSubmissionPolicy Mock Object
+                <#
+                    $ReportSubmissionPolicy = [PSCustomObject]@{
+                        ReportJunkToCustomizedAddress               = $true
+                        ReportNotJunkToCustomizedAddress            = $true
+                        ReportPhishToCustomizedAddress              = $true
+                        ReportJunkAddresses                         = @('security@example.com')
+                        ReportNotJunkAddresses                      = @('security@example.com')
+                        ReportPhishAddresses                        = @('security@example.com')
+                        ReportChatMessageEnabled                    = $false
+                        ReportChatMessageToCustomizedAddressEnabled = $false
+                    }
+                #>
                 $ReportSubmissionPolicy = Get-ReportSubmissionPolicy | Select-Object -Property ReportJunkToCustomizedAddress, ReportNotJunkToCustomizedAddress, ReportPhishToCustomizedAddress, ReportJunkAddresses, ReportNotJunkAddresses, ReportPhishAddresses, ReportChatMessageEnabled, ReportChatMessageToCustomizedAddressEnabled
                 return $ReportSubmissionPolicy
             }

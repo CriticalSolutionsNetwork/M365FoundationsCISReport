@@ -21,6 +21,10 @@
         Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.
     .PARAMETER SkipRecommendation
         Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
+    .PARAMETER ApprovedCloudStorageProviders
+        Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
+    .PARAMETER ApprovedFederatedDomains
+        Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.
     .PARAMETER DoNotConnect
         If specified, the cmdlet will not establish a connection to Microsoft 365 services.
     .PARAMETER DoNotDisconnect
@@ -129,31 +133,31 @@ function Invoke-M365SecurityAudit {
         [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
         [string]$TenantAdminUrl,
 
-        [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration policy when '1.3.1' is included in the tests to be run. The domain name of your organization, e.g., 'example.com'.")]
+        [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration and DKIM Config for tests '1.3.1' and 2.1.9. The domain name of your organization, e.g., 'example.com'.")]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
         [string]$DomainName,
 
         # E-Level with optional ProfileLevel selection
-        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter', HelpMessage = "Specifies the E-Level (E3 or E5) for the audit.")]
         [ValidateSet('E3', 'E5')]
         [string]$ELevel,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter', HelpMessage = "Specifies the profile level (L1 or L2) for the audit.")]
         [ValidateSet('L1', 'L2')]
         [string]$ProfileLevel,
 
         # IG Filters, one at a time
-        [Parameter(Mandatory = $true, ParameterSetName = 'IG1Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG1Filter', HelpMessage = "Includes tests where IG1 is true.")]
         [switch]$IncludeIG1,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'IG2Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG2Filter', HelpMessage = "Includes tests where IG2 is true.")]
         [switch]$IncludeIG2,
 
-        [Parameter(Mandatory = $true, ParameterSetName = 'IG3Filter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'IG3Filter', HelpMessage = "Includes tests where IG3 is true.")]
         [switch]$IncludeIG3,
 
         # Inclusion of specific recommendation numbers
-        [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter', HelpMessage = "Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.")]
         [ValidateSet(
             '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
                 '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
@@ -166,7 +170,7 @@ function Invoke-M365SecurityAudit {
         [string[]]$IncludeRecommendation,
 
         # Exclusion of specific recommendation numbers
-        [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter', HelpMessage = "Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.")]
         [ValidateSet(
             '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
                 '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
@@ -179,12 +183,27 @@ function Invoke-M365SecurityAudit {
         [string[]]$SkipRecommendation,
 
         # Common parameters for all parameter sets
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.")]
+        [ValidateSet(
+            'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
+        )]
+        [string[]]$ApprovedCloudStorageProviders = @(),
+
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.")]
+        [string[]]$ApprovedFederatedDomains,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not establish a connection to Microsoft 365 services.")]
         [switch]$DoNotConnect,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not disconnect from Microsoft 365 services after execution.")]
         [switch]$DoNotDisconnect,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not check for the presence of required modules.")]
         [switch]$NoModuleCheck,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.")]
         [switch]$DoNotConfirmConnections
     )
-
     Begin {
         if ($script:MaximumFunctionCount -lt 8192) {
             $script:MaximumFunctionCount = 8192
@@ -286,7 +305,7 @@ function Invoke-M365SecurityAudit {
                 Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
                 $functionName = $testFunction.BaseName
                 if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName
+                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName -ApprovedCloudStorageProviders $ApprovedCloudStorageProviders -ApprovedFederatedDomains $ApprovedFederatedDomains
                     # Add the result to the collection
                     [void]$allAuditResults.Add($auditResult)
                 }

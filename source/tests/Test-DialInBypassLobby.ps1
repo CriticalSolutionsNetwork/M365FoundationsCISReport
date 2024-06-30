@@ -5,16 +5,14 @@ function Test-DialInBypassLobby {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.4"
+        Write-Verbose "Running Test-DialInBypassLobby for $recnum..."
     }
-
     process {
-
         try {
             # 8.5.4 (L1) Ensure users dialing in can't bypass the lobby
             #
@@ -31,11 +29,15 @@ function Test-DialInBypassLobby {
             #   - Condition A: The `AllowPSTNUsersToBypassLobby` setting in the Global Teams meeting policy is not set to `False`.
             #   - Condition B: Verification using the UI in the Microsoft Teams admin center shows that "People dialing in can't bypass the lobby" is not set to `Off`.
             #   - Condition C: Individuals who dial in by phone are able to join the meeting directly without waiting in the lobby.
-
             # Retrieve Teams meeting policy for PSTN users
+            # $CsTeamsMeetingPolicyPSTN Mock Object
+            <#
+                $CsTeamsMeetingPolicyPSTN = [PSCustomObject]@{
+                    AllowPSTNUsersToBypassLobby           = $true
+                }
+            #>
             $CsTeamsMeetingPolicyPSTN = Get-CISMSTeamsOutput -Rec $recnum
             $PSTNBypassDisabled = -not $CsTeamsMeetingPolicyPSTN.AllowPSTNUsersToBypassLobby
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $PSTNBypassDisabled) {
                 "Users dialing in can bypass the lobby"
@@ -43,14 +45,12 @@ function Test-DialInBypassLobby {
             else {
                 "N/A"
             }
-
             $details = if ($PSTNBypassDisabled) {
                 "AllowPSTNUsersToBypassLobby is set to False"
             }
             else {
                 "AllowPSTNUsersToBypassLobby is set to True"
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -66,7 +66,6 @@ function Test-DialInBypassLobby {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

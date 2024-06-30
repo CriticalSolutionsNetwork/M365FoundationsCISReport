@@ -5,14 +5,13 @@ function Test-NoAnonymousMeetingStart {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.2"
+        Write-Verbose "Running Test-NoAnonymousMeetingStart for $recnum..."
     }
-
     process {
         try {
             # 8.5.2 (L1) Ensure anonymous users and dial-in callers can't start a meeting
@@ -30,13 +29,10 @@ function Test-NoAnonymousMeetingStart {
             #   - Condition A: The `AllowAnonymousUsersToStartMeeting` setting in the Teams admin center is not set to `False`.
             #   - Condition B: The setting for anonymous users and dial-in callers starting a meeting allows them to bypass the lobby.
             #   - Condition C: Verification using the UI indicates that the setting `Anonymous users and dial-in callers can start a meeting` is not set to `Off`.
-
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
             # Retrieve the Teams meeting policy for the global scope and check if anonymous users can start meetings
             $CsTeamsMeetingPolicyAnonymous = Get-CISMSTeamsOutput -Rec $recnum
             $anonymousStartDisabled = -not $CsTeamsMeetingPolicyAnonymous.AllowAnonymousUsersToStartMeeting
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($anonymousStartDisabled) {
                 "N/A"
@@ -44,9 +40,7 @@ function Test-NoAnonymousMeetingStart {
             else {
                 "Anonymous users and dial-in callers can start a meeting" # Condition A and B
             }
-
             $details = "AllowAnonymousUsersToStartMeeting is set to $($CsTeamsMeetingPolicyAnonymous.AllowAnonymousUsersToStartMeeting)" # Condition C
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -62,7 +56,6 @@ function Test-NoAnonymousMeetingStart {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

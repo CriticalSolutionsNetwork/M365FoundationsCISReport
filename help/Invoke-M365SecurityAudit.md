@@ -14,47 +14,52 @@ Invokes a security audit for Microsoft 365 environments.
 
 ### Default (Default)
 ```
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-DoNotConnect] [-DoNotDisconnect]
- [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>]
+ [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
+ [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### ELevelFilter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -ELevel <String>
- -ProfileLevel <String> [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ -ProfileLevel <String> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>]
+ [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ### IG1Filter
 ```
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG1] [-DoNotConnect]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG1]
+ [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### IG2Filter
 ```
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG2] [-DoNotConnect]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG2]
+ [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### IG3Filter
 ```
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG3] [-DoNotConnect]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG3]
+ [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### RecFilter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeRecommendation <String[]>
- [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
+ [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### SkipRecFilter
 ```
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -SkipRecommendation <String[]>
- [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
+ [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -294,6 +299,36 @@ Parameter Sets: SkipRecFilter
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ApprovedCloudStorageProviders
+Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: @()
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ApprovedFederatedDomains
+Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
