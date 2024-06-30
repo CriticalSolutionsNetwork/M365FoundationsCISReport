@@ -4,6 +4,7 @@ function Test-EnableDKIM {
     param (
         # Aligned
         # Parameters can be added if needed
+        [string]$DomainName
     )
 
     begin {
@@ -37,9 +38,16 @@ function Test-EnableDKIM {
 
             # Retrieve DKIM configuration for all domains
             $dkimConfig = Get-CISExoOutput -Rec $recnum
-            $dkimResult = ($dkimConfig | ForEach-Object { $_.Enabled }) -notcontains $false
-            $dkimFailedDomains = $dkimConfig | Where-Object { -not $_.Enabled } | ForEach-Object { $_.Domain }
-
+            if (-not $DomainName) {
+                $dkimResult = ($dkimConfig | ForEach-Object { $_.Enabled }) -notcontains $false
+                $dkimFailedDomains = $dkimConfig | Where-Object { -not $_.Enabled } | ForEach-Object { $_.Domain }
+            }
+            else {
+                $dkimResult = ($dkimConfig | Where-Object { $_.Domain -eq $DomainName }).Enabled
+                if ($dkimResult -eq $false) {
+                    $dkimFailedDomains = $dkimConfig | Where-Object { $_.Domain -eq $DomainName } | ForEach-Object { $_.Domain }
+                }
+            }
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $dkimResult) {
                 "DKIM is not enabled for some domains"  # Condition A fail
@@ -47,21 +55,25 @@ function Test-EnableDKIM {
             else {
                 "N/A"
             }
-
+            $basedetails = "All domains have DKIM enabled"
             $details = if ($dkimResult) {
-                "All domains have DKIM enabled"  # Condition A pass
+                if ($DomainName) {
+                    "Domain: $DomainName; $basedetails"
+                }
+                else {
+                    $basedetails
+                }  # Condition A pass
             }
             else {
                 "DKIM not enabled for: $($dkimFailedDomains -join ', ')"  # Condition B fail
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec            = $recnum
-                Result         = $dkimResult
-                Status         = if ($dkimResult) { "Pass" } else { "Fail" }
-                Details        = $details
-                FailureReason  = $failureReasons
+                Rec           = $recnum
+                Result        = $dkimResult
+                Status        = if ($dkimResult) { "Pass" } else { "Fail" }
+                Details       = $details
+                FailureReason = $failureReasons
             }
             $auditResult = Initialize-CISAuditResult @params
         }
