@@ -5,14 +5,12 @@ function Test-TeamsExternalAccess {
         [Parameter(Mandatory = $false, HelpMessage = "Specifies the approved federated domains for the audit. Accepts an array of allowed domain names.")]
         [string[]]$ApprovedFederatedDomains
     )
-
     begin {
         # Dot source the class script if necessary
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.2.1"
     }
-
     process {
         try {
             # 8.2.1 (L1) Ensure 'external access' is restricted in the Teams admin center
@@ -23,7 +21,6 @@ function Test-TeamsExternalAccess {
             #   - Condition A: The `AllowTeamsConsumer` setting is `False`.
             #   - Condition B: The `AllowPublicUsers` setting is `False`.
             #   - Condition C: The `AllowFederatedUsers` setting is `False` or, if `True`, the `AllowedDomains` contains only authorized domain names.
-
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
             # $externalAccessConfig Mock Object
             <#
@@ -48,18 +45,15 @@ function Test-TeamsExternalAccess {
                 }
             #>
             $externalAccessConfig = Get-CISMSTeamsOutput -Rec $recnum
-
             # Testing
             #$externalAccessConfig.AllowedDomains = @("msn.com", "google.com")
             #$externalAccessConfig.AllowTeamsConsumer = $false
             #$externalAccessConfig.AllowPublicUsers = $false
             #$externalAccessConfig.AllowFederatedUsers = $true
             # The above is for testing and will be replaced with the actual values from the Teams PowerShell output in production.
-
             $allowedDomainsLimited = $false
             $allowedDomainsMatch = $false
             $invalidDomains = @()
-
             if ($externalAccessConfig.AllowFederatedUsers) {
                 if ($externalAccessConfig.AllowedDomains -ne 'AllowAllKnownDomains' -and $externalAccessConfig.AllowedDomains.Count -gt 0) {
                     $allowedDomainsLimited = $true
@@ -72,10 +66,8 @@ function Test-TeamsExternalAccess {
                     }
                 }
             }
-
             # Check if the configurations are as recommended
             $isCompliant = -not $externalAccessConfig.AllowTeamsConsumer -and -not $externalAccessConfig.AllowPublicUsers -and (-not $externalAccessConfig.AllowFederatedUsers -or ($allowedDomainsLimited -and $allowedDomainsMatch))
-
             # Create an instance of CISAuditResult and populate it
             $params = @{
                 Rec           = $recnum
@@ -91,7 +83,6 @@ function Test-TeamsExternalAccess {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return auditResult
         return $auditResult
