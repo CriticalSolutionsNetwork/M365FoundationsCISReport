@@ -23,6 +23,8 @@
         Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
     .PARAMETER ApprovedCloudStorageProviders
         Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
+    .PARAMETER ApprovedFederatedDomains
+        Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.
     .PARAMETER DoNotConnect
         If specified, the cmdlet will not establish a connection to Microsoft 365 services.
     .PARAMETER DoNotDisconnect
@@ -131,7 +133,7 @@ function Invoke-M365SecurityAudit {
         [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
         [string]$TenantAdminUrl,
 
-        [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration policy when '1.3.1' is included in the tests to be run. The domain name of your organization, e.g., 'example.com'.")]
+        [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration and DKIM Config for tests '1.3.1' and 2.1.9. The domain name of your organization, e.g., 'example.com'.")]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
         [string]$DomainName,
 
@@ -186,6 +188,9 @@ function Invoke-M365SecurityAudit {
             'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
         )]
         [string[]]$ApprovedCloudStorageProviders = @(),
+
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.")]
+        [string[]]$ApprovedFederatedDomains,
 
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not establish a connection to Microsoft 365 services.")]
         [switch]$DoNotConnect,
@@ -300,7 +305,7 @@ function Invoke-M365SecurityAudit {
                 Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
                 $functionName = $testFunction.BaseName
                 if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName -ApprovedCloudStorageProviders $ApprovedCloudStorageProviders
+                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName -ApprovedCloudStorageProviders $ApprovedCloudStorageProviders -ApprovedFederatedDomains $ApprovedFederatedDomains
                     # Add the result to the collection
                     [void]$allAuditResults.Add($auditResult)
                 }
