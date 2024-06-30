@@ -164,7 +164,7 @@ function Get-CISMSTeamsOutput {
                 #   - Condition B: The setting for anonymous users and dial-in callers starting a meeting allows them to bypass the lobby.
                 #   - Condition C: Verification using the UI indicates that the setting `Anonymous users and dial-in callers can start a meeting` is not set to `Off`.
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-                # $teamsMeetingPolicy Mock Object
+                # $CsTeamsMeetingPolicyAnonymous Mock Object
                 <#
                     $CsTeamsMeetingPolicyAnonymous = [PSCustomObject]@{
                         AllowAnonymousUsersToStartMeeting           = $true
@@ -191,10 +191,14 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `AutoAdmittedUsers` setting in the Teams meeting policy is not set to `EveryoneInCompanyExcludingGuests`.
                 #   - Condition B: The setting for "Who can bypass the lobby" is not configured to "People in my org" using the UI.
                 #   - Condition C: Verification using the Microsoft Teams admin center indicates that the meeting join & lobby settings are not configured as recommended.
-
                 # Connect to Teams PowerShell using Connect-MicrosoftTeams
-
                 # Retrieve the Teams meeting policy for lobby bypass settings
+                # $CsTeamsMeetingPolicyLobby Mock Object
+                <#
+                    $CsTeamsMeetingPolicyLobby = [PSCustomObject]@{
+                        AutoAdmittedUsers           = "OrganizerOnly"
+                    }
+                #>
                 $CsTeamsMeetingPolicyLobby = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property AutoAdmittedUsers
                 return $CsTeamsMeetingPolicyLobby
             }
