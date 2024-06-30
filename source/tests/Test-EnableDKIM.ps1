@@ -6,23 +6,19 @@ function Test-EnableDKIM {
         # Parameters can be added if needed
         [string]$DomainName
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "2.1.9"
-
+        Write-Verbose "Running Test-EnableDKIM for $recnum..."
         <#
         Conditions for 2.1.9 (L1) Ensure DKIM is enabled for all Exchange Online Domains (Automated)
-
         Validate test for a pass:
         - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
         - Specific conditions to check:
           - Condition A: DKIM is enabled for all Exchange Online domains in the Microsoft 365 security center.
           - Condition B: Using the Exchange Online PowerShell Module, the `CnameConfiguration.Enabled` property for each domain is set to `True`.
-
         Validate test for a fail:
         - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
         - Specific conditions to check:
@@ -30,12 +26,9 @@ function Test-EnableDKIM {
           - Condition B: Using the Exchange Online PowerShell Module, the `CnameConfiguration.Enabled` property for one or more domains is set to `False`.
         #>
     }
-
     process {
-
         try {
             # 2.1.9 (L1) Ensure DKIM is enabled for all Exchange Online Domains
-
             # Retrieve DKIM configuration for all domains
             $dkimConfig = Get-CISExoOutput -Rec $recnum
             if (-not $DomainName) {
@@ -82,7 +75,6 @@ function Test-EnableDKIM {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult
