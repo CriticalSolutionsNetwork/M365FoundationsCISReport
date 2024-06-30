@@ -6,6 +6,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Added `ApprovedCloudStorageProviders` parameter to `Invoke-M365SecurityAudit` to allow for testing of approved cloud storage providers for 8.1.1.
+
+## [0.1.18] - 2024-06-29
+
+### Added
+
 - Added `Get-PhishPolicyDetail` and `Test-PhishPolicyCompliance` private functions to help test for phishing policy compliance.
 
 ### Fixed
@@ -15,8 +21,6 @@ The format is based on and uses the types of changes according to [Keep a Change
 #### Changed
 
 - Changed main function parameter for Domain to `DomainName`.
-
-
 
 ## [0.1.17] - 2024-06-28
 
