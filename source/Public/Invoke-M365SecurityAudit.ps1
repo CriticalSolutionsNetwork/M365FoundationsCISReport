@@ -5,7 +5,7 @@
         The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters. It allows auditing of various configurations and settings within a Microsoft 365 environment, such as compliance with CIS benchmarks.
     .PARAMETER TenantAdminUrl
         The URL of the tenant admin. If not specified, none of the SharePoint Online tests will run.
-    .PARAMETER M365DomainForPWPolicyTest
+    .PARAMETER DomainName
         The domain name of the Microsoft 365 environment to test. This parameter is not mandatory and by default it will pass/fail all found domains as a group if a specific domain is not specified.
     .PARAMETER ELevel
         Specifies the E-Level (E3 or E5) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter.
@@ -46,7 +46,7 @@
                         user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
         FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -ELevel "E5" -ProfileLevel "L1"
+        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ELevel "E5" -ProfileLevel "L1"
 
         Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
         Output:
@@ -62,7 +62,7 @@
                         user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
         FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -IncludeIG1
+        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -IncludeIG1
 
         Performs an audit including all tests where IG1 is true.
         Output:
@@ -78,7 +78,7 @@
                         user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
         FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
+        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
         Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
         Output:
         Status      : Fail
@@ -93,7 +93,7 @@
                         user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
         FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
-        PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -M365DomainForPWPolicyTest "contoso.com"
+        PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
         PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
 
         Captures the audit results into a variable and exports them to a CSV file.
@@ -131,7 +131,7 @@ function Invoke-M365SecurityAudit {
 
         [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration policy when '1.3.1' is included in the tests to be run. The domain name of your organization, e.g., 'example.com'.")]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
-        [string]$M365DomainForPWPolicyTest,
+        [string]$DomainName,
 
         # E-Level with optional ProfileLevel selection
         [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter')]
@@ -286,7 +286,7 @@ function Invoke-M365SecurityAudit {
                 Write-Progress -Activity "Executing Tests" -Status "Executing $($currentTestIndex) of $($totalTests): $($testFunction.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
                 $functionName = $testFunction.BaseName
                 if ($PSCmdlet.ShouldProcess($functionName, "Execute test")) {
-                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $M365DomainForPWPolicyTest
+                    $auditResult = Invoke-TestFunction -FunctionFile $testFunction -DomainName $DomainName
                     # Add the result to the collection
                     [void]$allAuditResults.Add($auditResult)
                 }
