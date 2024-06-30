@@ -5,14 +5,12 @@ function Test-OrganizersPresent {
         # Aligned
         # Parameters can be defined here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "8.5.6"
     }
-
     process {
         try {
             # 8.5.6 (L2) Ensure only organizers and co-organizers can present
@@ -30,26 +28,28 @@ function Test-OrganizersPresent {
             #   - Condition A: The `DesignatedPresenterRoleMode` setting in the Teams meeting policy is not set to `OrganizerOnlyUserOverride`.
             #   - Condition B: Verification using the Teams admin center indicates that the setting "Who can present" is not configured to "Only organizers and co-organizers".
             #   - Condition C: Verification using PowerShell indicates that the `DesignatedPresenterRoleMode` is not set to `OrganizerOnlyUserOverride`.
-
             # Retrieve the Teams meeting policy for presenters
+            # $CsTeamsMeetingPolicyPresenters Mock Object
+            <#
+                $CsTeamsMeetingPolicyPresenters = [PSCustomObject]@{
+                    DesignatedPresenterRoleMode           = "Enabled"
+                }
+            #>
             $CsTeamsMeetingPolicyPresenters = Get-CISMSTeamsOutput -Rec $recnum
             $presenterRoleRestricted = $CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode -eq 'OrganizerOnlyUserOverride'
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $presenterRoleRestricted) {
-                "Others besides organizers and co-organizers can present"
+                "Others besides organizers and co-organizers can present. Use the following command to remediate:`nSet-CsTeamsMeetingPolicy -Identity Global -DesignatedPresenterRoleMode `"OrganizerOnlyUserOverride`""
             }
             else {
                 "N/A"
             }
-
             $details = if ($presenterRoleRestricted) {
                 "Only organizers and co-organizers can present."
             }
             else {
                 "DesignatedPresenterRoleMode is set to $($CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode)"
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -65,7 +65,6 @@ function Test-OrganizersPresent {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

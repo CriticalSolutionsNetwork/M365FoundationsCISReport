@@ -273,8 +273,13 @@ function Get-CISMSTeamsOutput {
                 #   - Condition A: The `DesignatedPresenterRoleMode` setting in the Teams meeting policy is not set to `OrganizerOnlyUserOverride`.
                 #   - Condition B: Verification using the Teams admin center indicates that the setting "Who can present" is not configured to "Only organizers and co-organizers".
                 #   - Condition C: Verification using PowerShell indicates that the `DesignatedPresenterRoleMode` is not set to `OrganizerOnlyUserOverride`.
-
                 # Retrieve the Teams meeting policy for presenters
+                # $CsTeamsMeetingPolicyPresenters Mock Object
+                <#
+                    $CsTeamsMeetingPolicyPresenters = [PSCustomObject]@{
+                        DesignatedPresenterRoleMode           = "Enabled"
+                    }
+                #>
                 $CsTeamsMeetingPolicyPresenters = Get-CsTeamsMeetingPolicy -Identity Global | Select-Object -Property DesignatedPresenterRoleMode
                 return $CsTeamsMeetingPolicyPresenters
             }
