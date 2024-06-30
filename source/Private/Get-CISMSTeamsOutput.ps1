@@ -312,9 +312,14 @@ function Get-CISMSTeamsOutput {
             '8.6.1' {
                 # Test-ReportSecurityInTeams.ps1
                 # 8.6.1 (L1) Ensure users can report security concerns in Teams
-
                 # Retrieve the necessary settings for Teams and Exchange Online
                 # Condition A: Ensure the 'Report a security concern' setting in the Teams admin center is set to 'On'.
+                # $CsTeamsMessagingPolicy Mock Object
+                <#
+                    $CsTeamsMessagingPolicy = [PSCustomObject]@{
+                        AllowSecurityEndUserReporting           = $true
+                    }
+                #>
                 $CsTeamsMessagingPolicy = Get-CsTeamsMessagingPolicy -Identity Global | Select-Object -Property AllowSecurityEndUserReporting
                 return $CsTeamsMessagingPolicy
             }
