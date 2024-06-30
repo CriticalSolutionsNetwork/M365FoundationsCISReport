@@ -14,8 +14,7 @@ Grants Microsoft Graph permissions for an auditor.
 
 ```
 Grant-M365SecurityAuditConsent [-UserPrincipalNameForConsent] <String> [-SkipGraphConnection]
- [-SkipModuleCheck] [-SuppressRevertOutput] [-DoNotDisconnect] [-ProgressAction <ActionPreference>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+ [-SkipModuleCheck] [-SuppressRevertOutput] [-DoNotDisconnect] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -41,33 +40,18 @@ Grants Microsoft Graph permissions to user@example.com, skipping the connection 
 
 ## PARAMETERS
 
-### -DoNotDisconnect
-If specified, does not disconnect from Microsoft Graph after granting consent.
+### -UserPrincipalNameForConsent
+Specify the UPN of the user to grant consent for.
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-{{ Fill ProgressAction Description }}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
+Required: True
+Position: 1
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByPropertyName, ByValue)
 Accept wildcard characters: False
 ```
 
@@ -116,32 +100,17 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -UserPrincipalNameForConsent
-Specify the UPN of the user to grant consent for.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: True (ByPropertyName, ByValue)
-Accept wildcard characters: False
-```
-
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
+### -DoNotDisconnect
+If specified, does not disconnect from Microsoft Graph after granting consent.
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases: cf
+Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -154,6 +123,21 @@ The cmdlet is not run.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
 
 Required: False
 Position: Named
