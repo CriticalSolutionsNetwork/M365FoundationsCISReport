@@ -27,17 +27,18 @@ function Test-TeamsExternalFileSharing {
             # Assuming that 'approvedProviders' is a list of approved cloud storage service names
             # This list must be defined according to your organization's approved cloud storage services
             $clientConfig = Get-CISMSTeamsOutput -Rec $recnum
-            $approvedProviders = @("AllowDropBox", "AllowBox", "AllowGoogleDrive", "AllowShareFile", "AllowEgnyte")
+            $unapprovedProviders = @("AllowDropBox", "AllowBox", "AllowGoogleDrive", "AllowShareFile", "AllowEgnyte")
             $isCompliant = $true
             $nonCompliantProviders = @()
 
-            foreach ($provider in $approvedProviders) {
-                if (-not $clientConfig.$provider) {
+            foreach ($provider in $unapprovedProviders) {
+                if ($clientConfig.$provider) {
                     $isCompliant = $false
                     $nonCompliantProviders += $provider
                 }
             }
 
+            # Create an instance of CISAuditResult and populate it
             # Create an instance of CISAuditResult and populate it
             $params = @{
                 Rec           = $recnum
