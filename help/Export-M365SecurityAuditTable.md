@@ -190,10 +190,11 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### [CISAuditResult[]], [string]
+### [CISAuditResult[]] - An array of CISAuditResult objects.
+### [string] - A path to a CSV file.
 ## OUTPUTS
 
-### [PSCustomObject]
+### [PSCustomObject] - A custom object containing the path to the zip file and its hash.
 ## NOTES
 
 ## RELATED LINKS

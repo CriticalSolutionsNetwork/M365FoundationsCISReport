@@ -277,7 +277,15 @@
     <command:inputTypes>
       <command:inputType>
         <dev:type>
-          <maml:name>[CISAuditResult[]], [string]</maml:name>
+          <maml:name>[CISAuditResult[]] - An array of CISAuditResult objects.</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <maml:name>[string] - A path to a CSV file.</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -287,7 +295,7 @@
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>[PSCustomObject]</maml:name>
+          <maml:name>[PSCustomObject] - A custom object containing the path to the zip file and its hash.</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
