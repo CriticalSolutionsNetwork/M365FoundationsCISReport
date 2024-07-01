@@ -4,7 +4,7 @@ Import-Module .\output\module\M365FoundationsCISReport\*\*.psd1
 
 
 <#
-    $ver = "v0.1.18"
+    $ver = "v0.1.22"
     git checkout main
     git pull origin main
     git tag -a $ver -m "Release version $ver refactor Update"
@@ -58,7 +58,6 @@ Set-Secret -Name "GitHubToken" -Vault ModuleBuildCreds
 
 $GalleryApiToken = Get-Secret -Name "GalleryApiToken" -Vault ModuleBuildCreds -AsPlainText
 $GitHubToken = Get-Secret -Name "GitHubToken" -Vault ModuleBuildCreds -AsPlainText
-
 
 $GalleryApiToken
 $GitHubToken
