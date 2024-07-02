@@ -40,12 +40,24 @@ function Get-CISSpoOutput {
         switch ($Rec) {
             '7.2.1' {
                 # Test-ModernAuthSharePoint.ps1
+                # $SPOTenant Mock Object
+                <#
+                    $SPOTenant = [PSCustomObject]@{
+                        LegacyAuthProtocolsEnabled           = $true
+                    }
+                #>
                 $SPOTenant = Get-SPOTenant | Select-Object -Property LegacyAuthProtocolsEnabled
                 return $SPOTenant
             }
             '7.2.2' {
                 # Test-SharePointAADB2B.ps1
                 # 7.2.2 (L1) Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled
+                # $SPOTenantAzureADB2B Mock Object
+                <#
+                    $SPOTenantAzureADB2B = [PSCustomObject]@{
+                        EnableAzureADB2BIntegration           = $false
+                    }
+                #>
                 $SPOTenantAzureADB2B = Get-SPOTenant | Select-Object EnableAzureADB2BIntegration
                 return $SPOTenantAzureADB2B
             }
@@ -53,17 +65,36 @@ function Get-CISSpoOutput {
                 # Test-RestrictExternalSharing.ps1
                 # 7.2.3 (L1) Ensure external content sharing is restricted
                 # Retrieve the SharingCapability setting for the SharePoint tenant
+                # $SPOTenantSharingCapability Mock Object
+                <#
+                    $SPOTenantSharingCapability = [PSCustomObject]@{
+                        SharingCapability           = "ExternalUserAndGuestSharing"
+                    }
+                #>
                 $SPOTenantSharingCapability = Get-SPOTenant | Select-Object SharingCapability
                 return $SPOTenantSharingCapability
             }
             '7.2.4' {
                 # Test-OneDriveContentRestrictions.ps1
+                # 7.2.4 (L2) Ensure OneDrive content sharing is restricted
+                # $SPOTenant Mock Object
+                <#
+                    $SPOTenant = [PSCustomObject]@{
+                        OneDriveSharingCapability           = "ExternalUserAndGuestSharing"
+                    }
+                #>
                 $SPOTenant = Get-SPOTenant | Select-Object OneDriveSharingCapability
                 return $SPOTenant
             }
             '7.2.5' {
                 # Test-SharePointGuestsItemSharing.ps1
                 # 7.2.5 (L2) Ensure that SharePoint guest users cannot share items they don't own
+                # $SPOTenant Mock Object
+                <#
+                    $SPOTenant = [PSCustomObject]@{
+                        PreventExternalUsersFromResharing           = $false
+                    }
+                #>
                 $SPOTenant = Get-SPOTenant | Select-Object PreventExternalUsersFromResharing
                 return $SPOTenant
             }

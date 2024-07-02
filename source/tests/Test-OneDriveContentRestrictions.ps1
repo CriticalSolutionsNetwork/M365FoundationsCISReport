@@ -5,7 +5,6 @@ function Test-OneDriveContentRestrictions {
         # Aligned
         # Define your parameters here
     )
-
     begin {
         # 7.2.4 (L2) Ensure OneDrive content sharing is restricted
         #
@@ -22,36 +21,38 @@ function Test-OneDriveContentRestrictions {
         #   - Condition A: The OneDriveSharingCapability setting is not configured to "Disabled" using the PowerShell cmdlet `Get-SPOTenant | fl OneDriveSharingCapability`.
         #   - Condition B: The OneDriveSharingCapability is not set to "Only people in your organization" in the SharePoint admin center under Policies > Sharing > OneDrive.
         #   - Condition C: OneDrive content sharing is more permissive than SharePoint content sharing.
-
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "7.2.4"
+        Write-Verbose "Running Test-OneDriveContentRestrictions for $recnum..."
     }
-
     process {
         try {
             # 7.2.4 (L2) Ensure OneDrive content sharing is restricted
-
             # Retrieve OneDrive sharing capability settings
+            # $SPOTenant Mock Object
+            <#
+                $SPOTenant = [PSCustomObject]@{
+                    OneDriveSharingCapability           = "ExternalUserAndGuestSharing"
+                }
+            #>
             $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $isOneDriveSharingRestricted = $SPOTenant.OneDriveSharingCapability -eq 'Disabled'
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isOneDriveSharingRestricted) {
-                "OneDrive content sharing is not restricted to 'Disabled'. Current setting: $($SPOTenant.OneDriveSharingCapability)"
+                "OneDrive content sharing is not restricted to 'Disabled'. To remediate this setting, use the Set-SPOTenant command.`n`n" + `
+                "Set-SPOTenant -OneDriveSharingCapability Disabled"
             }
             else {
                 "N/A"
             }
-
             $details = if ($isOneDriveSharingRestricted) {
                 "OneDrive content sharing is restricted."
             }
             else {
                 "OneDriveSharingCapability: $($SPOTenant.OneDriveSharingCapability)"
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -67,7 +68,6 @@ function Test-OneDriveContentRestrictions {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return auditResult
         return $auditResult

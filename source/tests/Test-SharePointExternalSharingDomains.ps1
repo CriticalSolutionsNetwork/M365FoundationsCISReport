@@ -5,14 +5,12 @@ function Test-SharePointExternalSharingDomains {
         # Aligned
         # Define your parameters here
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "7.2.6"
-
+        Write-Verbose "Running Test-SharePointExternalSharingDomains for $recnum..."
         # Conditions for 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
         #
         # Validate test for a pass:
@@ -29,13 +27,18 @@ function Test-SharePointExternalSharingDomains {
         #   - Condition B: The "SharingDomainRestrictionMode" is not set to "AllowList" using PowerShell.
         #   - Condition C: The "SharingAllowedDomainList" does not contain the domains trusted by the organization for external sharing.
     }
-
     process {
         try {
             # 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
             $SPOTenant = Get-CISSpoOutput -Rec $recnum
+            # $SPOTenant Mock Object
+            <#
+                $SPOTenant = [PSCustomObject]@{
+                    SharingDomainRestrictionMode           = "AllowList"
+                    SharingAllowedDomainList                = "domain1.com", "domain2.com"
+                }
+            #>
             $isDomainRestrictionConfigured = $SPOTenant.SharingDomainRestrictionMode -eq 'AllowList'
-
             # Populate the auditResult object with the required properties
             $params = @{
                 Rec           = $recnum
@@ -51,7 +54,6 @@ function Test-SharePointExternalSharingDomains {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return auditResult
         return $auditResult
