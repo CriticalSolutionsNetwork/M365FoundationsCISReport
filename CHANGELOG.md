@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Added hash and compress steps to `Export-M365SecurityAuditTable` function.
+
+## [0.1.21] - 2024-07-01
+
 ### Fixed
 
 - SPO tests formatting and output.

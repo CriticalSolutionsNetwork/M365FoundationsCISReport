@@ -221,17 +221,21 @@ function Export-M365SecurityAuditTable {
             }
             $fileHashes | Set-Content -Path $hashFilePath
             $createdFiles += $hashFilePath # Add the hash file to the array
+
             # Create a zip file and add all the created files
             $zipFilePath = "$ExportPath\$timestamp`_M365FoundationsAudit.zip"
             Compress-Archive -Path $createdFiles -DestinationPath $zipFilePath
+
             # Remove the original files after they have been added to the zip
             foreach ($file in $createdFiles) {
                 Remove-Item -Path $file -Force
             }
+
             # Compute the hash for the zip file and rename it
             $zipHash = Get-FileHash -Path $zipFilePath -Algorithm SHA256
             $newZipFilePath = "$ExportPath\$timestamp`_M365FoundationsAudit_$($zipHash.Hash.Substring(0, 8)).zip"
             Rename-Item -Path $zipFilePath -NewName $newZipFilePath
+
             # Output the zip file path with hash
             [PSCustomObject]@{
                 ZipFilePath = $newZipFilePath
