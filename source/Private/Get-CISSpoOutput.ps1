@@ -101,18 +101,39 @@ function Get-CISSpoOutput {
             '7.2.6' {
                 # Test-SharePointExternalSharingDomains.ps1
                 # 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
+                # Add Authorized Domains?
+                # $SPOTenant Mock Object
+                <#
+                    $SPOTenant = [PSCustomObject]@{
+                        SharingDomainRestrictionMode           = "AllowList"
+                        SharingAllowedDomainList                = "domain1.com", "domain2.com"
+                    }
+                #>
                 $SPOTenant = Get-SPOTenant | Select-Object SharingDomainRestrictionMode, SharingAllowedDomainList
                 return $SPOTenant
             }
             '7.2.7' {
                 # Test-LinkSharingRestrictions.ps1
                 # Retrieve link sharing configuration for SharePoint and OneDrive
+                # $SPOTenantLinkSharing Mock Object
+                <#
+                    $$SPOTenantLinkSharing = [PSCustomObject]@{
+                        DefaultSharingLinkType           = "Direct"
+                    }
+                #>
                 $SPOTenantLinkSharing = Get-SPOTenant | Select-Object DefaultSharingLinkType
                 return $SPOTenantLinkSharing
             }
             '7.2.9' {
                 # Test-GuestAccessExpiration.ps1
                 # Retrieve SharePoint tenant settings related to guest access expiration
+                # $SPOTenantGuestAccess Mock Object
+                <#
+                    $SPOTenantGuestAccess = [PSCustomObject]@{
+                        ExternalUserExpirationRequired           = "$false"
+                        ExternalUserExpireInDays                 = "60"
+                    }
+                #>
                 $SPOTenantGuestAccess = Get-SPOTenant | Select-Object ExternalUserExpirationRequired, ExternalUserExpireInDays
                 return $SPOTenantGuestAccess
             }
@@ -120,24 +141,53 @@ function Get-CISSpoOutput {
                 # Test-ReauthWithCode.ps1
                 # 7.2.10 (L1) Ensure reauthentication with verification code is restricted
                 # Retrieve reauthentication settings for SharePoint Online
+                # $SPOTenantReauthentication Mock Object
+                <#
+                    $SPOTenantReauthentication = [PSCustomObject]@{
+                        EmailAttestationRequired                    = "$false"
+                        EmailAttestationReAuthDays                  = "30"
+                    }
+                #>
                 $SPOTenantReauthentication = Get-SPOTenant | Select-Object EmailAttestationRequired, EmailAttestationReAuthDays
                 return $SPOTenantReauthentication
             }
             '7.3.1' {
                 # Test-DisallowInfectedFilesDownload.ps1
                 # Retrieve the SharePoint tenant configuration
+                # $SPOTenantDisallowInfectedFileDownload Mock Object
+                <#
+                    $SPOTenantDisallowInfectedFileDownload = [PSCustomObject]@{
+                        DisallowInfectedFileDownload           = $false
+                    }
+                #>
                 $SPOTenantDisallowInfectedFileDownload = Get-SPOTenant | Select-Object DisallowInfectedFileDownload
                 return $SPOTenantDisallowInfectedFileDownload
             }
             '7.3.2' {
                 # Test-OneDriveSyncRestrictions.ps1
                 # Retrieve OneDrive sync client restriction settings
+                # Add isHybrid paramter?
+                # $SPOTenantSyncClientRestriction Mock Object
+                <#
+                    $SPOTenantSyncClientRestriction = [PSCustomObject]@{
+                        TenantRestrictionEnabled           = $true
+                        AllowedDomainList                  = "786548DD-877B-4760-A749-6B1EFBC1190A", "877564FF-877B-4760-A749-6B1EFBC1190A"
+                    }
+                #>
                 $SPOTenantSyncClientRestriction = Get-SPOTenantSyncClientRestriction | Select-Object TenantRestrictionEnabled, AllowedDomainList
                 return $SPOTenantSyncClientRestriction
             }
             '7.3.4' {
                 # Test-RestrictCustomScripts.ps1
                 # Retrieve all site collections and select necessary properties
+                # $SPOSitesCustomScript Mock Object
+                <#
+                    $SPOSitesCustomScript = [PSCustomObject]@{
+                        Title           = "Site Collection 1"
+                        Url             = "https://contoso.sharepoint.com/sites/site1"
+                        DenyAddAndCustomizePages = "Enabled"
+                    }
+                #>
                 $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
                 return $SPOSitesCustomScript
             }
