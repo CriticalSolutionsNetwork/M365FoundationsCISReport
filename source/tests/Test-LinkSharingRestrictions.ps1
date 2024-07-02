@@ -6,14 +6,13 @@ function Test-LinkSharingRestrictions {
         # Define your parameters here
         # Test behavior in prod
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
         $recnum = "7.2.7"
+        Write-Verbose "Running Test-LinkSharingRestrictions for $recnum..."
     }
-
     process {
         try {
             # 7.2.7 (L1) Ensure link sharing is restricted in SharePoint and OneDrive
@@ -31,21 +30,24 @@ function Test-LinkSharingRestrictions {
             #   - Condition A: The `DefaultSharingLinkType` setting in SharePoint and OneDrive is not set to `Direct`.
             #   - Condition B: The setting `Choose the type of link that's selected by default when users share files and folders in SharePoint and OneDrive` is not set to `Specific people (only the people the user specifies)`.
             #   - Condition C: Verification using the UI indicates that the link sharing settings are not configured as recommended.
-
             # Retrieve link sharing configuration for SharePoint and OneDrive
+            # $SPOTenantLinkSharing Mock Object
+            <#
+                $$SPOTenantLinkSharing = [PSCustomObject]@{
+                    DefaultSharingLinkType           = "Direct"
+                }
+            #>
             $SPOTenantLinkSharing = Get-CISSpoOutput -Rec $recnum
             $isLinkSharingRestricted = $SPOTenantLinkSharing.DefaultSharingLinkType -eq 'Direct'  # Or 'SpecificPeople' as per the recommendation
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isLinkSharingRestricted) {
-                "Link sharing is not restricted to 'Specific people'. Current setting: $($SPOTenantLinkSharing.DefaultSharingLinkType)"
+                "Link sharing is not restricted to 'Specific people'. Current setting: $($SPOTenantLinkSharing.DefaultSharingLinkType). To remediate this setting, use the Set-SPOTenant command:`n`n" + `
+                "Set-SPOTenant -DefaultSharingLinkType Direct"
             }
             else {
                 "N/A"
             }
-
             $details = "DefaultSharingLinkType: $($SPOTenantLinkSharing.DefaultSharingLinkType)"
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -55,14 +57,12 @@ function Test-LinkSharingRestrictions {
                 FailureReason = $failureReasons
             }
             $auditResult = Initialize-CISAuditResult @params
-
         }
         catch {
             $LastError = $_
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

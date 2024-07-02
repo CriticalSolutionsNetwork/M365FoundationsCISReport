@@ -5,14 +5,12 @@ function Test-SharePointGuestsItemSharing {
         # Aligned
         # Define your parameters here
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-
         $recnum = "7.2.5"
-
+        Write-Verbose "Running Test-SharePointGuestsItemSharing for $recnum..."
         # Conditions for 7.2.5 (L2) Ensure that SharePoint guest users cannot share items they don't own
         #
         # Validate test for a pass:
@@ -29,20 +27,24 @@ function Test-SharePointGuestsItemSharing {
         #   - Condition B: The SharePoint admin center setting "Allow guests to share items they don't own" is checked.
         #   - Condition C: Ensure that external users can re-share items they don't own.
     }
-
     process {
         try {
             # 7.2.5 (L2) Ensure that SharePoint guest users cannot share items they don't own
+            # $SPOTenant Mock Object
+            <#
+                $SPOTenant = [PSCustomObject]@{
+                    PreventExternalUsersFromResharing           = $false
+                }
+            #>
             $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $isGuestResharingPrevented = $SPOTenant.PreventExternalUsersFromResharing
-
             # Populate the auditResult object with the required properties
             $params = @{
                 Rec           = $recnum
                 Result        = $isGuestResharingPrevented
                 Status        = if ($isGuestResharingPrevented) { "Pass" } else { "Fail" }
                 Details       = "PreventExternalUsersFromResharing: $isGuestResharingPrevented"
-                FailureReason = if (-not $isGuestResharingPrevented) { "Guest users can reshare items they don't own." } else { "N/A" }
+                FailureReason = if (-not $isGuestResharingPrevented) { "Guest users can reshare items they don't own. To prevent external users from resharing content they don't own,`nuse the following command:`nSet-SPOTenant -PreventExternalUsersFromResharing `$True" } else { "N/A" }
             }
             $auditResult = Initialize-CISAuditResult @params
         }
@@ -51,7 +53,6 @@ function Test-SharePointGuestsItemSharing {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return auditResult
         return $auditResult

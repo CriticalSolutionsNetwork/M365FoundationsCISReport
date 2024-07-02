@@ -5,17 +5,14 @@ function Test-DisallowInfectedFilesDownload {
         # Aligned
         # Define your parameters here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "7.3.1"
+        Write-Verbose "Running Test-DisallowInfectedFilesDownload for $recnum..."
     }
-
     process {
-
         try {
             # 7.3.1 (L2) Ensure Office 365 SharePoint infected files are disallowed for download
             #
@@ -32,28 +29,30 @@ function Test-DisallowInfectedFilesDownload {
             #   - Condition A: The `DisallowInfectedFileDownload` setting is not set to `True`.
             #   - Condition B: The setting does not prevent users from downloading infected files.
             #   - Condition C: Verification using the PowerShell command indicates that the setting is incorrectly configured.
-
             # Retrieve the SharePoint tenant configuration
+            # $SPOTenantDisallowInfectedFileDownload Mock Object
+            <#
+                $SPOTenantDisallowInfectedFileDownload = [PSCustomObject]@{
+                    DisallowInfectedFileDownload           = $false
+                }
+            #>
             $SPOTenantDisallowInfectedFileDownload = Get-CISSpoOutput -Rec $recnum
-
             # Condition A: The `DisallowInfectedFileDownload` setting is set to `True`
             $isDisallowInfectedFileDownloadEnabled = $SPOTenantDisallowInfectedFileDownload.DisallowInfectedFileDownload
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isDisallowInfectedFileDownloadEnabled) {
-                "Downloading infected files is not disallowed."  # Condition B: The setting does not prevent users from downloading infected files
+                "Downloading infected files is not disallowed. To ensure infected files cannot be downloaded, use the following command:`n" + ` # Condition B: The setting does not prevent users from downloading infected files
+                "Set-SPOTenant -DisallowInfectedFileDownload `$true"
             }
             else {
                 "N/A"
             }
-
             $details = if ($isDisallowInfectedFileDownloadEnabled) {
                 "DisallowInfectedFileDownload: True"  # Condition C: Verification confirms the setting is correctly configured
             }
             else {
                 "DisallowInfectedFileDownload: False"  # Condition C: Verification indicates the setting is incorrectly configured
             }
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -69,7 +68,6 @@ function Test-DisallowInfectedFilesDownload {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

@@ -12,16 +12,14 @@ function Test-ModernAuthSharePoint {
 
         # Initialization code, if needed
         $recnum = "7.2.1"
-
+        Write-Verbose "Running Test-ModernAuthSharePoint for $recnum..."
         <#
         # Conditions for 7.2.1 (L1) Ensure modern authentication for SharePoint applications is required
-
         ## Validate test for a pass:
         # - Confirm that the automated test results align with the manual audit steps outlined in the CIS benchmark.
         # - Specific conditions to check:
         #   - Condition A: The setting "Apps that don't use modern authentication" is set to "Block access" in the SharePoint admin center.
         #   - Condition B: The PowerShell command `Get-SPOTenant | ft LegacyAuthProtocolsEnabled` returns `False`.
-
         ## Validate test for a fail:
         # - Confirm that the failure conditions in the automated test are consistent with the manual audit results.
         # - Specific conditions to check:
@@ -29,23 +27,25 @@ function Test-ModernAuthSharePoint {
         #   - Condition B: The PowerShell command `Get-SPOTenant | ft LegacyAuthProtocolsEnabled` returns `True`.
         #>
     }
-
     process {
         try {
             # 7.2.1 (L1) Ensure modern authentication for SharePoint applications is required
+            # $SPOTenant Mock Object
+            <#
+                $SPOTenant = [PSCustomObject]@{
+                    LegacyAuthProtocolsEnabled           = $true
+                }
+            #>
             $SPOTenant = Get-CISSpoOutput -Rec $recnum
             $modernAuthForSPRequired = -not $SPOTenant.LegacyAuthProtocolsEnabled
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $modernAuthForSPRequired) {
-                "Legacy authentication protocols are enabled" # Fail Condition B
+                "Legacy authentication protocols are enabled. The following command can be used to disable:`nSet-SPOTenant -LegacyAuthProtocolsEnabled `$false" # Fail Condition B
             }
             else {
                 "N/A"
             }
-
             $details = "LegacyAuthProtocolsEnabled: $($SPOTenant.LegacyAuthProtocolsEnabled)" # Details for Condition B
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -61,7 +61,6 @@ function Test-ModernAuthSharePoint {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

@@ -5,17 +5,14 @@ function Test-GuestAccessExpiration {
         # Aligned
         # Define your parameters here if needed
     )
-
     begin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-
         # Initialization code, if needed
         $recnum = "7.2.9"
+        Write-Verbose "Running Test-GuestAccessExpiration for $recnum..."
     }
-
     process {
-
         try {
             # 7.2.9 (L1) Ensure guest access to a site or OneDrive will expire automatically
             #
@@ -32,21 +29,25 @@ function Test-GuestAccessExpiration {
             #   - Condition A: The ExternalUserExpirationRequired setting in SharePoint is not set to True.
             #   - Condition B: The ExternalUserExpireInDays setting in SharePoint is configured to more than 30 days.
             #   - Condition C: Verification using the SharePoint Admin Center indicates that guest access is not set to expire automatically after the specified number of days.
-
             # Retrieve SharePoint tenant settings related to guest access expiration
+            # $SPOTenantGuestAccess Mock Object
+            <#
+                $SPOTenantGuestAccess = [PSCustomObject]@{
+                    ExternalUserExpirationRequired           = "$false"
+                    ExternalUserExpireInDays                 = "60"
+                }
+            #>
             $SPOTenantGuestAccess = Get-CISSpoOutput -Rec $recnum
             $isGuestAccessExpirationConfiguredCorrectly = $SPOTenantGuestAccess.ExternalUserExpirationRequired -and $SPOTenantGuestAccess.ExternalUserExpireInDays -le 30
-
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isGuestAccessExpirationConfiguredCorrectly) {
-                "Guest access expiration is not configured to automatically expire within 30 days or less."
+                "Guest access expiration is not configured to automatically expire within 30 days or less. To remediate this setting, use the Set-SPOTenant command:`n`n" + `
+                "Set-SPOTenant -ExternalUserExpirationRequired `$true -ExternalUserExpireInDays 30"
             }
             else {
                 "N/A"
             }
-
             $details = "ExternalUserExpirationRequired: $($SPOTenantGuestAccess.ExternalUserExpirationRequired); ExternalUserExpireInDays: $($SPOTenantGuestAccess.ExternalUserExpireInDays)"
-
             # Create and populate the CISAuditResult object
             $params = @{
                 Rec            = $recnum
@@ -62,7 +63,6 @@ function Test-GuestAccessExpiration {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult
