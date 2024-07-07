@@ -15,6 +15,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Fixed
 
 - Fixed Test 1.3.3 to be the simpler version of the test while including output to check for current users sharing calendars.
+- Safe Attachments logic and added `$DomainName` as input to 2.1.4 to test main policy.
 
 ## [0.1.23] - 2024-07-02
 
