@@ -75,39 +75,48 @@ function Get-Action {
             return $Dictionary
         }
         "ConvertActions" {
-            $actionDictionary = switch ($ActionType) {
-                "Admin"    { $Dictionary.AdminActions }
-                "Delegate" { $Dictionary.DelegateActions }
-                "Owner"    { $Dictionary.OwnerActions }
+            try {
+                $actionDictionary = switch ($ActionType) {
+                    "Admin"    { $Dictionary.AdminActions }
+                    "Delegate" { $Dictionary.DelegateActions }
+                    "Owner"    { $Dictionary.OwnerActions }
+                }
+
+                $abbreviatedActions = @()
+                foreach ($action in $Actions) {
+                    if ($actionDictionary.ContainsKey($action)) {
+                        $abbreviatedActions += $actionDictionary[$action]
+                    }
+                }
+                return $abbreviatedActions
+            }
+            catch {
+                throw $_
             }
 
-            $abbreviatedActions = @()
-            foreach ($action in $Actions) {
-                if ($actionDictionary.ContainsKey($action)) {
-                    $abbreviatedActions += $actionDictionary[$action]
-                }
-            }
-            return $abbreviatedActions
         }
         "ReverseActions" {
-            $reverseDictionary = @{}
-            $originalDictionary = switch ($ReverseActionType) {
-                "Admin"    { $Dictionary.AdminActions }
-                "Delegate" { $Dictionary.DelegateActions }
-                "Owner"    { $Dictionary.OwnerActions }
-            }
-
-            foreach ($key in $originalDictionary.Keys) {
-                $reverseDictionary[$originalDictionary[$key]] = $key
-            }
-
-            $fullNames = @()
-            foreach ($abbrAction in $AbbreviatedActions) {
-                if ($reverseDictionary.ContainsKey($abbrAction)) {
-                    $fullNames += $reverseDictionary[$abbrAction]
+            try {
+                $reverseDictionary = @{}
+                $originalDictionary = switch ($ReverseActionType) {
+                    "Admin"    { $Dictionary.AdminActions }
+                    "Delegate" { $Dictionary.DelegateActions }
+                    "Owner"    { $Dictionary.OwnerActions }
                 }
+                foreach ($key in $originalDictionary.Keys) {
+                    $reverseDictionary[$originalDictionary[$key]] = $key
+                }
+                $fullNames = @()
+                foreach ($abbrAction in $AbbreviatedActions) {
+                    if ($reverseDictionary.ContainsKey($abbrAction)) {
+                        $fullNames += $reverseDictionary[$abbrAction]
+                    }
+                }
+                return $fullNames
             }
-            return $fullNames
+            catch {
+                throw $_
+            }
         }
     }
 }
