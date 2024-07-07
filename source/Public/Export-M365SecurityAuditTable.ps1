@@ -109,44 +109,12 @@ function Export-M365SecurityAuditTable {
             switch ($test) {
                 "6.1.2" {
                     $details = $auditResult.Details
-                    if ($details -ne "No M365 E3 licenses found.") {
-                        $csv = $details | ConvertFrom-Csv -Delimiter '|'
-                    }
-                    else {
-                        $csv = $null
-                    }
-                    if ($null -ne $csv) {
-                        foreach ($row in $csv) {
-                            $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin -Version '6.1.2') -join ','
-                            $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate -Version '6.1.2' ) -join ','
-                            $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner -Version '6.1.2' ) -join ','
-                        }
-                        $newObjectDetails = $csv
-                    }
-                    else {
-                        $newObjectDetails = $details
-                    }
+                    $newObjectDetails = Get-AuditMailboxDetail -Details $details -Version '6.1.2'
                     $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
                 }
                 "6.1.3" {
                     $details = $auditResult.Details
-                    if ($details -ne "No M365 E5 licenses found.") {
-                        $csv = $details | ConvertFrom-Csv -Delimiter '|'
-                    }
-                    else {
-                        $csv = $null
-                    }
-                    if ($null -ne $csv) {
-                        foreach ($row in $csv) {
-                            $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin -Version '6.1.3') -join ','
-                            $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate -Version '6.1.3') -join ','
-                            $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner -Version '6.1.3') -join ','
-                        }
-                        $newObjectDetails = $csv
-                    }
-                    else {
-                        $newObjectDetails = $details
-                    }
+                    $newObjectDetails = Get-AuditMailboxDetail -Details $details -Version '6.1.3'
                     $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
                 }
                 Default {
