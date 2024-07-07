@@ -50,7 +50,7 @@ $mailboxes = Get-Mailbox -ResultSize Unlimited
 $calendarFolders = @{}
 # Get the default calendar folder names for all mailboxes
 $mailboxes | ForEach-Object {
-    $calendarFolderName = [string](Get-EXOMailboxFolderStatistics $_.PrimarySmtpAddress -FolderScope Calendar | Where-Object { $_.FolderType -eq `'Calendar`' }).Name
+    $calendarFolderName = [string](Get-EXOMailboxFolderStatistics $_.PrimarySmtpAddress -FolderScope Calendar | Where-Object { $_.FolderType -eq 'Calendar' }).Name
     $calendarFolders[$_.PrimarySmtpAddress] = $calendarFolderName
 }
 # Get the calendar folder settings for each mailbox
