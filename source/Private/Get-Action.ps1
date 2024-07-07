@@ -11,6 +11,12 @@ function Get-Action {
         [ValidateSet("Admin", "Delegate", "Owner")]
         [string]$ActionType,
 
+        [Parameter(Position = 2, Mandatory = $true, ParameterSetName = "ConvertActions")]
+        [Parameter(Position = 2, Mandatory = $true, ParameterSetName = "ReverseActions")]
+        [Parameter(Position = 1, Mandatory = $true, ParameterSetName = "GetDictionaries")]
+        [ValidateSet("6.1.2", "6.1.3")]
+        [string]$Version = "6.1.2",
+
         [Parameter(Position = 0, ParameterSetName = "ReverseActions")]
         [string[]]$AbbreviatedActions,
 
@@ -20,62 +26,110 @@ function Get-Action {
     )
 
     $Dictionary = @{
-        AdminActions = @{
-            ApplyRecord              = 'AR'
-            Copy                     = 'CP'
-            Create                   = 'CR'
-            FolderBind               = 'FB'
-            HardDelete               = 'HD'
-            MailItemsAccessed        = 'MIA'
-            Move                     = 'MV'
-            MoveToDeletedItems       = 'MTDI'
-            SendAs                   = 'SA'
-            SendOnBehalf             = 'SOB'
-            Send                     = 'SD'
-            SoftDelete               = 'SD'
-            Update                   = 'UP'
-            UpdateCalendarDelegation = 'UCD'
-            UpdateFolderPermissions  = 'UFP'
-            UpdateInboxRules         = 'UIR'
+        "6.1.2" = @{
+            AdminActions = @{
+                ApplyRecord              = 'AR'
+                Copy                     = 'CP'
+                Create                   = 'CR'
+                FolderBind               = 'FB'
+                HardDelete               = 'HD'
+                Move                     = 'MV'
+                MoveToDeletedItems       = 'MTDI'
+                SendAs                   = 'SA'
+                SendOnBehalf             = 'SOB'
+                SoftDelete               = 'SD'
+                Update                   = 'UP'
+                UpdateCalendarDelegation = 'UCD'
+                UpdateFolderPermissions  = 'UFP'
+                UpdateInboxRules         = 'UIR'
+            }
+            DelegateActions = @{
+                ApplyRecord             = 'AR'
+                Create                  = 'CR'
+                FolderBind              = 'FB'
+                HardDelete              = 'HD'
+                Move                    = 'MV'
+                MoveToDeletedItems      = 'MTDI'
+                SendAs                  = 'SA'
+                SendOnBehalf            = 'SOB'
+                SoftDelete              = 'SD'
+                Update                  = 'UP'
+                UpdateFolderPermissions = 'UFP'
+                UpdateInboxRules        = 'UIR'
+            }
+            OwnerActions = @{
+                ApplyRecord              = 'AR'
+                Create                   = 'CR'
+                HardDelete               = 'HD'
+                MailboxLogin             = 'ML'
+                Move                     = 'MV'
+                MoveToDeletedItems       = 'MTDI'
+                SoftDelete               = 'SD'
+                Update                   = 'UP'
+                UpdateCalendarDelegation = 'UCD'
+                UpdateFolderPermissions  = 'UFP'
+                UpdateInboxRules         = 'UIR'
+            }
         }
-        DelegateActions = @{
-            ApplyRecord             = 'AR'
-            Create                  = 'CR'
-            FolderBind              = 'FB'
-            HardDelete              = 'HD'
-            MailItemsAccessed       = 'MIA'
-            Move                    = 'MV'
-            MoveToDeletedItems      = 'MTDI'
-            SendAs                  = 'SA'
-            SendOnBehalf            = 'SOB'
-            SoftDelete              = 'SD'
-            Update                  = 'UP'
-            UpdateFolderPermissions = 'UFP'
-            UpdateInboxRules        = 'UIR'
-        }
-        OwnerActions = @{
-            ApplyRecord              = 'AR'
-            Create                   = 'CR'
-            HardDelete               = 'HD'
-            MailboxLogin             = 'ML'
-            MailItemsAccessed        = 'MIA'
-            Move                     = 'MV'
-            MoveToDeletedItems       = 'MTDI'
-            Send                     = 'SD'
-            SoftDelete               = 'SD'
-            Update                   = 'UP'
-            UpdateCalendarDelegation = 'UCD'
-            UpdateFolderPermissions  = 'UFP'
-            UpdateInboxRules         = 'UIR'
+        "6.1.3" = @{
+            AdminActions = @{
+                ApplyRecord              = 'AR'
+                Copy                     = 'CP'
+                Create                   = 'CR'
+                FolderBind               = 'FB'
+                HardDelete               = 'HD'
+                MailItemsAccessed        = 'MIA'
+                Move                     = 'MV'
+                MoveToDeletedItems       = 'MTDI'
+                SendAs                   = 'SA'
+                SendOnBehalf             = 'SOB'
+                Send                     = 'SD'
+                SoftDelete               = 'SD'
+                Update                   = 'UP'
+                UpdateCalendarDelegation = 'UCD'
+                UpdateFolderPermissions  = 'UFP'
+                UpdateInboxRules         = 'UIR'
+            }
+            DelegateActions = @{
+                ApplyRecord             = 'AR'
+                Create                  = 'CR'
+                FolderBind              = 'FB'
+                HardDelete              = 'HD'
+                MailItemsAccessed       = 'MIA'
+                Move                    = 'MV'
+                MoveToDeletedItems      = 'MTDI'
+                SendAs                  = 'SA'
+                SendOnBehalf            = 'SOB'
+                SoftDelete              = 'SD'
+                Update                  = 'UP'
+                UpdateFolderPermissions = 'UFP'
+                UpdateInboxRules        = 'UIR'
+            }
+            OwnerActions = @{
+                ApplyRecord              = 'AR'
+                Create                   = 'CR'
+                HardDelete               = 'HD'
+                MailboxLogin             = 'ML'
+                MailItemsAccessed        = 'MIA'
+                Move                     = 'MV'
+                MoveToDeletedItems       = 'MTDI'
+                Send                     = 'SD'
+                SoftDelete               = 'SD'
+                Update                   = 'UP'
+                UpdateCalendarDelegation = 'UCD'
+                UpdateFolderPermissions  = 'UFP'
+                UpdateInboxRules         = 'UIR'
+            }
         }
     }
 
     switch ($PSCmdlet.ParameterSetName) {
         "GetDictionaries" {
-            return $Dictionary
+            return $Dictionary[$Version]
         }
         "ConvertActions" {
             try {
+                $Dictionary = $Dictionary[$Version]
                 $actionDictionary = switch ($ActionType) {
                     "Admin"    { $Dictionary.AdminActions }
                     "Delegate" { $Dictionary.DelegateActions }
@@ -97,6 +151,7 @@ function Get-Action {
         }
         "ReverseActions" {
             try {
+                $Dictionary = $Dictionary[$Version]
                 $reverseDictionary = @{}
                 $originalDictionary = switch ($ReverseActionType) {
                     "Admin"    { $Dictionary.AdminActions }
