@@ -107,9 +107,12 @@
                     FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
         PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
+        PS> Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
+
+        Or:
         PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
 
-            Captures the audit results into a variable and exports them to a CSV file.
+            Captures the audit results into a variable and exports them to a CSV file (Nested tables will be truncated).
                 Output:
                     CISAuditResult[]
                     auditResults.csv
@@ -203,6 +206,7 @@ function Invoke-M365SecurityAudit {
     )
     Begin {
         if ($script:MaximumFunctionCount -lt 8192) {
+            Write-Verbose "Setting the `$script:MaximumFunctionCount to 8192 for the test run." -Verbose
             $script:MaximumFunctionCount = 8192
         }
         # Ensure required modules are installed
