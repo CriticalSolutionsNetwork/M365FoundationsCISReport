@@ -21,30 +21,30 @@
         Switch to export the results to an Excel file. When specified, results are exported in Excel format.
     .INPUTS
         [CISAuditResult[]] - An array of CISAuditResult objects.
-        [string] - A path to a CSV file.
+            [string] - A path to a CSV file.
     .OUTPUTS
         [PSCustomObject] - A custom object containing the path to the zip file and its hash.
     .EXAMPLE
         Export-M365SecurityAuditTable -AuditResults $object -OutputTestNumber 6.1.2
-        # Outputs the result of test number 6.1.2 from the provided audit results as an object.
+            # Outputs the result of test number 6.1.2 from the provided audit results as an object.
     .EXAMPLE
         Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp"
-        # Exports all audit results to the specified path in CSV format.
+            # Exports all audit results to the specified path in CSV format.
     .EXAMPLE
         Export-M365SecurityAuditTable -CsvPath "C:\temp\auditresultstoday1.csv" -OutputTestNumber 6.1.2
-        # Outputs the result of test number 6.1.2 from the CSV file as an object.
+            # Outputs the result of test number 6.1.2 from the CSV file as an object.
     .EXAMPLE
         Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
-        # Exports all audit results from the CSV file to the specified path in CSV format.
+            # Exports all audit results from the CSV file to the specified path in CSV format.
     .EXAMPLE
         Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
-        # Exports all audit results along with the original test results to the specified path in CSV format.
+            # Exports all audit results along with the original test results to the specified path in CSV format.
     .EXAMPLE
         Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
-        # Exports all audit results from the CSV file along with the original test results to the specified path in CSV format.
+            # Exports all audit results from the CSV file along with the original test results to the specified path in CSV format.
     .EXAMPLE
         Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportToExcel
-        # Exports all audit results to the specified path in Excel format.
+            # Exports all audit results to the specified path in Excel format.
     .LINK
         https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
 #>
@@ -109,44 +109,12 @@ function Export-M365SecurityAuditTable {
             switch ($test) {
                 "6.1.2" {
                     $details = $auditResult.Details
-                    if ($details -ne "No M365 E3 licenses found.") {
-                        $csv = $details | ConvertFrom-Csv -Delimiter '|'
-                    }
-                    else {
-                        $csv = $null
-                    }
-                    if ($null -ne $csv) {
-                        foreach ($row in $csv) {
-                            $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
-                            $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate | Where-Object { $_ -notin @("MailItemsAccessed") }) -join ','
-                            $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }) -join ','
-                        }
-                        $newObjectDetails = $csv
-                    }
-                    else {
-                        $newObjectDetails = $details
-                    }
+                    $newObjectDetails = Get-AuditMailboxDetail -Details $details -Version '6.1.2'
                     $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
                 }
                 "6.1.3" {
                     $details = $auditResult.Details
-                    if ($details -ne "No M365 E5 licenses found.") {
-                        $csv = $details | ConvertFrom-Csv -Delimiter '|'
-                    }
-                    else {
-                        $csv = $null
-                    }
-                    if ($null -ne $csv) {
-                        foreach ($row in $csv) {
-                            $row.AdminActionsMissing = (Get-Action -AbbreviatedActions $row.AdminActionsMissing.Split(',') -ReverseActionType Admin) -join ','
-                            $row.DelegateActionsMissing = (Get-Action -AbbreviatedActions $row.DelegateActionsMissing.Split(',') -ReverseActionType Delegate) -join ','
-                            $row.OwnerActionsMissing = (Get-Action -AbbreviatedActions $row.OwnerActionsMissing.Split(',') -ReverseActionType Owner) -join ','
-                        }
-                        $newObjectDetails = $csv
-                    }
-                    else {
-                        $newObjectDetails = $details
-                    }
+                    $newObjectDetails = Get-AuditMailboxDetail -Details $details -Version '6.1.3'
                     $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
                 }
                 Default {

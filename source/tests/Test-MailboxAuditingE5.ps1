@@ -24,13 +24,14 @@ function Test-MailboxAuditingE5 {
         #   - Condition B: AuditAdmin actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SendAs, SendOnBehalf, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
         #   - Condition C: AuditDelegate actions do not include all of the following: ApplyRecord, Create, HardDelete, MailItemsAccessed, MoveToDeletedItems, SendAs, SendOnBehalf, SoftDelete, Update, UpdateFolderPermissions, UpdateInboxRules.
         #   - Condition D: AuditOwner actions do not include all of the following: ApplyRecord, HardDelete, MailItemsAccessed, MoveToDeletedItems, Send, SoftDelete, Update, UpdateCalendarDelegation, UpdateFolderPermissions, UpdateInboxRules.
-        $actionDictionaries = Get-Action -Dictionaries
+        $recnum = "6.1.3"
+        $version = $recnum
+        $actionDictionaries = Get-Action -Dictionaries -Version $version
         $AdminActions = $actionDictionaries.AdminActions.Keys
         $DelegateActions = $actionDictionaries.DelegateActions.Keys
         $OwnerActions = $actionDictionaries.OwnerActions.Keys
         $allFailures = @()
         $processedUsers = @{}
-        $recnum = "6.1.3"
         Write-Verbose "Running Test-MailboxAuditingE5 for $recnum..."
         $allUsers = Get-CISMgOutput -Rec $recnum
     }
@@ -52,19 +53,19 @@ function Test-MailboxAuditingE5 {
                         # Validate Admin actions
                         foreach ($action in $AdminActions) {
                             if ($mailbox.AuditAdmin -notcontains $action) {
-                                $missingAdminActions += (Get-Action -Actions $action -ActionType "Admin") # Condition B
+                                $missingAdminActions += (Get-Action -Actions $action -ActionType "Admin" -Version $version) # Condition B
                             }
                         }
                         # Validate Delegate actions
                         foreach ($action in $DelegateActions) {
                             if ($mailbox.AuditDelegate -notcontains $action) {
-                                $missingDelegateActions += (Get-Action -Actions $action -ActionType "Delegate") # Condition C
+                                $missingDelegateActions += (Get-Action -Actions $action -ActionType "Delegate" -Version $version) # Condition C
                             }
                         }
                         # Validate Owner actions
                         foreach ($action in $OwnerActions) {
                             if ($mailbox.AuditOwner -notcontains $action) {
-                                $missingOwnerActions += (Get-Action -Actions $action -ActionType "Owner") # Condition D
+                                $missingOwnerActions += (Get-Action -Actions $action -ActionType "Owner" -Version $version) # Condition D
                             }
                         }
                         if ($missingAdminActions.Count -gt 0 -or $missingDelegateActions.Count -gt 0 -or $missingOwnerActions.Count -gt 0) {

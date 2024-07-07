@@ -1,4 +1,4 @@
----
+﻿---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
@@ -32,22 +32,6 @@ Updates the 'AuditData' worksheet in 'excel.xlsx' with data from 'data.csv', add
 
 ## PARAMETERS
 
-### -ExcelPath
-Specifies the path to the Excel file to be updated.
-This parameter is mandatory.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -CsvPath
 Specifies the path to the CSV file containing new data.
 This parameter is mandatory.
@@ -59,6 +43,22 @@ Aliases:
 
 Required: False
 Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExcelPath
+Specifies the path to the Excel file to be updated.
+This parameter is mandatory.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -86,7 +86,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.String
-### The function accepts strings for file paths and worksheet names.
+###     The function accepts strings for file paths and worksheet names.
 ## OUTPUTS
 
 ### None

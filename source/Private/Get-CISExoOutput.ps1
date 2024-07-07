@@ -87,60 +87,6 @@ function Get-CISExoOutput {
                 # [psobject[]]
                 return $sharingPolicies
             }
-            '1.3.3b' {
-                # $mailboxes Mock Object
-                <#
-                    $mailboxes = @(
-                        [PSCustomObject]@{
-                            UserPrincipalName = "SMBuser1@domain.com"
-                            ExternalDirectoryObjectId = "123e4567-e89b-12d3-a456-426614174000"
-                            PrimarySmtpAddress = "SMBuser1@domain.com"
-                            PublishEnabled       = $False
-                            PublishedCalendarUrl = "https://example.com/calendar/smbuser1"
-                        },
-                        [PSCustomObject]@{
-                            UserPrincipalName = "SMBuser2@domain.com"
-                            ExternalDirectoryObjectId = "987e6543-21ba-12d3-a456-426614174000"
-                            PrimarySmtpAddress = "SMBuser2@domain.com"
-                            PublishEnabled       = $False
-                            PublishedCalendarUrl = "https://example.com/calendar/smbuser2"
-                        },
-                        [PSCustomObject]@{
-                            UserPrincipalName = "SMBuser3@domain.com"
-                            ExternalDirectoryObjectId = "abcddcba-98fe-76dc-a456-426614174000"
-                            PrimarySmtpAddress = "SMBuser3@domain.com"
-                            PublishEnabled       = $False
-                            PublishedCalendarUrl = "https://example.com/calendar/smbuser3"
-                        }
-                    )
-                #>
-                $mailboxes = Get-Mailbox -ResultSize Unlimited
-                $results = foreach ($mailbox in $mailboxes) {
-                    # Get the name of the default calendar folder (depends on the mailbox's language)
-                    # Return single string Ex: return "Calendar" x 3 in array
-                    $calendarFolder = [string](Get-EXOMailboxFolderStatistics $mailbox.PrimarySmtpAddress -Folderscope Calendar | Where-Object { $_.FolderType -eq 'Calendar' }).Name
-                    Write-Verbose "Calendar folder for $($mailbox.PrimarySmtpAddress): $calendarFolder"
-                    # Get users calendar folder settings for their default Calendar folder
-                    # calendar has the format identity:\<calendar folder name>
-                    $calendar = Get-MailboxCalendarFolder -Identity "$($mailbox.PrimarySmtpAddress):\$calendarFolder"
-                    #Write-Host "Calendar object for $($mailbox.PrimarySmtpAddress): $calendar"
-                    Write-Verbose "Calendar publishing enabled: $($calendar.PublishEnabled)"
-                    # Check if calendar publishing is enabled and create a custom object
-                    if ($calendar.PublishEnabled) {
-                        [PSCustomObject]@{
-                            PrimarySmtpAddress   = $mailbox.PrimarySmtpAddress
-                            CalendarFolder       = $calendarFolder
-                            PublishEnabled       = $calendar.PublishEnabled
-                            PublishedCalendarUrl = $calendar.PublishedCalendarUrl
-                        }
-                    }
-                }
-                $calendarDetails = @()
-                foreach ($calendar in $results) {
-                    $calendarDetails += "Calendar: $($calendar.PrimarySmtpAddress); URL: $($calendar.PublishedCalendarUrl)"
-                }
-                return $calendarDetails
-            }
             '1.3.6' {
                 # Test-CustomerLockbox.ps1
                 # Step: Retrieve the organization configuration (Condition C: Pass/Fail)
@@ -274,10 +220,11 @@ function Get-CISExoOutput {
                         )
                     #>
                     $safeAttachmentPolicies = Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue | Where-Object { $_.Enable -eq $true }
+                    $safeAttachmentRules = Get-SafeAttachmentRule
                     # [object[]]
-                    return $safeAttachmentPolicies
+                    return $safeAttachmentPolicies, $safeAttachmentRules
                     else {
-                        return 1
+                        return 1,1
                     }
                 }
             }

@@ -24,13 +24,15 @@ function Test-MailboxAuditingE3 {
         #>
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-        $actionDictionaries = Get-Action -Dictionaries
-        # E3 specific actions
-        $AdminActions = $actionDictionaries.AdminActions.Keys | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }
-        $DelegateActions = $actionDictionaries.DelegateActions.Keys | Where-Object { $_ -notin @("MailItemsAccessed") }
-        $OwnerActions = $actionDictionaries.OwnerActions.Keys | Where-Object { $_ -notin @("MailItemsAccessed", "Send") }
-        $allFailures = @()
         $recnum = "6.1.2"
+        $version = $recnum
+        $actionDictionaries = Get-Action -Dictionaries -Version $version
+        # E3 specific actions
+        $AdminActions = $actionDictionaries.AdminActions.Keys
+        $DelegateActions = $actionDictionaries.DelegateActions.Keys
+        $OwnerActions = $actionDictionaries.OwnerActions.Keys
+        $allFailures = @()
+
         Write-Verbose "Running Test-MailboxAuditingE3 for $recnum..."
         $allUsers = Get-CISMgOutput -Rec $recnum
         $processedUsers = @{}  # Dictionary to track processed users
@@ -52,17 +54,17 @@ function Test-MailboxAuditingE3 {
                     if ($mailbox.AuditEnabled) {
                         foreach ($action in $AdminActions) {
                             if ($mailbox.AuditAdmin -notcontains $action) {
-                                $missingAdminActions += (Get-Action -Actions $action -ActionType "Admin")
+                                $missingAdminActions += (Get-Action -Actions $action -ActionType "Admin" -Version $version)
                             }
                         }
                         foreach ($action in $DelegateActions) {
                             if ($mailbox.AuditDelegate -notcontains $action) {
-                                $missingDelegateActions += (Get-Action -Actions $action -ActionType "Delegate")
+                                $missingDelegateActions += (Get-Action -Actions $action -ActionType "Delegate" -Version $version)
                             }
                         }
                         foreach ($action in $OwnerActions) {
                             if ($mailbox.AuditOwner -notcontains $action) {
-                                $missingOwnerActions += (Get-Action -Actions $action -ActionType "Owner")
+                                $missingOwnerActions += (Get-Action -Actions $action -ActionType "Owner" -Version $version)
                             }
                         }
                         if ($missingAdminActions.Count -gt 0 -or $missingDelegateActions.Count -gt 0 -or $missingOwnerActions.Count -gt 0) {

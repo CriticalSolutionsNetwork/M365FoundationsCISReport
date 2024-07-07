@@ -16,11 +16,11 @@
     .EXAMPLE
         Grant-M365SecurityAuditConsent -UserPrincipalNameForConsent user@example.com
 
-        Grants Microsoft Graph permissions to user@example.com for the client application with the specified Application ID.
+            Grants Microsoft Graph permissions to user@example.com for the client application with the specified Application ID.
     .EXAMPLE
         Grant-M365SecurityAuditConsent -UserPrincipalNameForConsent user@example.com -SkipGraphConnection
 
-        Grants Microsoft Graph permissions to user@example.com, skipping the connection to Microsoft Graph.
+            Grants Microsoft Graph permissions to user@example.com, skipping the connection to Microsoft Graph.
     .NOTES
         This function requires the Microsoft.Graph module version 2.4.0 or higher.
     .LINK

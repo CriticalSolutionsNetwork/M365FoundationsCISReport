@@ -8,19 +8,19 @@
 .EXAMPLE
     PS> Get-AdminRoleUserLicense
 
-    This example retrieves all administrative role users along with their licenses by connecting to Microsoft Graph using the default scopes.
+        This example retrieves all administrative role users along with their licenses by connecting to Microsoft Graph using the default scopes.
 .EXAMPLE
     PS> Get-AdminRoleUserLicense -SkipGraphConnection
 
-    This example retrieves all administrative role users along with their licenses without attempting to connect to Microsoft Graph, assuming that the connection is already established.
+        This example retrieves all administrative role users along with their licenses without attempting to connect to Microsoft Graph, assuming that the connection is already established.
 .INPUTS
     None. You cannot pipe objects to Get-AdminRoleUserLicense.
 .OUTPUTS
     PSCustomObject
-    Returns a custom object for each user with administrative roles that includes the following properties: RoleName, UserName, UserPrincipalName, UserId, HybridUser, and Licenses.
+        Returns a custom object for each user with administrative roles that includes the following properties: RoleName, UserName, UserPrincipalName, UserId, HybridUser, and Licenses.
 .NOTES
     Creation Date:  2024-04-15
-    Purpose/Change: Initial function development to support Microsoft 365 administrative role auditing.
+        Purpose/Change: Initial function development to support Microsoft 365 administrative role auditing.
 .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Get-AdminRoleUserLicense
 #>

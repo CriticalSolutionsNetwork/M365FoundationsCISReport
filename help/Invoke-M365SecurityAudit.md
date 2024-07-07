@@ -1,4 +1,4 @@
----
+﻿---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
@@ -165,12 +165,26 @@ What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsof
 
 ## PARAMETERS
 
-### -TenantAdminUrl
-The URL of the tenant admin.
-If not specified, none of the SharePoint Online tests will run.
+### -ApprovedCloudStorageProviders
+Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
 
 ```yaml
-Type: String
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: @()
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ApprovedFederatedDomains
+Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.
+
+```yaml
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -196,25 +210,54 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ELevel
-Specifies the E-Level (E3 or E5) for the audit.
-This parameter is optional and can be combined with the ProfileLevel parameter.
+### -DoNotConfirmConnections
+If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
 
 ```yaml
-Type: String
-Parameter Sets: ELevelFilter
+Type: SwitchParameter
+Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ProfileLevel
-Specifies the profile level (L1 or L2) for the audit.
-This parameter is optional and can be combined with the ELevel parameter.
+### -DoNotConnect
+If specified, the cmdlet will not establish a connection to Microsoft 365 services.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DoNotDisconnect
+If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ELevel
+Specifies the E-Level (E3 or E5) for the audit.
+This parameter is optional and can be combined with the ProfileLevel parameter.
 
 ```yaml
 Type: String
@@ -289,6 +332,37 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -NoModuleCheck
+If specified, the cmdlet will not check for the presence of required modules.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProfileLevel
+Specifies the profile level (L1 or L2) for the audit.
+This parameter is optional and can be combined with the ELevel parameter.
+
+```yaml
+Type: String
+Parameter Sets: ELevelFilter
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -SkipRecommendation
 Specifies specific recommendations to exclude from the audit.
 Accepts an array of recommendation numbers.
@@ -305,104 +379,14 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ApprovedCloudStorageProviders
-Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
+### -TenantAdminUrl
+The URL of the tenant admin.
+If not specified, none of the SharePoint Online tests will run.
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
-
-Required: False
-Position: Named
-Default value: @()
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ApprovedFederatedDomains
-Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DoNotConnect
-If specified, the cmdlet will not establish a connection to Microsoft 365 services.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DoNotDisconnect
-If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -NoModuleCheck
-If specified, the cmdlet will not check for the presence of required modules.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DoNotConfirmConnections
-If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
 
 Required: False
 Position: Named
@@ -426,6 +410,22 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
@@ -435,7 +435,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ### CISAuditResult[]
-### The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
+###     The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
 ## NOTES
 - This module is based on CIS benchmarks.
 - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.

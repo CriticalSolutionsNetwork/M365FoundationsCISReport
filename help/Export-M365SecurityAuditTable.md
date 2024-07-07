@@ -1,4 +1,4 @@
----
+﻿---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
@@ -109,22 +109,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -OutputTestNumber
-The test number to output as an object.
-Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
-
-```yaml
-Type: String
-Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ExportAllTests
 Switch to export all test results.
 
@@ -135,6 +119,21 @@ Aliases:
 
 Required: False
 Position: 1
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExportOriginalTests
+Switch to export the original audit results to a CSV file.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Aliases:
+
+Required: True
+Position: Named
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -155,21 +154,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExportOriginalTests
-Switch to export the original audit results to a CSV file.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
-Aliases:
-
-Required: True
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ExportToExcel
 Switch to export the results to an Excel file.
 
@@ -185,13 +169,29 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -OutputTestNumber
+The test number to output as an object.
+Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
+
+```yaml
+Type: String
+Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
+Aliases:
+
+Required: True
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ### [CISAuditResult[]] - An array of CISAuditResult objects.
-### [string] - A path to a CSV file.
+###     [string] - A path to a CSV file.
 ## OUTPUTS
 
 ### [PSCustomObject] - A custom object containing the path to the zip file and its hash.

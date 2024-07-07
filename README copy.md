@@ -13,81 +13,40 @@ For full license details, please visit [Creative Commons Attribution-NonCommerci
 [Register for and download CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
 
 ## Invoke-M365SecurityAudit
-### Synopsis
-Invokes a security audit for Microsoft 365 environments.
-### Syntax
+
+# EXAMPLES
 ```powershell
+# Example 1: Performing a security audit based on CIS benchmarks
+$auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com"
+$auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ApprovedCloudStorageProviders "DropBox" -ApprovedFederatedDomains "northwind.com"
 
-Invoke-M365SecurityAudit -TenantAdminUrl <String> -DomainName <String> [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-WhatIf] [-Confirm] [<CommonParameters>]
+# Example 2: Exporting a security audit and it's nested tables to zipped CSV files
+Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
+    # Output Ex: 2024.07.07_14.55.55_M365FoundationsAudit_368B2E2F.zip
 
-Invoke-M365SecurityAudit -TenantAdminUrl <String> -DomainName <String> [-ELevel <String>] [-ProfileLevel <String>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-WhatIf] [-Confirm] [<CommonParameters>]
+# Example 3: Retrieving licenses for users in administrative roles
+Get-AdminRoleUserLicense
 
-Invoke-M365SecurityAudit -TenantAdminUrl <String> -DomainName <String> [-IncludeIG1] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-WhatIf] [-Confirm] [<CommonParameters>]
+# Example 4: Getting MFA status of users
+Get-MFAStatus -UserId "user@domain.com"
 
-Invoke-M365SecurityAudit -TenantAdminUrl <String> -DomainName <String> [-IncludeIG2] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-WhatIf] [-Confirm] [<CommonParameters>]
+# Example 5: Removing rows with empty status values from a CSV file
+Remove-RowsWithEmptyCSVStatus -FilePath "C:\Reports\Report.xlsx" -WorksheetName "Sheet1"
 
-Invoke-M365SecurityAudit -TenantAdminUrl <String> -DomainName <String> [-IncludeIG3] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-WhatIf] [-Confirm] [<CommonParameters>]
+# Example 6: Synchronizing CIS benchmark data with audit results
+Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "Combined Profiles"
 
-Invoke-M365SecurityAudit -TenantAdminUrl <String> -DomainName <String> [-IncludeRecommendation <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-WhatIf] [-Confirm] [<CommonParameters>]
-
-Invoke-M365SecurityAudit -TenantAdminUrl <String> -DomainName <String> [-SkipRecommendation <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-WhatIf] [-Confirm] [<CommonParameters>]
-
-
-
-
+# Example 7: Granting Microsoft Graph permissions to the auditor
+Grant-M365SecurityAuditConsent -UserPrincipalNameForConsent 'user@example.com'
 ```
-### Parameters
-| Name  | Alias  | Description | Required? | Pipeline Input | Default Value |
-| - | - | - | - | - | - |
-| <nobr>TenantAdminUrl</nobr> |  | The URL of the tenant admin. This parameter is mandatory. | true | false |  |
-| <nobr>DomainName</nobr> |  | The domain name of the Microsoft 365 environment. This parameter is mandatory. | true | false |  |
-| <nobr>ELevel</nobr> |  | Specifies the E-Level \(E3 or E5\) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter. | false | false |  |
-| <nobr>ProfileLevel</nobr> |  | Specifies the profile level \(L1 or L2\) for the audit. This parameter is optional and can be combined with the ELevel parameter. | false | false |  |
-| <nobr>IncludeIG1</nobr> |  | If specified, includes tests where IG1 is true. | false | false | False |
-| <nobr>IncludeIG2</nobr> |  | If specified, includes tests where IG2 is true. | false | false | False |
-| <nobr>IncludeIG3</nobr> |  | If specified, includes tests where IG3 is true. | false | false | False |
-| <nobr>IncludeRecommendation</nobr> |  | Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers. | false | false |  |
-| <nobr>SkipRecommendation</nobr> |  | Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers. | false | false |  |
-| <nobr>DoNotConnect</nobr> |  | If specified, the cmdlet will not establish a connection to Microsoft 365 services. | false | false | False |
-| <nobr>DoNotDisconnect</nobr> |  | If specified, the cmdlet will not disconnect from Microsoft 365 services after execution. | false | false | False |
-| <nobr>NoModuleCheck</nobr> |  | If specified, the cmdlet will not check for the presence of required modules. | false | false | False |
-| <nobr>WhatIf</nobr> | wi |  | false | false |  |
-| <nobr>Confirm</nobr> | cf |  | false | false |  |
-### Inputs
- - None. You cannot pipe objects to Invoke-M365SecurityAudit.
 
-### Outputs
- - CISAuditResult\\[\] The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
+# NOTE
+Ensure that you have the necessary permissions and administrative roles in your Microsoft 365 environment to run these cmdlets. Proper configuration and setup are required for accurate audit results.
 
-### Note
-This module is based on CIS benchmarks and is governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. For more details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
+# TROUBLESHOOTING NOTE
+If you encounter any issues while using the cmdlets, ensure that your environment meets the module prerequisites. Check for any updates or patches that may address known bugs. For issues related to specific cmdlets, refer to the individual help files for troubleshooting tips.
 
-### Examples
-**EXAMPLE 1**
-```powershell
-Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ELevel "E5" -ProfileLevel "L1"
-```
-Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
-
-**EXAMPLE 2**
-```powershell
-Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -IncludeIG1
-```
-Performs an audit including all tests where IG1 is true.
-
-**EXAMPLE 3**
-```powershell
-Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
-```
-Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
-
-**EXAMPLE 4**
-```powershell
-$auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
-PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
-```
-Captures the audit results into a variable and exports them to a CSV file.
-
-### Links
-
- - [Online Version: [GitHub Repository URL]](#Online Version: [GitHub Repository URL])
+# SEE ALSO
+- [CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks/)
+- [Microsoft 365 Security Documentation](https://docs.microsoft.com/en-us/microsoft-365/security/)
+- [PowerShell Documentation](https://docs.microsoft.com/en-us/powershell/)

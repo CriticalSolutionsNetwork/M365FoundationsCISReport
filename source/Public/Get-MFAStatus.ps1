@@ -7,20 +7,20 @@
         The User Principal Name (UPN) of a specific user to retrieve MFA status for. If not provided, the function retrieves MFA status for all users.
     .EXAMPLE
         Get-MFAStatus
-        Retrieves the MFA status for all Azure Active Directory users.
+            Retrieves the MFA status for all Azure Active Directory users.
     .EXAMPLE
         Get-MFAStatus -UserId "example@domain.com"
-        Retrieves the MFA status for the specified user with the UPN "example@domain.com".
+            Retrieves the MFA status for the specified user with the UPN "example@domain.com".
     .OUTPUTS
         System.Object
-        Returns a sorted list of custom objects containing the following properties:
-        - UserPrincipalName
-        - DisplayName
-        - MFAState
-        - MFADefaultMethod
-        - MFAPhoneNumber
-        - PrimarySMTP
-        - Aliases
+            Returns a sorted list of custom objects containing the following properties:
+                - UserPrincipalName
+                - DisplayName
+                - MFAState
+                - MFADefaultMethod
+                - MFAPhoneNumber
+                - PrimarySMTP
+                - Aliases
     .NOTES
         The function requires the MSOL module to be installed and connected to your tenant.
         Ensure that you have the necessary permissions to read user and MFA status information.

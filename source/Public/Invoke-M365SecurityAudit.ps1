@@ -2,15 +2,17 @@
     .SYNOPSIS
         Invokes a security audit for Microsoft 365 environments.
     .DESCRIPTION
-        The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters. It allows auditing of various configurations and settings within a Microsoft 365 environment, such as compliance with CIS benchmarks.
+        The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters.
+        It allows auditing of various configurations and settings within a Microsoft 365 environment in alignment with CIS benchmarks designated "Automatic".
     .PARAMETER TenantAdminUrl
         The URL of the tenant admin. If not specified, none of the SharePoint Online tests will run.
     .PARAMETER DomainName
-        The domain name of the Microsoft 365 environment to test. This parameter is not mandatory and by default it will pass/fail all found domains as a group if a specific domain is not specified.
+        The domain name of the Microsoft 365 environment to test. It is optional and will trigger various tests to run only for the specified domain.
+            Tests Affected: 2.1.9/Test-EnableDKIM, 1.3.1/Test-PasswordNeverExpirePolicy, 2.1.4/Test-SafeAttachmentsPolicy
     .PARAMETER ELevel
         Specifies the E-Level (E3 or E5) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter.
     .PARAMETER ProfileLevel
-        Specifies the profile level (L1 or L2) for the audit. This parameter is optional and can be combined with the ELevel parameter.
+        Specifies the profile level (L1 or L2) for the audit. This parameter is mandatory, but only when ELevel is selected. Otherwise it is not required.
     .PARAMETER IncludeIG1
         If specified, includes tests where IG1 is true.
     .PARAMETER IncludeIG2
@@ -22,9 +24,11 @@
     .PARAMETER SkipRecommendation
         Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
     .PARAMETER ApprovedCloudStorageProviders
-        Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
+        Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names for test 8.1.1/Test-TeamsExternalFileSharing.
+            Acceptable values: 'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
     .PARAMETER ApprovedFederatedDomains
-        Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.
+        Specifies the approved federated domains for the audit test 8.2.1/Test-TeamsExternalAccess. Accepts an array of allowed domain names.
+            Additional Tests may include this parameter in the future.
     .PARAMETER DoNotConnect
         If specified, the cmdlet will not establish a connection to Microsoft 365 services.
     .PARAMETER DoNotDisconnect
@@ -36,85 +40,94 @@
     .EXAMPLE
         PS> Invoke-M365SecurityAudit
 
-        Performs a security audit using default parameters.
-        Output:
-        Status      : Fail
-        ELevel      : E3
-        ProfileLevel: L1
-        Connection  : Microsoft Graph
-        Rec         : 1.1.1
-        Result      : False
-        Details     : Non-compliant accounts:
-                        Username        | Roles                  | HybridStatus | Missing Licence
-                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-        FailureReason: Non-Compliant Accounts: 2
+            Performs a security audit using default parameters.
+                Output:
+
+                    Status      : Fail
+                    ELevel      : E3
+                    ProfileLevel: L1
+                    Connection  : Microsoft Graph
+                    Rec         : 1.1.1
+                    Result      : False
+                    Details     : Non-compliant accounts:
+                                    Username        | Roles                  | HybridStatus | Missing Licence
+                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+                    FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ELevel "E5" -ProfileLevel "L1"
 
-        Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
-        Output:
-        Status      : Fail
-        ELevel      : E5
-        ProfileLevel: L1
-        Connection  : Microsoft Graph
-        Rec         : 1.1.1
-        Result      : False
-        Details     : Non-compliant accounts:
-                        Username        | Roles                  | HybridStatus | Missing Licence
-                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-        FailureReason: Non-Compliant Accounts: 2
+            Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
+                Output:
+
+                    Status      : Fail
+                    ELevel      : E5
+                    ProfileLevel: L1
+                    Connection  : Microsoft Graph
+                    Rec         : 1.1.1
+                    Result      : False
+                    Details     : Non-compliant accounts:
+                                    Username        | Roles                  | HybridStatus | Missing Licence
+                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+                    FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -IncludeIG1
 
-        Performs an audit including all tests where IG1 is true.
-        Output:
-        Status      : Fail
-        ELevel      : E3
-        ProfileLevel: L1
-        Connection  : Microsoft Graph
-        Rec         : 1.1.1
-        Result      : False
-        Details     : Non-compliant accounts:
-                        Username        | Roles                  | HybridStatus | Missing Licence
-                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-        FailureReason: Non-Compliant Accounts: 2
+            Performs an audit including all tests where IG1 is true.
+                Output:
+
+                    Status      : Fail
+                    ELevel      : E3
+                    ProfileLevel: L1
+                    Connection  : Microsoft Graph
+                    Rec         : 1.1.1
+                    Result      : False
+                    Details     : Non-compliant accounts:
+                                    Username        | Roles                  | HybridStatus | Missing Licence
+                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+                    FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
-        Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
-        Output:
-        Status      : Fail
-        ELevel      : E3
-        ProfileLevel: L1
-        Connection  : Microsoft Graph
-        Rec         : 1.1.1
-        Result      : False
-        Details     : Non-compliant accounts:
-                        Username        | Roles                  | HybridStatus | Missing Licence
-                        user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                        user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-        FailureReason: Non-Compliant Accounts: 2
+
+            Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
+                Output:
+
+                    Status      : Fail
+                    ELevel      : E3
+                    ProfileLevel: L1
+                    Connection  : Microsoft Graph
+                    Rec         : 1.1.1
+                    Result      : False
+                    Details     : Non-compliant accounts:
+                                    Username        | Roles                  | HybridStatus | Missing Licence
+                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
+                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
+                    FailureReason: Non-Compliant Accounts: 2
     .EXAMPLE
         PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
+        PS> Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
+
+        Or:
         PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
 
-        Captures the audit results into a variable and exports them to a CSV file.
-        Output:
-        CISAuditResult[]
-        auditResults.csv
+            Captures the audit results into a variable and exports them to a CSV file (Nested tables will be truncated).
+                Output:
+                    CISAuditResult[]
+                    auditResults.csv
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -WhatIf
 
-        Displays what would happen if the cmdlet is run without actually performing the audit.
-        Output:
-        What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
+            Displays what would happen if the cmdlet is run without actually performing the audit.
+                Output:
+
+                    What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
     .INPUTS
         None. You cannot pipe objects to Invoke-M365SecurityAudit.
     .OUTPUTS
         CISAuditResult[]
-        The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
+            The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
     .NOTES
         - This module is based on CIS benchmarks.
         - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
@@ -193,6 +206,7 @@ function Invoke-M365SecurityAudit {
     )
     Begin {
         if ($script:MaximumFunctionCount -lt 8192) {
+            Write-Verbose "Setting the `$script:MaximumFunctionCount to 8192 for the test run." -Verbose
             $script:MaximumFunctionCount = 8192
         }
         # Ensure required modules are installed

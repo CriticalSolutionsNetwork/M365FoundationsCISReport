@@ -1,27 +1,27 @@
 <#
     .SYNOPSIS
-    Synchronizes and updates data in an Excel worksheet with new information from a CSV file, including audit dates.
+        Synchronizes and updates data in an Excel worksheet with new information from a CSV file, including audit dates.
     .DESCRIPTION
-    The Sync-CISExcelAndCsvData function merges and updates data in a specified Excel worksheet from a CSV file. This includes adding or updating fields for connection status, details, failure reasons, and the date of the update. It's designed to ensure that the Excel document maintains a running log of changes over time, ideal for tracking remediation status and audit history.
+        The Sync-CISExcelAndCsvData function merges and updates data in a specified Excel worksheet from a CSV file. This includes adding or updating fields for connection status, details, failure reasons, and the date of the update. It's designed to ensure that the Excel document maintains a running log of changes over time, ideal for tracking remediation status and audit history.
     .PARAMETER ExcelPath
-    Specifies the path to the Excel file to be updated. This parameter is mandatory.
+        Specifies the path to the Excel file to be updated. This parameter is mandatory.
     .PARAMETER CsvPath
-    Specifies the path to the CSV file containing new data. This parameter is mandatory.
+        Specifies the path to the CSV file containing new data. This parameter is mandatory.
     .PARAMETER SheetName
-    Specifies the name of the worksheet in the Excel file where data will be merged and updated. This parameter is mandatory.
+        Specifies the name of the worksheet in the Excel file where data will be merged and updated. This parameter is mandatory.
     .EXAMPLE
-    PS> Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "AuditData"
-    Updates the 'AuditData' worksheet in 'excel.xlsx' with data from 'data.csv', adding new information and the date of the update.
+        PS> Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "AuditData"
+            Updates the 'AuditData' worksheet in 'excel.xlsx' with data from 'data.csv', adding new information and the date of the update.
     .INPUTS
-    System.String
-    The function accepts strings for file paths and worksheet names.
+        System.String
+            The function accepts strings for file paths and worksheet names.
     .OUTPUTS
     None
     The function directly updates the Excel file and does not output any objects.
     .NOTES
-    - Ensure that the 'ImportExcel' module is installed and up to date to handle Excel file manipulations.
-    - It is recommended to back up the Excel file before running this function to avoid accidental data loss.
-    - The CSV file should have columns that match expected headers like 'Connection', 'Details', 'FailureReason', and 'Status' for correct data mapping.
+        - Ensure that the 'ImportExcel' module is installed and up to date to handle Excel file manipulations.
+        - It is recommended to back up the Excel file before running this function to avoid accidental data loss.
+        - The CSV file should have columns that match expected headers like 'Connection', 'Details', 'FailureReason', and 'Status' for correct data mapping.
     .LINK
     https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Sync-CISExcelAndCsvData
 #>
