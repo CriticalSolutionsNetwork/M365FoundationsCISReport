@@ -2,7 +2,8 @@
     .SYNOPSIS
         Invokes a security audit for Microsoft 365 environments.
     .DESCRIPTION
-        The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters. It allows auditing of various configurations and settings within a Microsoft 365 environment, such as compliance with CIS benchmarks.
+        The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters.
+        It allows auditing of various configurations and settings within a Microsoft 365 environment in alignment with CIS benchmarks designated "Automatic".
     .PARAMETER TenantAdminUrl
         The URL of the tenant admin. If not specified, none of the SharePoint Online tests will run.
     .PARAMETER DomainName
@@ -23,10 +24,11 @@
     .PARAMETER SkipRecommendation
         Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
     .PARAMETER ApprovedCloudStorageProviders
-        Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.
+        Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names for test 8.1.1/Test-TeamsExternalFileSharing.
         Acceptable values: 'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
     .PARAMETER ApprovedFederatedDomains
         Specifies the approved federated domains for the audit test 8.2.1/Test-TeamsExternalAccess. Accepts an array of allowed domain names.
+        Additional Tests may include this parameter in the future.
     .PARAMETER DoNotConnect
         If specified, the cmdlet will not establish a connection to Microsoft 365 services.
     .PARAMETER DoNotDisconnect
