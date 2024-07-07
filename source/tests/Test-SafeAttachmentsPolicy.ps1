@@ -1,19 +1,22 @@
 function Test-SafeAttachmentsPolicy {
     [CmdletBinding()]
     [OutputType([CISAuditResult])]
-    param ()
+    param (
+        [Parameter(Mandatory = $false)]
+        [string]$DomainName
+    )
     begin {
         $recnum = "2.1.4"
         Write-Verbose "Running Test-SafeAttachmentsPolicy for $recnum..."
         <#
             Conditions for 2.1.4 (L2) Ensure Safe Attachments policy is enabled:
             Validate test for a pass:
-                - Ensure the highest priority Safe Attachments policy is enabled.
-                - Check if the policy's action is set to 'Block'.
+                - Ensure Safe Attachments policies are enabled.
+                - Check if each policy's action is set to 'Block'.
                 - Confirm the QuarantineTag is set to 'AdminOnlyAccessPolicy'.
                 - Verify that the Redirect setting is disabled.
             Validate test for a fail:
-                - If the highest priority Safe Attachments policy's action is not set to 'Block'.
+                - If any Safe Attachments policy's action is not set to 'Block'.
                 - If the QuarantineTag is not set to 'AdminOnlyAccessPolicy'.
                 - If the Redirect setting is enabled.
                 - If no enabled Safe Attachments policies are found.
@@ -33,35 +36,47 @@ function Test-SafeAttachmentsPolicy {
                 }
             )
         #>
-        $safeAttachmentPolicies = Get-CISExoOutput -Rec $recnum
+        $safeAttachmentPolicies, $safeAttachmentRules = Get-CISExoOutput -Rec $recnum
+        $safeAttachmentPolicies = $safeAttachmentPolicies | Where-Object { $_.Identity -in $safeAttachmentRules.SafeAttachmentPolicy }
         if ($safeAttachmentPolicies -ne 1) {
             try {
-                $highestPriorityPolicy = $safeAttachmentPolicies | Select-Object -First 1
+                if ($DomainName) {
+                    $safeAttachmentPolicies = $safeAttachmentPolicies | Where-Object { $_.Identity -eq ($safeAttachmentRules | Sort-Object -Property Priority | Where-Object { $_.RecipientDomainIs -in $DomainName } | Select-Object -ExpandProperty SafeAttachmentPolicy -First 1) }
+                    $RecipientDomains = $safeAttachmentRules | Where-Object { $_.SafeAttachmentPolicy -eq $safeAttachmentPolicies.Identity } | Select-Object -ExpandProperty RecipientDomainIs
+                }
                 # Initialize details and failure reasons
                 $details = @()
                 $failureReasons = @()
-                # Check policy specifics as per CIS benchmark requirements
-                if ($highestPriorityPolicy.Action -ne 'Block') {
-                    $failureReasons += "Policy action is not set to 'Block'."
+                foreach ($policy in $safeAttachmentPolicies) {
+                    # Check policy specifics as per CIS benchmark requirements
+                    if ($Policy.Action -ne 'Block') {
+                        $failureReasons += "Policy: $($Policy.Identity); Action is not set to 'Block'."
+                    }
+                    if ($Policy.QuarantineTag -ne 'AdminOnlyAccessPolicy') {
+                        $failureReasons += "Policy: $($Policy.Identity); Quarantine is not set to 'AdminOnlyAccessPolicy'."
+                    }
+                    if ($Policy.Redirect -ne $false) {
+                        $failureReasons += "Policy: $($Policy.Identity); Redirect is not disabled."
+                    }
+                    # The result is a pass if there are no failure reasons
+                    $details += [PSCustomObject]@{
+                        Policy        = ($Policy.Identity).trim()
+                        Action        = $Policy.Action
+                        QuarantineTag = $Policy.QuarantineTag
+                        Redirect      = $Policy.Redirect
+                        Enabled       = $Policy.Enable
+                        Priority      = [int]($safeAttachmentRules | Where-Object { $_.SafeAttachmentPolicy -eq $Policy.Identity } | Select-Object -ExpandProperty Priority)
+                    }
                 }
-                if ($highestPriorityPolicy.QuarantineTag -ne 'AdminOnlyAccessPolicy') {
-                    $failureReasons += "Quarantine policy is not set to 'AdminOnlyAccessPolicy'."
-                }
-                if ($highestPriorityPolicy.Redirect -ne $false) {
-                    $failureReasons += "Redirect is not disabled."
-                }
-                # The result is a pass if there are no failure reasons
                 $result = $failureReasons.Count -eq 0
-                $details = [PSCustomObject]@{
-                    Policy        = $highestPriorityPolicy.Identity
-                    Action        = $highestPriorityPolicy.Action
-                    QuarantineTag = $highestPriorityPolicy.QuarantineTag
-                    Redirect      = $highestPriorityPolicy.Redirect
-                    Enabled       = $highestPriorityPolicy.Enable
+                if ($RecipientDomains) {
+                    $failureReasons += "Recipient domain(s): '$($RecipientDomains -join ', ' )' included in tested policy."
                 }
                 # Format details for output manually
-                $detailsString = "Policy|Action|QuarantineTag|Redirect|Enabled`n" + ($details |
-                    ForEach-Object { "$($_.Policy)|$($_.Action)|$($_.QuarantineTag)|$($_.Redirect)|$($_.Enabled)`n" }
+                $detailsString = "Policy|Action|QuarantineTag|Redirect|Enabled|Priority`n" + `
+                ($details | ForEach-Object {
+                        "$($_.Policy)|$($_.Action)|$($_.QuarantineTag)|$($_.Redirect)|$($_.Enabled)|$($_.Priority)`n"
+                    }
                 )
                 $failureReasonsString = ($failureReasons -join "`n")
                 # Create and populate the CISAuditResult object

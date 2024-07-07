@@ -220,10 +220,11 @@ function Get-CISExoOutput {
                         )
                     #>
                     $safeAttachmentPolicies = Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue | Where-Object { $_.Enable -eq $true }
+                    $safeAttachmentRules = Get-SafeAttachmentRule
                     # [object[]]
-                    return $safeAttachmentPolicies
+                    return $safeAttachmentPolicies, $safeAttachmentRules
                     else {
-                        return 1
+                        return 1,1
                     }
                 }
             }
