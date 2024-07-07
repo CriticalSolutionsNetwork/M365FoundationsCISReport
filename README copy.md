@@ -11,6 +11,14 @@ This PowerShell module is based on CIS benchmarks and is distributed under the C
 For full license details, please visit [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en).
 
 [Register for and download CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
+# Table of Contents
+1. [Invoke-M365SecurityAudit](#Invoke-M365SecurityAudit)
+2. [Export-M365SecurityAuditTable](#Export-M365SecurityAuditTable)
+3. [Get-AdminRoleUserLicense](#Get-AdminRoleUserLicense)
+4. [Get-MFAStatus](#Get-MFAStatus)
+5. [Grant-M365SecurityAuditConsent](#Grant-M365SecurityAuditConsent)
+6. [Remove-RowsWithEmptyCSVStatus](#Remove-RowsWithEmptyCSVStatus)
+7. [Sync-CISExcelAndCsvData](#Sync-CISExcelAndCsvData)
 
 ## Invoke-M365SecurityAudit
 
