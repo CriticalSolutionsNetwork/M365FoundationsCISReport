@@ -18,9 +18,11 @@ The module includes functionality to synchronize audit results with CIS benchmar
 ```powershell
 # Example 1: Performing a security audit based on CIS benchmarks
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com"
+$auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ApprovedCloudStorageProviders "DropBox" -ApprovedFederatedDomains "northwind.com"
 
-# Example 2: Exporting a security audit table to a CSV file
-Export-M365SecurityAuditTable -ExportAllTests -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests
+# Example 2: Exporting a security audit and it's nested tables to zipped CSV files
+Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
+    # Output Ex: 2024.07.07_14.55.55_M365FoundationsAudit_368B2E2F.zip
 
 # Example 3: Retrieving licenses for users in administrative roles
 Get-AdminRoleUserLicense
