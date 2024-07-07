@@ -4,7 +4,7 @@ Import-Module .\output\module\M365FoundationsCISReport\*\*.psd1
 
 
 <#
-    $ver = "v0.1.22"
+    $ver = "v0.1.23"
     git checkout main
     git pull origin main
     git tag -a $ver -m "Release version $ver refactor Update"
