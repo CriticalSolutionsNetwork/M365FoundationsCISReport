@@ -12,7 +12,7 @@ For full license details, please visit [Creative Commons Attribution-NonCommerci
 
 [Register for and download CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
 # Table of Contents
-1. [Invoke-M365SecurityAudit](##Invoke-M365SecurityAudit)
+1. [Invoke-M365SecurityAudit](#Invoke-M365SecurityAudit)
 2. [Export-M365SecurityAuditTable](#Export-M365SecurityAuditTable)
 3. [Get-AdminRoleUserLicense](#Get-AdminRoleUserLicense)
 4. [Get-MFAStatus](#Get-MFAStatus)
