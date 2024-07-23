@@ -45,13 +45,12 @@ function Test-PasswordNeverExpirePolicy {
                 $isDefault = $domain.IsDefault
                 # Step (Condition C): Determine if the notification window is set to 30 days
                 $notificationWindow = $domain.PasswordNotificationWindowInDays
-                $notificationPolIsCompliant = $notificationWindow -eq 30
+                $notificationPolIsCompliant = $true # No longer a requirement
                 # Step (Condition A): Retrieve password expiration policy
                 $passwordPolicy = $domain.PasswordValidityPeriodInDays
                 $pwPolIsCompliant = $passwordPolicy -eq 2147483647
                 # Step (Condition A & B): Determine if the policy is compliant
                 $overallResult = $overallResult -and $notificationPolIsCompliant -and $pwPolIsCompliant
-
                 # Step (Condition A & B): Prepare failure reasons and details based on compliance
                 $failureReasons = if ($notificationPolIsCompliant -and $pwPolIsCompliant) {
                     "N/A"
@@ -59,18 +58,14 @@ function Test-PasswordNeverExpirePolicy {
                 else {
                     "Password expiration is not set to never expire or notification window is not set to 30 days for domain $domainName. Run the following command to remediate: `nUpdate-MgDomain -DomainId $domainName -PasswordValidityPeriodInDays 2147483647 -PasswordNotificationWindowInDays 30`n"
                 }
-
                 $details = "$domainName|$passwordPolicy days|$notificationWindow days|$isDefault"
-
                 # Add details and failure reasons to the lists
                 $detailsList += $details
                 $failureReasonsList += $failureReasons
             }
-
             # Prepare the final failure reason and details
             $finalFailureReason = $failureReasonsList -join "`n"
             $finalDetails = $detailsList -join "`n"
-
             # Step: Create and populate the CISAuditResult object
             $params = @{
                 Rec           = $recnum
@@ -86,7 +81,6 @@ function Test-PasswordNeverExpirePolicy {
             $auditResult = Get-TestError -LastError $LastError -recnum $recnum
         }
     }
-
     end {
         # Return the audit result
         return $auditResult

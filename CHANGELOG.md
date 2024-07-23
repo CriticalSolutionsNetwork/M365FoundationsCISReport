@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed test 1.3.1 as notification window for password expiration is no longer required.
+
+## [0.1.24] - 2024-07-07
+
 ### Added
 
 - New private function `Get-AuditMailboxDetail` for 6.1.2 and 6.1.3 tests to get the action details for the test.
