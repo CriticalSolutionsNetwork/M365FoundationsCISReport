@@ -18,15 +18,15 @@ function Measure-AuditResult {
     $passPercentage = if ($totalTests -eq 0) { 0 } else { [math]::Round(($passedTests / $totalTests) * 100, 2) }
 
     # Display the pass percentage to the user
-    Write-Host "Audit completed. $passedTests out of $totalTests tests passed." -ForegroundColor Cyan
-    Write-Host "Your passing percentage is $passPercentage%." -ForegroundColor Magenta
+    Write-Verbose "Audit completed. $passedTests out of $totalTests tests passed."
+    Write-Verbose "Your passing percentage is $passPercentage%."
 
     # Display details of failed tests
     if ($FailedTests.Count -gt 0) {
-        Write-Host "The following tests failed to complete:" -ForegroundColor Red
+        Write-Verbose "The following tests failed to complete:"
         foreach ($failedTest in $FailedTests) {
-            Write-Host "Test: $($failedTest.Test)" -ForegroundColor Yellow
-            Write-Host "Error: $($failedTest.Error)" -ForegroundColor Yellow
+            Write-Verbose "Test: $($failedTest.Test)"
+            Write-Verbose "Error: $($failedTest.Error)"
         }
     }
 }

@@ -14,7 +14,7 @@ function Get-RequiredModule {
             return @(
                 @{ ModuleName = "ExchangeOnlineManagement"; RequiredVersion = "3.3.0"; SubModules = @() },
                 @{ ModuleName = "AzureAD"; RequiredVersion = "2.0.2.182"; SubModules = @() },
-                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModules = @("Groups", "DeviceManagement", "Users", "Identity.DirectoryManagement", "Identity.SignIns") },
+                @{ ModuleName = "Microsoft.Graph"; RequiredVersion = "2.4.0"; SubModules = @("DeviceManagement", "Users", "Identity.DirectoryManagement", "Identity.SignIns") },
                 @{ ModuleName = "Microsoft.Online.SharePoint.PowerShell"; RequiredVersion = "16.0.24009.12000"; SubModules = @() },
                 @{ ModuleName = "MicrosoftTeams"; RequiredVersion = "5.5.0"; SubModules = @() }
             )

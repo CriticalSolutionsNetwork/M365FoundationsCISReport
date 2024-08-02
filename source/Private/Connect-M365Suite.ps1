@@ -11,14 +11,18 @@ function Connect-M365Suite {
         [Parameter(Mandatory = $false)]
         [switch]$SkipConfirmation
     )
-
-    $VerbosePreference = "SilentlyContinue"
+    if (!$SkipConfirmation) {
+        $VerbosePreference = "Continue"
+    }
+    else {
+        $VerbosePreference = "SilentlyContinue"
+    }
     $tenantInfo = @()
     $connectedServices = @()
 
     try {
         if ($RequiredConnections -contains "AzureAD" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "AzureAD | EXO | Microsoft Graph") {
-            Write-Host "Connecting to Azure Active Directory..." -ForegroundColor Yellow
+            Write-Verbose "Connecting to Azure Active Directory..."
             Connect-AzureAD -WarningAction SilentlyContinue | Out-Null
             $tenantDetails = Get-AzureADTenantDetail -WarningAction SilentlyContinue
             $tenantInfo += [PSCustomObject]@{
@@ -27,11 +31,11 @@ function Connect-M365Suite {
                 TenantID = $tenantDetails.ObjectId
             }
             $connectedServices += "AzureAD"
-            Write-Host "Successfully connected to Azure Active Directory." -ForegroundColor Green
+            Write-Verbose "Successfully connected to Azure Active Directory."
         }
 
         if ($RequiredConnections -contains "Microsoft Graph" -or $RequiredConnections -contains "EXO | Microsoft Graph") {
-            Write-Host "Connecting to Microsoft Graph with scopes: Directory.Read.All, Domain.Read.All, Policy.Read.All, Organization.Read.All" -ForegroundColor Yellow
+            Write-Verbose "Connecting to Microsoft Graph with scopes: Directory.Read.All, Domain.Read.All, Policy.Read.All, Organization.Read.All"
             try {
                 Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome | Out-Null
                 $graphOrgDetails = Get-MgOrganization
@@ -41,10 +45,10 @@ function Connect-M365Suite {
                     TenantID = $graphOrgDetails.Id
                 }
                 $connectedServices += "Microsoft Graph"
-                Write-Host "Successfully connected to Microsoft Graph with specified scopes." -ForegroundColor Green
+                Write-Verbose "Successfully connected to Microsoft Graph with specified scopes."
             }
             catch {
-                Write-Host "Failed to connect to MgGraph, attempting device auth." -ForegroundColor Yellow
+                Write-Verbose "Failed to connect to MgGraph, attempting device auth."
                 Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -UseDeviceCode -NoWelcome | Out-Null
                 $graphOrgDetails = Get-MgOrganization
                 $tenantInfo += [PSCustomObject]@{
@@ -53,12 +57,12 @@ function Connect-M365Suite {
                     TenantID = $graphOrgDetails.Id
                 }
                 $connectedServices += "Microsoft Graph"
-                Write-Host "Successfully connected to Microsoft Graph with specified scopes." -ForegroundColor Green
+                Write-Verbose "Successfully connected to Microsoft Graph with specified scopes."
             }
         }
 
         if ($RequiredConnections -contains "EXO" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "Microsoft Teams | EXO" -or $RequiredConnections -contains "EXO | Microsoft Graph") {
-            Write-Host "Connecting to Exchange Online..." -ForegroundColor Yellow
+            Write-Verbose "Connecting to Exchange Online..."
             Connect-ExchangeOnline -ShowBanner:$false | Out-Null
             $exoTenant = (Get-OrganizationConfig).Identity
             $tenantInfo += [PSCustomObject]@{
@@ -67,11 +71,11 @@ function Connect-M365Suite {
                 TenantID = "N/A"
             }
             $connectedServices += "EXO"
-            Write-Host "Successfully connected to Exchange Online." -ForegroundColor Green
+            Write-Verbose "Successfully connected to Exchange Online."
         }
 
         if ($RequiredConnections -contains "SPO") {
-            Write-Host "Connecting to SharePoint Online..." -ForegroundColor Yellow
+            Write-Verbose "Connecting to SharePoint Online..."
             Connect-SPOService -Url $TenantAdminUrl | Out-Null
             $spoContext = Get-SPOCrossTenantHostUrl
             $tenantName = Get-UrlLine -Output $spoContext
@@ -80,11 +84,11 @@ function Connect-M365Suite {
                 TenantName = $tenantName
             }
             $connectedServices += "SPO"
-            Write-Host "Successfully connected to SharePoint Online." -ForegroundColor Green
+            Write-Verbose "Successfully connected to SharePoint Online."
         }
 
         if ($RequiredConnections -contains "Microsoft Teams" -or $RequiredConnections -contains "Microsoft Teams | EXO") {
-            Write-Host "Connecting to Microsoft Teams..." -ForegroundColor Yellow
+            Write-Verbose "Connecting to Microsoft Teams..."
             Connect-MicrosoftTeams | Out-Null
             $teamsTenantDetails = Get-CsTenant
             $tenantInfo += [PSCustomObject]@{
@@ -93,20 +97,20 @@ function Connect-M365Suite {
                 TenantID = $teamsTenantDetails.TenantId
             }
             $connectedServices += "Microsoft Teams"
-            Write-Host "Successfully connected to Microsoft Teams." -ForegroundColor Green
+            Write-Verbose "Successfully connected to Microsoft Teams."
         }
 
         # Display tenant information and confirm with the user
         if (-not $SkipConfirmation) {
-            Write-Host "Connected to the following tenants:" -ForegroundColor Yellow
+            Write-Verbose "Connected to the following tenants:"
             foreach ($tenant in $tenantInfo) {
-                Write-Host "Service: $($tenant.Service)" -ForegroundColor Cyan
-                Write-Host "Tenant Context: $($tenant.TenantName)`n" -ForegroundColor Green
-                #Write-Host "Tenant ID: $($tenant.TenantID)"
+                Write-Verbose "Service: $($tenant.Service)"
+                Write-Verbose "Tenant Context: $($tenant.TenantName)`n"
+                #Write-Verbose "Tenant ID: $($tenant.TenantID)"
             }
             $confirmation = Read-Host "Do you want to proceed with these connections? (Y/N)"
             if ($confirmation -notlike 'Y') {
-                Write-Host "Connection setup aborted by user." -ForegroundColor Red
+                Write-Verbose "Connection setup aborted by user."
                 Disconnect-M365Suite -RequiredConnections $connectedServices
                 throw "User aborted connection setup."
             }
@@ -114,7 +118,7 @@ function Connect-M365Suite {
     }
     catch {
         $VerbosePreference = "Continue"
-        Write-Host "There was an error establishing one or more connections: $_" -ForegroundColor Red
+        Write-Verbose "There was an error establishing one or more connections: $_"
         throw $_
     }
 

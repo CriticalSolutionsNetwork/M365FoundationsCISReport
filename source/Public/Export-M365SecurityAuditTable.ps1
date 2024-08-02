@@ -49,7 +49,7 @@
         https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
 #>
 function Export-M365SecurityAuditTable {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     [OutputType([PSCustomObject])]
     param (
         [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "ExportAllResultsFromAuditResults")]
@@ -74,12 +74,21 @@ function Export-M365SecurityAuditTable {
         [switch]$ExportOriginalTests,
         [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
         [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
-        [switch]$ExportToExcel
+        [switch]$ExportToExcel,
+        # Add Prefix to filename after date when outputting to excel or csv.
+        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
+        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
+        # Validate that the count of letters in the prefix is less than 5.
+        [ValidateLength(0, 5)]
+        [string]$Prefix = "Corp"
     )
     Begin {
         $createdFiles = @() # Initialize an array to keep track of created files
+
         if ($ExportToExcel) {
-            Assert-ModuleAvailability -ModuleName ImportExcel -RequiredVersion "7.8.9"
+            if ($PSCmdlet.ShouldProcess("ImportExcel v7.8.9", "Assert-ModuleAvailability")) {
+                Assert-ModuleAvailability -ModuleName ImportExcel -RequiredVersion "7.8.9"
+            }
         }
         if ($PSCmdlet.ParameterSetName -like "ExportAllResultsFromCsv" -or $PSCmdlet.ParameterSetName -eq "OutputObjectFromCsvSingle") {
             $AuditResults = Import-Csv -Path $CsvPath | ForEach-Object {
@@ -127,86 +136,84 @@ function Export-M365SecurityAuditTable {
     }
     End {
         if ($ExportPath) {
-            $timestamp = (Get-Date).ToString("yyyy.MM.dd_HH.mm.ss")
-            $exportedTests = @()
-            foreach ($result in $results) {
-                $testDef = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $result.TestNumber }
-                if ($testDef) {
-                    $fileName = "$ExportPath\$($timestamp)_$($result.TestNumber).$($testDef.TestFileName -replace '\.ps1$').csv"
-                    if ($result.Details.Count -eq 0) {
-                        Write-Information "No results found for test number $($result.TestNumber)." -InformationAction Continue
-                    }
-                    else {
-                        if (($result.Details -ne "No M365 E3 licenses found.") -and ($result.Details -ne "No M365 E5 licenses found.")) {
-                            if ($ExportToExcel) {
-                                $xlsxPath = [System.IO.Path]::ChangeExtension($fileName, '.xlsx')
-                                $result.Details | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
-                                $createdFiles += $xlsxPath # Add the created file to the array
+            if ($PSCmdlet.ShouldProcess("Export-M365SecurityAuditTable", "Exporting results to $ExportPath")) {
+                $timestamp = (Get-Date).ToString("yyyy.MM.dd_HH.mm.ss")
+                $exportedTests = @()
+                foreach ($result in $results) {
+                    $testDef = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $result.TestNumber }
+                    if ($testDef) {
+                        $fileName = "$ExportPath\$($timestamp)_$($result.TestNumber).$($testDef.TestFileName -replace '\.ps1$').csv"
+                        if ($result.Details.Count -eq 0) {
+                            Write-Information "No results found for test number $($result.TestNumber)."
+                        }
+                        else {
+                            if (($result.Details -ne "No M365 E3 licenses found.") -and ($result.Details -ne "No M365 E5 licenses found.")) {
+                                if ($ExportToExcel) {
+                                    $xlsxPath = [System.IO.Path]::ChangeExtension($fileName, '.xlsx')
+                                    $result.Details | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
+                                    $createdFiles += $xlsxPath # Add the created file to the array
+                                }
+                                else {
+                                    $result.Details | Export-Csv -Path $fileName -NoTypeInformation
+                                    $createdFiles += $fileName # Add the created file to the array
+                                }
+                                $exportedTests += $result.TestNumber
                             }
-                            else {
-                                $result.Details | Export-Csv -Path $fileName -NoTypeInformation
-                                $createdFiles += $fileName # Add the created file to the array
-                            }
-                            $exportedTests += $result.TestNumber
                         }
                     }
                 }
-            }
-            if ($exportedTests.Count -gt 0) {
-                Write-Information "The following tests were exported: $($exportedTests -join ', ')" -InformationAction Continue
-            }
-            else {
+                if ($exportedTests.Count -gt 0) {
+                    Write-Information "The following tests were exported: $($exportedTests -join ', ')"
+                }
+                else {
+                    if ($ExportOriginalTests) {
+                        Write-Information "Full audit results exported however, none of the following tests had exports: `n1.1.1, 1.3.1, 6.1.2, 6.1.3, 7.3.4"
+                    }
+                    else {
+                        Write-Information "No specified tests were included in the export."
+                    }
+                }
                 if ($ExportOriginalTests) {
-                    Write-Information "Full audit results exported however, none of the following tests had exports: `n1.1.1, 1.3.1, 6.1.2, 6.1.3, 7.3.4" -InformationAction Continue
+                    # Define the test numbers to check
+                    $TestNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
+                    # Check for large details and update the AuditResults array
+                    $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
+                    $originalFileName = "$ExportPath\$timestamp`_$Prefix-M365FoundationsAudit.csv"
+                    if ($ExportToExcel) {
+                        $xlsxPath = [System.IO.Path]::ChangeExtension($originalFileName, '.xlsx')
+                        $updatedAuditResults | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
+                        $createdFiles += $xlsxPath # Add the created file to the array
+                    }
+                    else {
+                        $updatedAuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
+                        $createdFiles += $originalFileName # Add the created file to the array
+                    }
                 }
-                else {
-                    Write-Information "No specified tests were included in the export." -InformationAction Continue
+                # Hash each file and add it to a dictionary
+                # Hash each file and save the hashes to a text file
+                $hashFilePath = "$ExportPath\$timestamp`_Hashes.txt"
+                $fileHashes = @()
+                foreach ($file in $createdFiles) {
+                    $hash = Get-FileHash -Path $file -Algorithm SHA256
+                    $fileHashes += "$($file): $($hash.Hash)"
                 }
-            }
-            if ($ExportOriginalTests) {
-                # Define the test numbers to check
-                $TestNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-                # Check for large details and update the AuditResults array
-                $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
-                $originalFileName = "$ExportPath\$timestamp`_M365FoundationsAudit.csv"
-                if ($ExportToExcel) {
-                    $xlsxPath = [System.IO.Path]::ChangeExtension($originalFileName, '.xlsx')
-                    $updatedAuditResults | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
-                    $createdFiles += $xlsxPath # Add the created file to the array
+                $fileHashes | Set-Content -Path $hashFilePath
+                $createdFiles += $hashFilePath # Add the hash file to the array
+                # Create a zip file and add all the created files
+                $zipFilePath = "$ExportPath\$timestamp`_$Prefix-M365FoundationsAudit.zip"
+                Compress-Archive -Path $createdFiles -DestinationPath $zipFilePath
+                # Remove the original files after they have been added to the zip
+                foreach ($file in $createdFiles) {
+                    Remove-Item -Path $file -Force
                 }
-                else {
-                    $updatedAuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
-                    $createdFiles += $originalFileName # Add the created file to the array
+                # Compute the hash for the zip file and rename it
+                $zipHash = Get-FileHash -Path $zipFilePath -Algorithm SHA256
+                $newZipFilePath = "$ExportPath\$timestamp`_$Prefix-M365FoundationsAudit_$($zipHash.Hash.Substring(0, 8)).zip"
+                Rename-Item -Path $zipFilePath -NewName $newZipFilePath
+                # Output the zip file path with hash
+                return [PSCustomObject]@{
+                    ZipFilePath = $newZipFilePath
                 }
-            }
-            # Hash each file and add it to a dictionary
-            # Hash each file and save the hashes to a text file
-            $hashFilePath = "$ExportPath\$timestamp`_Hashes.txt"
-            $fileHashes = @()
-            foreach ($file in $createdFiles) {
-                $hash = Get-FileHash -Path $file -Algorithm SHA256
-                $fileHashes += "$($file): $($hash.Hash)"
-            }
-            $fileHashes | Set-Content -Path $hashFilePath
-            $createdFiles += $hashFilePath # Add the hash file to the array
-
-            # Create a zip file and add all the created files
-            $zipFilePath = "$ExportPath\$timestamp`_M365FoundationsAudit.zip"
-            Compress-Archive -Path $createdFiles -DestinationPath $zipFilePath
-
-            # Remove the original files after they have been added to the zip
-            foreach ($file in $createdFiles) {
-                Remove-Item -Path $file -Force
-            }
-
-            # Compute the hash for the zip file and rename it
-            $zipHash = Get-FileHash -Path $zipFilePath -Algorithm SHA256
-            $newZipFilePath = "$ExportPath\$timestamp`_M365FoundationsAudit_$($zipHash.Hash.Substring(0, 8)).zip"
-            Rename-Item -Path $zipFilePath -NewName $newZipFilePath
-
-            # Output the zip file path with hash
-            [PSCustomObject]@{
-                ZipFilePath = $newZipFilePath
             }
         } # End of ExportPath
         elseif ($OutputTestNumber) {
@@ -214,7 +221,7 @@ function Export-M365SecurityAuditTable {
                 return $results[0].Details
             }
             else {
-                Write-Information "No results found for test number $($OutputTestNumber)." -InformationAction Continue
+                Write-Information "No results found for test number $($OutputTestNumber)."
             }
         }
         else {
