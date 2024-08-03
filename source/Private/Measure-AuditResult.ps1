@@ -18,8 +18,8 @@ function Measure-AuditResult {
     $passPercentage = if ($totalTests -eq 0) { 0 } else { [math]::Round(($passedTests / $totalTests) * 100, 2) }
 
     # Display the pass percentage to the user
-    Write-Verbose "Audit completed. $passedTests out of $totalTests tests passed."
-    Write-Verbose "Your passing percentage is $passPercentage%."
+    Write-Information "Audit completed. $passedTests out of $totalTests tests passed."
+    Write-Information "Your passing percentage is $passPercentage%."
 
     # Display details of failed tests
     if ($FailedTests.Count -gt 0) {

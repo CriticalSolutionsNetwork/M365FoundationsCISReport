@@ -1,13 +1,3 @@
-<#
-    .SYNOPSIS
-        This is a sample Private function only visible within the module.
-    .DESCRIPTION
-        This sample function is not exported to the module and only return the data passed as parameter.
-    .EXAMPLE
-        $null = Get-CISSpoOutput -PrivateData 'NOTHING TO SEE HERE'
-    .PARAMETER PrivateData
-        The PrivateData parameter is what will be returned without transformation.
-#>
 function Get-CISSpoOutput {
     [cmdletBinding()]
     param(
@@ -15,186 +5,45 @@ function Get-CISSpoOutput {
         [String]$Rec
     )
     begin {
-        # Begin Block #
-        <#
-            # Tests
-            7.2.1
-            7.2.2
-            7.2.3
-            7.2.4
-            7.2.5
-            7.2.6
-            7.2.7
-            7.2.9
-            7.2.10
-            7.3.1
-            7.3.2
-            7.3.4
-
-            # Test number array
-            $testNumbers = @('7.2.1', '7.2.2', '7.2.3', '7.2.4', '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.2.10', '7.3.1', '7.3.2', '7.3.4')
-        #>
-    }
-    process {
-        Write-Verbose "Retuning data for Rec: $Rec"
-        switch ($Rec) {
-            '7.2.1' {
-                # Test-ModernAuthSharePoint.ps1
-                # $SPOTenant Mock Object
-                <#
-                    $SPOTenant = [PSCustomObject]@{
-                        LegacyAuthProtocolsEnabled           = $true
-                    }
-                #>
-                $SPOTenant = Get-SPOTenant | Select-Object -Property LegacyAuthProtocolsEnabled
-                return $SPOTenant
-            }
-            '7.2.2' {
-                # Test-SharePointAADB2B.ps1
-                # 7.2.2 (L1) Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled
-                # $SPOTenantAzureADB2B Mock Object
-                <#
-                    $SPOTenantAzureADB2B = [PSCustomObject]@{
-                        EnableAzureADB2BIntegration           = $false
-                    }
-                #>
-                $SPOTenantAzureADB2B = Get-SPOTenant | Select-Object EnableAzureADB2BIntegration
-                return $SPOTenantAzureADB2B
-            }
-            '7.2.3' {
-                # Test-RestrictExternalSharing.ps1
-                # 7.2.3 (L1) Ensure external content sharing is restricted
-                # Retrieve the SharingCapability setting for the SharePoint tenant
-                # $SPOTenantSharingCapability Mock Object
-                <#
-                    $SPOTenantSharingCapability = [PSCustomObject]@{
-                        SharingCapability           = "ExternalUserAndGuestSharing"
-                    }
-                #>
-                $SPOTenantSharingCapability = Get-SPOTenant | Select-Object SharingCapability
-                return $SPOTenantSharingCapability
-            }
-            '7.2.4' {
-                # Test-OneDriveContentRestrictions.ps1
-                # 7.2.4 (L2) Ensure OneDrive content sharing is restricted
-                # $SPOTenant Mock Object
-                <#
-                    $SPOTenant = [PSCustomObject]@{
-                        OneDriveSharingCapability           = "ExternalUserAndGuestSharing"
-                    }
-                #>
-                $SPOTenant = Get-SPOTenant | Select-Object OneDriveSharingCapability
-                return $SPOTenant
-            }
-            '7.2.5' {
-                # Test-SharePointGuestsItemSharing.ps1
-                # 7.2.5 (L2) Ensure that SharePoint guest users cannot share items they don't own
-                # $SPOTenant Mock Object
-                <#
-                    $SPOTenant = [PSCustomObject]@{
-                        PreventExternalUsersFromResharing           = $false
-                    }
-                #>
-                $SPOTenant = Get-SPOTenant | Select-Object PreventExternalUsersFromResharing
-                return $SPOTenant
-            }
-            '7.2.6' {
-                # Test-SharePointExternalSharingDomains.ps1
-                # 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
-                # Add Authorized Domains?
-                # $SPOTenant Mock Object
-                <#
-                    $SPOTenant = [PSCustomObject]@{
-                        SharingDomainRestrictionMode           = "AllowList"
-                        SharingAllowedDomainList                = "domain1.com", "domain2.com"
-                    }
-                #>
-                $SPOTenant = Get-SPOTenant | Select-Object SharingDomainRestrictionMode, SharingAllowedDomainList
-                return $SPOTenant
-            }
-            '7.2.7' {
-                # Test-LinkSharingRestrictions.ps1
-                # Retrieve link sharing configuration for SharePoint and OneDrive
-                # $SPOTenantLinkSharing Mock Object
-                <#
-                    $$SPOTenantLinkSharing = [PSCustomObject]@{
-                        DefaultSharingLinkType           = "Direct"
-                    }
-                #>
-                $SPOTenantLinkSharing = Get-SPOTenant | Select-Object DefaultSharingLinkType
-                return $SPOTenantLinkSharing
-            }
-            '7.2.9' {
-                # Test-GuestAccessExpiration.ps1
-                # Retrieve SharePoint tenant settings related to guest access expiration
-                # $SPOTenantGuestAccess Mock Object
-                <#
-                    $SPOTenantGuestAccess = [PSCustomObject]@{
-                        ExternalUserExpirationRequired           = "$false"
-                        ExternalUserExpireInDays                 = "60"
-                    }
-                #>
-                $SPOTenantGuestAccess = Get-SPOTenant | Select-Object ExternalUserExpirationRequired, ExternalUserExpireInDays
-                return $SPOTenantGuestAccess
-            }
-            '7.2.10' {
-                # Test-ReauthWithCode.ps1
-                # 7.2.10 (L1) Ensure reauthentication with verification code is restricted
-                # Retrieve reauthentication settings for SharePoint Online
-                # $SPOTenantReauthentication Mock Object
-                <#
-                    $SPOTenantReauthentication = [PSCustomObject]@{
-                        EmailAttestationRequired                    = "$false"
-                        EmailAttestationReAuthDays                  = "30"
-                    }
-                #>
-                $SPOTenantReauthentication = Get-SPOTenant | Select-Object EmailAttestationRequired, EmailAttestationReAuthDays
-                return $SPOTenantReauthentication
-            }
-            '7.3.1' {
-                # Test-DisallowInfectedFilesDownload.ps1
-                # Retrieve the SharePoint tenant configuration
-                # $SPOTenantDisallowInfectedFileDownload Mock Object
-                <#
-                    $SPOTenantDisallowInfectedFileDownload = [PSCustomObject]@{
-                        DisallowInfectedFileDownload           = $false
-                    }
-                #>
-                $SPOTenantDisallowInfectedFileDownload = Get-SPOTenant | Select-Object DisallowInfectedFileDownload
-                return $SPOTenantDisallowInfectedFileDownload
-            }
-            '7.3.2' {
-                # Test-OneDriveSyncRestrictions.ps1
-                # Retrieve OneDrive sync client restriction settings
-                # Add isHybrid paramter?
-                # $SPOTenantSyncClientRestriction Mock Object
-                <#
-                    $SPOTenantSyncClientRestriction = [PSCustomObject]@{
-                        TenantRestrictionEnabled           = $true
-                        AllowedDomainList                  = "786548DD-877B-4760-A749-6B1EFBC1190A", "877564FF-877B-4760-A749-6B1EFBC1190A"
-                    }
-                #>
-                $SPOTenantSyncClientRestriction = Get-SPOTenantSyncClientRestriction | Select-Object TenantRestrictionEnabled, AllowedDomainList
-                return $SPOTenantSyncClientRestriction
-            }
-            '7.3.4' {
-                # Test-RestrictCustomScripts.ps1
-                # Retrieve all site collections and select necessary properties
-                # $SPOSitesCustomScript Mock Object
-                <#
-                    $SPOSitesCustomScript = [PSCustomObject]@{
-                        Title           = "Site Collection 1"
-                        Url             = "https://contoso.sharepoint.com/sites/site1"
-                        DenyAddAndCustomizePages = "Enabled"
-                    }
-                #>
-                $SPOSitesCustomScript = Get-SPOSite -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages
-                return $SPOSitesCustomScript
-            }
-            default { throw "No match found for test: $Rec" }
+        if (($script:PnpAuth)) {
+            $UsePnP = $true
+        }
+        # Determine the prefix based on the switch
+        $prefix = if ($UsePnP) { "PnP" } else { "SPO" }
+        # Define a hashtable to map the function calls
+        $commandMap = @{
+            '7.2.1'  = "Get-${prefix}Tenant | Select-Object -Property LegacyAuthProtocolsEnabled"
+            '7.2.2'  = "Get-${prefix}Tenant | Select-Object EnableAzureADB2BIntegration"
+            '7.2.3'  = "Get-${prefix}Tenant | Select-Object SharingCapability"
+            '7.2.4'  = "Get-${prefix}Tenant | Select-Object OneDriveSharingCapability"
+            '7.2.5'  = "Get-${prefix}Tenant | Select-Object PreventExternalUsersFromResharing"
+            '7.2.6'  = "Get-${prefix}Tenant | Select-Object SharingDomainRestrictionMode, SharingAllowedDomainList"
+            '7.2.7'  = "Get-${prefix}Tenant | Select-Object DefaultSharingLinkType"
+            '7.2.9'  = "Get-${prefix}Tenant | Select-Object ExternalUserExpirationRequired, ExternalUserExpireInDays"
+            '7.2.10' = "Get-${prefix}Tenant | Select-Object EmailAttestationRequired, EmailAttestationReAuthDays"
+            '7.3.1'  = "Get-${prefix}Tenant | Select-Object DisallowInfectedFileDownload"
+            '7.3.2'  = "Get-${prefix}TenantSyncClientRestriction | Select-Object TenantRestrictionEnabled, AllowedDomainList"
+            '7.3.4'  = if ($prefix -eq "SPO") {"Get-${prefix}Site -Limit All | Select-Object Title, Url, DenyAddAndCustomizePages"} else {"Get-${Prefix}TenantSite | Select-Object Title, Url, DenyAddAndCustomizePages"}
         }
     }
-    end {
-        Write-Verbose "Retuning data for Rec: $Rec"
+    process {
+        try {
+            Write-Verbose "Returning data for Rec: $Rec"
+            if ($commandMap.ContainsKey($Rec)) {
+                $command = $commandMap[$Rec]
+                $result = Invoke-Expression $command
+                return $result
+            }
+            else {
+                throw "No match found for test: $Rec"
+            }
+        }
+        catch {
+            throw "Get-CISSpoOutput: `n$_"
+        }
+
     }
-} # end function Get-CISMSTeamsOutput
+    end {
+        Write-Verbose "Finished processing for Rec: $Rec"
+    }
+}

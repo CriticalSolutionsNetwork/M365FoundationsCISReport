@@ -38,8 +38,14 @@ function Disconnect-M365Suite {
 
     try {
         if ($RequiredConnections -contains "SPO") {
-            Write-Verbose "Disconnecting from SharePoint Online..."
-            Disconnect-SPOService | Out-Null
+            if (($script:PnpAuth)) {
+                Write-Verbose "Disconnecting from PnPOnline..."
+                Disconnect-PnPOnline | Out-Null
+            }
+            else {
+                Write-Verbose "Disconnecting from SharePoint Online..."
+                Disconnect-SPOService | Out-Null
+            }
         }
     }
     catch {

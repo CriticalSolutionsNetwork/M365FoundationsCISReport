@@ -37,6 +37,8 @@
         If specified, the cmdlet will not check for the presence of required modules.
     .PARAMETER DoNotConfirmConnections
         If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
+    .PARAMETER AuthParams
+        Specifies an authentication object containing parameters for application-based authentication. If provided, this will be used for connecting to services.
     .EXAMPLE
         PS> Invoke-M365SecurityAudit
 
@@ -203,12 +205,17 @@ function Invoke-M365SecurityAudit {
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not check for the presence of required modules.")]
         [switch]$NoModuleCheck,
         [Parameter(Mandatory = $false, HelpMessage = "Specifies that the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.")]
-        [switch]$DoNotConfirmConnections
+        [switch]$DoNotConfirmConnections,
+        [Parameter(Mandatory = $false, HelpMessage = "Specifies an authentication object containing parameters for application-based authentication.")]
+        [CISAuthenticationParameters]$AuthParams
     )
     Begin {
         if ($script:MaximumFunctionCount -lt 8192) {
             Write-Verbose "Setting the `$script:MaximumFunctionCount to 8192 for the test run."
             $script:MaximumFunctionCount = 8192
+        }
+        if ($AuthParams) {
+            $script:PnpAuth = $true
         }
         # Ensure required modules are installed
         $requiredModules = Get-RequiredModule -AuditFunction
@@ -267,7 +274,7 @@ function Invoke-M365SecurityAudit {
             $actualUniqueConnections = Get-UniqueConnection -Connections $requiredConnections
             if (!($DoNotConnect) -and $PSCmdlet.ShouldProcess("Establish connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')", "Connect")) {
                 Write-Information "Establishing connections to Microsoft 365 services: $($actualUniqueConnections -join ', ')"
-                Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections -SkipConfirmation:$DoNotConfirmConnections
+                Connect-M365Suite -TenantAdminUrl $TenantAdminUrl -RequiredConnections $requiredConnections -SkipConfirmation:$DoNotConfirmConnections -AuthParams $AuthParams
             }
         }
         catch {
