@@ -51,7 +51,7 @@ Description = 'Automated assessment of 50 CIS 365 Foundations v3.0.0 benchmark.'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @()
+# RequiredModules = @()
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
