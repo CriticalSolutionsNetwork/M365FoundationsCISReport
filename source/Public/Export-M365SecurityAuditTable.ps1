@@ -11,7 +11,7 @@
         The path to a CSV file containing the audit results. This parameter is mandatory when exporting from a CSV file.
     .PARAMETER OutputTestNumber
         The test number to output as an object. Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4". This parameter is used to output a specific test result.
-    .PARAMETER ExportAllTests
+    .PARAMETER ExportNestedTables
         Switch to export all test results. When specified, all test results are exported to the specified path.
     .PARAMETER ExportPath
         The path where the CSV or Excel files will be exported. This parameter is mandatory when exporting all tests.
@@ -28,22 +28,22 @@
         Export-M365SecurityAuditTable -AuditResults $object -OutputTestNumber 6.1.2
             # Outputs the result of test number 6.1.2 from the provided audit results as an object.
     .EXAMPLE
-        Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp"
+        Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp"
             # Exports all audit results to the specified path in CSV format.
     .EXAMPLE
         Export-M365SecurityAuditTable -CsvPath "C:\temp\auditresultstoday1.csv" -OutputTestNumber 6.1.2
             # Outputs the result of test number 6.1.2 from the CSV file as an object.
     .EXAMPLE
-        Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
+        Export-M365SecurityAuditTable -ExportNestedTables -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
             # Exports all audit results from the CSV file to the specified path in CSV format.
     .EXAMPLE
-        Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
+        Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
             # Exports all audit results along with the original test results to the specified path in CSV format.
     .EXAMPLE
-        Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
+        Export-M365SecurityAuditTable -ExportNestedTables -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
             # Exports all audit results from the CSV file along with the original test results to the specified path in CSV format.
     .EXAMPLE
-        Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportToExcel
+        Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp" -ExportToExcel
             # Exports all audit results to the specified path in Excel format.
     .LINK
         https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
@@ -65,7 +65,7 @@ function Export-M365SecurityAuditTable {
         [string]$OutputTestNumber,
         [Parameter(Mandatory = $false, Position = 0, ParameterSetName = "ExportAllResultsFromAuditResults")]
         [Parameter(Mandatory = $false, Position = 0, ParameterSetName = "ExportAllResultsFromCsv")]
-        [switch]$ExportAllTests,
+        [switch]$ExportNestedTables,
         [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromAuditResults")]
         [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromCsv")]
         [string]$ExportPath,
@@ -102,7 +102,7 @@ function Export-M365SecurityAuditTable {
                 Initialize-CISAuditResult @params
             }
         }
-        if ($ExportAllTests) {
+        if ($ExportNestedTables) {
             $TestNumbers = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
         }
         $results = @()
