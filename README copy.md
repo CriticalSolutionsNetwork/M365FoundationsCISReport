@@ -21,9 +21,34 @@ For full license details, please visit [Creative Commons Attribution-NonCommerci
 7. [Remove-RowsWithEmptyCSVStatus](#Remove-RowsWithEmptyCSVStatus)
 8. [Sync-CISExcelAndCsvData](#Sync-CISExcelAndCsvData)
 
-## Invoke-M365SecurityAudit
+## Module Dependencies
+
+The `M365FoundationsCISReport` module relies on several other PowerShell modules to perform its operations. Ensure these modules are installed with the specified versions before using this module.
+
+### Required Modules for Audit Functions
+
+Default modules used for audit functions:
+
+- **ExchangeOnlineManagement**
+  - Required Version: `3.3.0`
+
+- **Microsoft.Graph**
+  - Required Version: `2.4.0`
+
+- **PnP.PowerShell** (Optional, if PnP App authentication is used for SharePoint Online)
+  - Required Version: `2.5.0`
+
+- **Microsoft.Online.SharePoint.PowerShell** (If PnP authentication is not used (Default) )
+  - Required Version: `16.0.24009.12000`
+
+- **MicrosoftTeams**
+  - Required Version: `5.5.0`
+
+- **ImportExcel** (If importing or exporting Excel files)
+  - Required Version: `7.8.9`
 
 # EXAMPLES
+
 ```powershell
 # Example 1: Performing a security audit based on CIS benchmarks
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com"
