@@ -57,7 +57,7 @@ $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -NoModuleCheck -NoModuleCheck -DoNotConfirmConnections -Confirm:$false
 
 # Example 2: Exporting a security audit and it's nested tables to zipped CSV files
-Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
+Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportNestedTables
     # Output Ex: 2024.07.07_14.55.55_M365FoundationsAudit_368B2E2F.zip
 
 # Example 3: Retrieving licenses for users in administrative roles
