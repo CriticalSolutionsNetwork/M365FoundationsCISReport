@@ -23,7 +23,7 @@ For full license details, please visit [Creative Commons Attribution-NonCommerci
 
 ## Module Dependencies
 
-The `M365FoundationsCISReport` module relies on several other PowerShell modules to perform its operations. Ensure these modules are installed with the specified versions before using this module.
+The `M365FoundationsCISReport` module relies on several other PowerShell modules to perform its operations. The default run ensures these modules are installed with the specified versions. Use -NoModuleCheck to skip this step if you have installed the required modules previously and would like to suppress any output for automated runs.
 
 ### Required Modules for Audit Functions
 
@@ -53,6 +53,8 @@ Default modules used for audit functions:
 # Example 1: Performing a security audit based on CIS benchmarks
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com"
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ApprovedCloudStorageProviders "DropBox" -ApprovedFederatedDomains "northwind.com"
+# Suppressed output for automated runs
+$auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -NoModuleCheck -NoModuleCheck -DoNotConfirmConnections -Confirm:$false
 
 # Example 2: Exporting a security audit and it's nested tables to zipped CSV files
 Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
