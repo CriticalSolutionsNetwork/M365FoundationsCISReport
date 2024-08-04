@@ -1,4 +1,4 @@
-﻿---
+---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version:
@@ -13,7 +13,8 @@ Removes rows from an Excel worksheet where the 'CSV_Status' column is empty and 
 ## SYNTAX
 
 ```
-Remove-RowsWithEmptyCSVStatus [-FilePath] <String> [-WorksheetName] <String> [<CommonParameters>]
+Remove-RowsWithEmptyCSVStatus [-FilePath] <String> [-WorksheetName] <String>
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -55,6 +56,21 @@ Aliases:
 
 Required: True
 Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

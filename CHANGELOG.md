@@ -4,9 +4,21 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Added `New-M365SecurityAuditAuthObject` function to create a new authentication object for the security audit for app-based authentication.
+
+### Changed
+
+- Changed authentication options to include parameter for authenticating with a certificate.
+- Changed verbose output to ensure methods for suppressing all forms of output are available.
+
+## [0.1.25] - 2024-07-23
+
 ### Fixed
 
 - Fixed test 1.3.1 as notification window for password expiration is no longer required.
+
 
 ## [0.1.24] - 2024-07-07
 

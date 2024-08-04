@@ -1,4 +1,4 @@
-﻿---
+---
 external help file: M365FoundationsCISReport-help.xml
 Module Name: M365FoundationsCISReport
 online version: https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
@@ -15,24 +15,27 @@ Exports M365 security audit results to a CSV file or outputs a specific test res
 ### OutputObjectFromAuditResultsSingle
 ```
 Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-OutputTestNumber] <String>
- [<CommonParameters>]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### ExportAllResultsFromAuditResults
 ```
-Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-ExportAllTests] -ExportPath <String>
- [-ExportOriginalTests] [-ExportToExcel] [<CommonParameters>]
+Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-ExportNestedTables] -ExportPath <String>
+ [-ExportOriginalTests] [-ExportToExcel] [-Prefix <String>] [-ProgressAction <ActionPreference>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ### OutputObjectFromCsvSingle
 ```
-Export-M365SecurityAuditTable [-CsvPath] <String> [-OutputTestNumber] <String> [<CommonParameters>]
+Export-M365SecurityAuditTable [-CsvPath] <String> [-OutputTestNumber] <String>
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### ExportAllResultsFromCsv
 ```
-Export-M365SecurityAuditTable [-CsvPath] <String> [-ExportAllTests] -ExportPath <String> [-ExportOriginalTests]
- [-ExportToExcel] [<CommonParameters>]
+Export-M365SecurityAuditTable [-CsvPath] <String> [-ExportNestedTables] -ExportPath <String>
+ [-ExportOriginalTests] [-ExportToExcel] [-Prefix <String>] [-ProgressAction <ActionPreference>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -109,8 +112,24 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExportAllTests
-Switch to export all test results.
+### -OutputTestNumber
+The test number to output as an object.
+Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
+
+```yaml
+Type: String
+Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
+Aliases:
+
+Required: True
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExportNestedTables
+Switch to export all test results. When specified, all test results are exported to the specified path.
 
 ```yaml
 Type: SwitchParameter
@@ -119,21 +138,6 @@ Aliases:
 
 Required: False
 Position: 1
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExportOriginalTests
-Switch to export the original audit results to a CSV file.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
-Aliases:
-
-Required: True
-Position: Named
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -154,6 +158,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -ExportOriginalTests
+Switch to export the original audit results to a CSV file.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -ExportToExcel
 Switch to export the results to an Excel file.
 
@@ -169,17 +188,62 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -OutputTestNumber
-The test number to output as an object.
-Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
+### -Prefix
+Add Prefix to filename after date when outputting to excel or csv.
+Validate that the count of letters in the prefix is less than 5.
 
 ```yaml
 Type: String
-Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
+Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
 Aliases:
 
-Required: True
-Position: 2
+Required: False
+Position: Named
+Default value: Corp
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WhatIf
+Shows what would happen if the cmdlet runs. The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -191,7 +255,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### [CISAuditResult[]] - An array of CISAuditResult objects.
-###     [string] - A path to a CSV file.
+### [string] - A path to a CSV file.
 ## OUTPUTS
 
 ### [PSCustomObject] - A custom object containing the path to the zip file and its hash.

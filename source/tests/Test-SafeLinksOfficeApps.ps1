@@ -58,7 +58,7 @@ function Test-SafeLinksOfficeApps {
                 $auditResult = Initialize-CISAuditResult @params
             }
             catch {
-                Write-Error "An error occurred during the test: $_"
+                Write-Error "An error occurred during the test $recnum`:: $_"
                 # Retrieve the description from the test definitions
                 $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
                 $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }

@@ -8,7 +8,7 @@ function Disconnect-M365Suite {
     # Clean up sessions
     try {
         if ($RequiredConnections -contains "EXO" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "Microsoft Teams | EXO") {
-            Write-Host "Disconnecting from Exchange Online..." -ForegroundColor Green
+            Write-Verbose "Disconnecting from Exchange Online..."
             Disconnect-ExchangeOnline -Confirm:$false | Out-Null
         }
     }
@@ -18,7 +18,7 @@ function Disconnect-M365Suite {
 
     try {
         if ($RequiredConnections -contains "AzureAD" -or $RequiredConnections -contains "AzureAD | EXO") {
-            Write-Host "Disconnecting from Azure AD..." -ForegroundColor Green
+            Write-Verbose "Disconnecting from Azure AD..."
             Disconnect-AzureAD | Out-Null
         }
     }
@@ -28,7 +28,7 @@ function Disconnect-M365Suite {
 
     try {
         if ($RequiredConnections -contains "Microsoft Graph") {
-            Write-Host "Disconnecting from Microsoft Graph..." -ForegroundColor Green
+            Write-Verbose "Disconnecting from Microsoft Graph..."
             Disconnect-MgGraph | Out-Null
         }
     }
@@ -38,8 +38,14 @@ function Disconnect-M365Suite {
 
     try {
         if ($RequiredConnections -contains "SPO") {
-            Write-Host "Disconnecting from SharePoint Online..." -ForegroundColor Green
-            Disconnect-SPOService | Out-Null
+            if (($script:PnpAuth)) {
+                Write-Verbose "Disconnecting from PnPOnline..."
+                Disconnect-PnPOnline | Out-Null
+            }
+            else {
+                Write-Verbose "Disconnecting from SharePoint Online..."
+                Disconnect-SPOService | Out-Null
+            }
         }
     }
     catch {
@@ -48,13 +54,12 @@ function Disconnect-M365Suite {
 
     try {
         if ($RequiredConnections -contains "Microsoft Teams" -or $RequiredConnections -contains "Microsoft Teams | EXO") {
-            Write-Host "Disconnecting from Microsoft Teams..." -ForegroundColor Green
+            Write-Verbose "Disconnecting from Microsoft Teams..."
             Disconnect-MicrosoftTeams | Out-Null
         }
     }
     catch {
         Write-Warning "Failed to disconnect from Microsoft Teams: $_"
     }
-
-    Write-Host "All necessary sessions have been disconnected." -ForegroundColor Green
+    Write-Verbose "All necessary sessions have been disconnected."
 }

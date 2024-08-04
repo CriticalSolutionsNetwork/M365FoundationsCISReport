@@ -58,9 +58,9 @@ function Test-BlockSharedMailboxSignIn {
                     }
                 )
             #>
-            $users = Get-CISAadOutput -Rec $recnum
+            $users = Get-CISMgOutput -Rec $recnum
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
-            $sharedMailboxDetails = $users | Where-Object {$_.objectid -in $objectids}
+            $sharedMailboxDetails = $users | Where-Object {$_.id -in $objectids}
             # Step: Identify enabled mailboxes (Condition B: Pass/Fail)
             $enabledMailboxes = $sharedMailboxDetails | Where-Object { $_.AccountEnabled } | ForEach-Object { $_.DisplayName }
             $allBlocked = $enabledMailboxes.Count -eq 0

@@ -38,76 +38,86 @@ function Get-CISMgOutput {
         #>
     }
     process {
-        Write-Verbose "Get-CISMgOutput: Retuning data for Rec: $Rec"
-        switch ($rec) {
-            '1.1.1' {
-                # 1.1.1
-                # Test-AdministrativeAccountCompliance
-                $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
-                return $AdminRoleAssignmentsAndUsers
-            }
-            '1.1.3' {
-                # Test-GlobalAdminsCount
-                # Step: Retrieve global admin role
-                $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
-                # Step: Retrieve global admin members
-                $globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id
-                return $globalAdmins
-            }
-            '1.2.1' {
-                # Test-ManagedApprovedPublicGroups
-                $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
-                return $allGroups
-            }
-            '1.3.1' {
-                # Test-PasswordNeverExpirePolicy.ps1
-                $domains = if ($DomainName) {
-                    Get-MgDomain -DomainId $DomainName
+        try {
+            Write-Verbose "Get-CISMgOutput: Retuning data for Rec: $Rec"
+            switch ($rec) {
+                '1.1.1' {
+                    # 1.1.1
+                    # Test-AdministrativeAccountCompliance
+                    $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
+                    return $AdminRoleAssignmentsAndUsers
                 }
-                else {
-                    Get-MgDomain
+                '1.1.3' {
+                    # Test-GlobalAdminsCount
+                    # Step: Retrieve global admin role
+                    $globalAdminRole = Get-MgDirectoryRole -Filter "RoleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'"
+                    # Step: Retrieve global admin members
+                    $globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id
+                    return $globalAdmins
                 }
-                return $domains
-            }
-            '5.1.2.3' {
-                # Test-RestrictTenantCreation
-                # Retrieve the tenant creation policy
-                $tenantCreationPolicy = (Get-MgPolicyAuthorizationPolicy).DefaultUserRolePermissions | Select-Object AllowedToCreateTenants
-                return $tenantCreationPolicy
-            }
-            '5.1.8.1' {
-                # Test-PasswordHashSync
-                # Retrieve password hash sync status (Condition A and C)
-                $passwordHashSync = Get-MgOrganization | Select-Object -ExpandProperty OnPremisesSyncEnabled
-                return $passwordHashSync
-            }
-            '6.1.2' {
-                # Test-MailboxAuditingE3
-                $tenantSkus = Get-MgSubscribedSku -All
-                $e3SkuPartNumber = "SPE_E3"
-                $founde3Sku = $tenantSkus | Where-Object { $_.SkuPartNumber -eq $e3SkuPartNumber }
-                if ($founde3Sku.Count -ne 0) {
-                    $allE3Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde3Sku.SkuId) )" -All
-                    return $allE3Users
+                '1.2.1' {
+                    # Test-ManagedApprovedPublicGroups
+                    $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
+                    return $allGroups
                 }
-                else {
-                    return $null
+                '1.2.2' {
+                    # Test-BlockSharedMailboxSignIn.ps1
+                    $users = Get-MgUser
+                    return $users
                 }
+                '1.3.1' {
+                    # Test-PasswordNeverExpirePolicy.ps1
+                    $domains = if ($DomainName) {
+                        Get-MgDomain -DomainId $DomainName
+                    }
+                    else {
+                        Get-MgDomain
+                    }
+                    return $domains
+                }
+                '5.1.2.3' {
+                    # Test-RestrictTenantCreation
+                    # Retrieve the tenant creation policy
+                    $tenantCreationPolicy = (Get-MgPolicyAuthorizationPolicy).DefaultUserRolePermissions | Select-Object AllowedToCreateTenants
+                    return $tenantCreationPolicy
+                }
+                '5.1.8.1' {
+                    # Test-PasswordHashSync
+                    # Retrieve password hash sync status (Condition A and C)
+                    $passwordHashSync = Get-MgOrganization | Select-Object -ExpandProperty OnPremisesSyncEnabled
+                    return $passwordHashSync
+                }
+                '6.1.2' {
+                    # Test-MailboxAuditingE3
+                    $tenantSKUs = Get-MgSubscribedSku -All
+                    $e3SkuPartNumber = "SPE_E3"
+                    $foundE3Sku = $tenantSKUs | Where-Object { $_.SkuPartNumber -eq $e3SkuPartNumber }
+                    if ($foundE3Sku.Count -ne 0) {
+                        $allE3Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($foundE3Sku.SkuId) )" -All
+                        return $allE3Users
+                    }
+                    else {
+                        return $null
+                    }
+                }
+                '6.1.3' {
+                    # Test-MailboxAuditingE5
+                    $tenantSKUs = Get-MgSubscribedSku -All
+                    $e5SkuPartNumber = "SPE_E5"
+                    $foundE5Sku = $tenantSKUs | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
+                    if ($foundE5Sku.Count -ne 0) {
+                        $allE5Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($foundE5Sku.SkuId) )" -All
+                        return $allE5Users
+                    }
+                    else {
+                        return $null
+                    }
+                }
+                default { throw "No match found for test: $Rec" }
             }
-            '6.1.3' {
-                # Test-MailboxAuditingE5
-                $tenantSkus = Get-MgSubscribedSku -All
-                $e5SkuPartNumber = "SPE_E5"
-                $founde5Sku = $tenantSkus | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
-                if ($founde5Sku.Count -ne 0) {
-                    $allE5Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($founde5Sku.SkuId) )" -All
-                    return $allE5Users
-                }
-                else {
-                    return $null
-                }
-            }
-            default { throw "No match found for test: $Rec" }
+        }
+        catch {
+            throw "Get-CISMgOutput: `n$_"
         }
     }
     end {
