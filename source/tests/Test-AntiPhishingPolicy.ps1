@@ -215,7 +215,7 @@ function Test-AntiPhishingPolicy {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test: $_"
+            Write-Error "An error occurred during the test $recnum`:: $_"
             $auditResult = Get-TestError -LastError $_ -recnum $recnum
         }
     }
