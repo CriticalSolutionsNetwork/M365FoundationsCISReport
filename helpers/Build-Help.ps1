@@ -53,8 +53,8 @@ Register-SecretVault -Name ModuleBuildCreds -ModuleName `
 "SecretManagement.JustinGrote.CredMan" -ErrorAction Stop
 
 
-Set-Secret -Name "GalleryApiToken" -Vault ModuleBuildCreds
-Set-Secret -Name "GitHubToken" -Vault ModuleBuildCreds
+#Set-Secret -Name "GalleryApiToken" -Vault ModuleBuildCreds
+#Set-Secret -Name "GitHubToken" -Vault ModuleBuildCreds
 
 
 $GalleryApiToken = Get-Secret -Name "GalleryApiToken" -Vault ModuleBuildCreds -AsPlainText
