@@ -77,11 +77,12 @@ Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.c
 Grant-M365SecurityAuditConsent -UserPrincipalNameForConsent 'user@example.com'
 
 # Example 8: (PowerShell 7.x Only) Creating a new authentication object for the security audit for app-based authentication.
-$authParams = New-M365SecurityAuditAuthObject -ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
-                                                            -ClientId "12345678-1234-1234-1234-123456789012" `
-                                                            -TenantId "12345678-1234-1234-1234-123456789012" `
-                                                            -OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
-                                                            -SpAdminUrl "https://yourcompany-admin.sharepoint.com"
+$authParams = New-M365SecurityAuditAuthObject `
+  -ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
+  -ClientId "12345678-1234-1234-1234-123456789012" `
+  -TenantId "12345678-1234-1234-1234-123456789012" `
+  -OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
+  -SpAdminUrl "https://yourcompany-admin.sharepoint.com"
 Invoke-M365SecurityAudit -AuthParams $authParams -TenantAdminUrl "https://yourcompany-admin.sharepoint.com"
 ```
 
