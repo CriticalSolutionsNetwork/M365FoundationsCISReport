@@ -17,8 +17,9 @@ For full license details, please visit [Creative Commons Attribution-NonCommerci
 3. [Get-AdminRoleUserLicense](#Get-AdminRoleUserLicense)
 4. [Get-MFAStatus](#Get-MFAStatus)
 5. [Grant-M365SecurityAuditConsent](#Grant-M365SecurityAuditConsent)
-6. [Remove-RowsWithEmptyCSVStatus](#Remove-RowsWithEmptyCSVStatus)
-7. [Sync-CISExcelAndCsvData](#Sync-CISExcelAndCsvData)
+6. [New-M365SecurityAuditAuthObject](#New-M365SecurityAuditAuthObject)
+7. [Remove-RowsWithEmptyCSVStatus](#Remove-RowsWithEmptyCSVStatus)
+8. [Sync-CISExcelAndCsvData](#Sync-CISExcelAndCsvData)
 
 ## Invoke-M365SecurityAudit
 
@@ -46,6 +47,14 @@ Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.c
 
 # Example 7: Granting Microsoft Graph permissions to the auditor
 Grant-M365SecurityAuditConsent -UserPrincipalNameForConsent 'user@example.com'
+
+# Example 8: (PowerShell 7.x Only) Creating a new authentication object for the security audit for app-based authentication.
+$authParams = New-M365SecurityAuditAuthObject -ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
+                                                            -ClientId "12345678-1234-1234-1234-123456789012" `
+                                                            -TenantId "12345678-1234-1234-1234-123456789012" `
+                                                            -OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
+                                                            -SpAdminUrl "https://yourcompany-admin.sharepoint.com"
+Invoke-M365SecurityAudit -AuthParams $authParams -TenantAdminUrl "https://yourcompany-admin.sharepoint.com"
 ```
 
 # NOTE
