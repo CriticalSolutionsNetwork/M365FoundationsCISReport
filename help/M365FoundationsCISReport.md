@@ -1,4 +1,4 @@
-﻿---
+---
 Module Name: M365FoundationsCISReport
 Module Guid: 0d064bfb-d1ce-484b-a173-993b55984dc9
 Download Help Link: {{Please enter Link manually}}
@@ -25,6 +25,9 @@ Grants Microsoft Graph permissions for an auditor.
 
 ### [Invoke-M365SecurityAudit](Invoke-M365SecurityAudit)
 Invokes a security audit for Microsoft 365 environments.
+
+### [New-M365SecurityAuditAuthObject](New-M365SecurityAuditAuthObject)
+Creates a new CISAuthenticationParameters object for Microsoft 365 authentication.
 
 ### [Remove-RowsWithEmptyCSVStatus](Remove-RowsWithEmptyCSVStatus)
 Removes rows from an Excel worksheet where the 'CSV_Status' column is empty and saves the result to a new file.

@@ -1,5 +1,5 @@
 # M365FoundationsCISReport Module
-
+[![PSScriptAnalyzer](https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport/actions/workflows/powershell.yml/badge.svg)](https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport/actions/workflows/powershell.yml)
 ## License
 
 This PowerShell module is based on CIS benchmarks and is distributed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. This means:

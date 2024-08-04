@@ -1,4 +1,4 @@
-﻿# M365FoundationsCISReport Module
+# M365FoundationsCISReport Module
 [![PSScriptAnalyzer](https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport/actions/workflows/powershell.yml/badge.svg)](https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport/actions/workflows/powershell.yml)
 ## License
 
@@ -11,9 +11,7 @@ This PowerShell module is based on CIS benchmarks and is distributed under the C
 For full license details, please visit [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en).
 
 [Register for and download CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
-
 # Table of Contents
-
 1. [Invoke-M365SecurityAudit](#Invoke-M365SecurityAudit)
 2. [Export-M365SecurityAuditTable](#Export-M365SecurityAuditTable)
 3. [Get-AdminRoleUserLicense](#Get-AdminRoleUserLicense)
@@ -67,14 +65,13 @@ Exports Microsoft 365 security audit results to CSV or Excel files and supports 
 ### Syntax
 ```powershell
 
-Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-OutputTestNumber] <String> [<CommonParameters>]
+Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-OutputTestNumber] <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [[-ExportAllTests]] -ExportPath <String> -ExportOriginalTests [-ExportToExcel] [<CommonParameters>]
+Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [[-ExportNestedTables]] -ExportPath <String> [-ExportOriginalTests] [-ExportToExcel] [-Prefix <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Export-M365SecurityAuditTable [-CsvPath] <String> [-OutputTestNumber] <String> [<CommonParameters>]
+Export-M365SecurityAuditTable [-CsvPath] <String> [-OutputTestNumber] <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Export-M365SecurityAuditTable [-CsvPath] <String> [[-ExportAllTests]] -ExportPath <String> -ExportOriginalTests [-ExportToExcel] [<CommonParameters>]
-
+Export-M365SecurityAuditTable [-CsvPath] <String> [[-ExportNestedTables]] -ExportPath <String> [-ExportOriginalTests] [-ExportToExcel] [-Prefix <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
 
 
@@ -86,10 +83,13 @@ Export-M365SecurityAuditTable [-CsvPath] <String> [[-ExportAllTests]] -ExportPat
 | <nobr>AuditResults</nobr> |  | An array of CISAuditResult objects containing the audit results. This parameter is mandatory when exporting from audit results. | true | false |  |
 | <nobr>CsvPath</nobr> |  | The path to a CSV file containing the audit results. This parameter is mandatory when exporting from a CSV file. | true | false |  |
 | <nobr>OutputTestNumber</nobr> |  | The test number to output as an object. Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4". This parameter is used to output a specific test result. | true | false |  |
-| <nobr>ExportAllTests</nobr> |  | Switch to export all test results. When specified, all test results are exported to the specified path. | false | false | False |
+| <nobr>ExportNestedTables</nobr> |  | Switch to export all test results. When specified, all test results are exported to the specified path. | false | false | False |
 | <nobr>ExportPath</nobr> |  | The path where the CSV or Excel files will be exported. This parameter is mandatory when exporting all tests. | true | false |  |
-| <nobr>ExportOriginalTests</nobr> |  | Switch to export the original audit results to a CSV file. When specified, the original test results are exported along with the processed results. | true | false | False |
+| <nobr>ExportOriginalTests</nobr> |  | Switch to export the original audit results to a CSV file. When specified, the original test results are exported along with the processed results. | false | false | False |
 | <nobr>ExportToExcel</nobr> |  | Switch to export the results to an Excel file. When specified, results are exported in Excel format. | false | false | False |
+| <nobr>Prefix</nobr> |  | Add Prefix to filename after date when outputting to excel or csv. Validate that the count of letters in the prefix is less than 5. | false | false | Corp |
+| <nobr>WhatIf</nobr> | wi |  | false | false |  |
+| <nobr>Confirm</nobr> | cf |  | false | false |  |
 ### Inputs
  - \[CISAuditResult\[\]\] - An array of CISAuditResult objects. \[string\] - A path to a CSV file.
 
@@ -100,44 +100,51 @@ Export-M365SecurityAuditTable [-CsvPath] <String> [[-ExportAllTests]] -ExportPat
 **EXAMPLE 1**
 ```powershell
 Export-M365SecurityAuditTable -AuditResults $object -OutputTestNumber 6.1.2
+# Outputs the result of test number 6.1.2 from the provided audit results as an object.
 ```
-\# Outputs the result of test number 6.1.2 from the provided audit results as an object.
+
 
 **EXAMPLE 2**
 ```powershell
-Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp"
+Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp"
+# Exports all audit results to the specified path in CSV format.
 ```
-\# Exports all audit results to the specified path in CSV format.
+
 
 **EXAMPLE 3**
 ```powershell
 Export-M365SecurityAuditTable -CsvPath "C:\temp\auditresultstoday1.csv" -OutputTestNumber 6.1.2
+# Outputs the result of test number 6.1.2 from the CSV file as an object.
 ```
-\# Outputs the result of test number 6.1.2 from the CSV file as an object.
+
 
 **EXAMPLE 4**
 ```powershell
-Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
+Export-M365SecurityAuditTable -ExportNestedTables -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
+# Exports all audit results from the CSV file to the specified path in CSV format.
 ```
-\# Exports all audit results from the CSV file to the specified path in CSV format.
+
 
 **EXAMPLE 5**
 ```powershell
-Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
+Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
+# Exports all audit results along with the original test results to the specified path in CSV format.
 ```
-\# Exports all audit results along with the original test results to the specified path in CSV format.
+
 
 **EXAMPLE 6**
 ```powershell
-Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
+Export-M365SecurityAuditTable -ExportNestedTables -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
+# Exports all audit results from the CSV file along with the original test results to the specified path in CSV format.
 ```
-\# Exports all audit results from the CSV file along with the original test results to the specified path in CSV format.
+
 
 **EXAMPLE 7**
 ```powershell
-Export-M365SecurityAuditTable -ExportAllTests -AuditResults $object -ExportPath "C:\temp" -ExportToExcel
+Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp" -ExportToExcel
+# Exports all audit results to the specified path in Excel format.
 ```
-\# Exports all audit results to the specified path in Excel format.
+
 
 ### Links
 
@@ -149,7 +156,6 @@ Retrieves user licenses and roles for administrative accounts from Microsoft 365
 ```powershell
 
 Get-AdminRoleUserLicense [-SkipGraphConnection] [<CommonParameters>]
-
 
 
 
@@ -195,7 +201,6 @@ Get-MFAStatus [[-UserId] <String>] [-SkipMSOLConnectionChecks] [<CommonParameter
 
 
 
-
 ```
 ### Parameters
 | Name  | Alias  | Description | Required? | Pipeline Input | Default Value |
@@ -212,14 +217,16 @@ The function requires the MSOL module to be installed and connected to your tena
 **EXAMPLE 1**
 ```powershell
 Get-MFAStatus
-```
 Retrieves the MFA status for all Azure Active Directory users.
+```
+
 
 **EXAMPLE 2**
 ```powershell
 Get-MFAStatus -UserId "example@domain.com"
-```
 Retrieves the MFA status for the specified user with the UPN "example@domain.com".
+```
+
 
 ### Links
 
@@ -231,7 +238,6 @@ Grants Microsoft Graph permissions for an auditor.
 ```powershell
 
 Grant-M365SecurityAuditConsent [-UserPrincipalNameForConsent] <String> [-SkipGraphConnection] [-SkipModuleCheck] [-SuppressRevertOutput] [-DoNotDisconnect] [-WhatIf] [-Confirm] [<CommonParameters>]
-
 
 
 
@@ -275,27 +281,19 @@ Invokes a security audit for Microsoft 365 environments.
 ### Syntax
 ```powershell
 
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] 
-[-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -ELevel <String> -ProfileLevel <String> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] 
-[-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -ELevel <String> -ProfileLevel <String> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeIG1 [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] 
-[-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeIG1 [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeIG2 [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] 
-[-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeIG2 [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeIG3 [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] 
-[-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeIG3 [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeRecommendation <String[]> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] 
-[-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeRecommendation <String[]> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
-Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -SkipRecommendation <String[]> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] 
-[-NoModuleCheck] [-DoNotConfirmConnections] [-WhatIf] [-Confirm] [<CommonParameters>]
-
+Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -SkipRecommendation <String[]> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>] [-WhatIf] [-Confirm] [<CommonParameters>]
 
 
 
@@ -319,6 +317,7 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -Skip
 | <nobr>DoNotDisconnect</nobr> |  | If specified, the cmdlet will not disconnect from Microsoft 365 services after execution. | false | false | False |
 | <nobr>NoModuleCheck</nobr> |  | If specified, the cmdlet will not check for the presence of required modules. | false | false | False |
 | <nobr>DoNotConfirmConnections</nobr> |  | If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them. | false | false | False |
+| <nobr>AuthParams</nobr> |  | Specifies an authentication object containing parameters for application-based authentication. If provided, this will be used for connecting to services. | false | false |  |
 | <nobr>WhatIf</nobr> | wi |  | false | false |  |
 | <nobr>Confirm</nobr> | cf |  | false | false |  |
 ### Inputs
@@ -410,9 +409,8 @@ FailureReason: Non-Compliant Accounts: 2
 **EXAMPLE 5**
 ```powershell
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
+PS> Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
 ```
-PS\> Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\\temp" -ExportOriginalTests -ExportAllTests  
-  
 Or:  
 PS\> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation  
   
@@ -433,6 +431,47 @@ What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsof
 ### Links
 
  - [https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit](https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit)
+## New-M365SecurityAuditAuthObject
+### Synopsis
+Creates a new CISAuthenticationParameters object for Microsoft 365 authentication.
+### Syntax
+```powershell
+
+New-M365SecurityAuditAuthObject [-ClientCertThumbPrint] <String> [-ClientId] <String> [-TenantId] <String> [-OnMicrosoftUrl] <String> [-SpAdminUrl] <String> [<CommonParameters>]
+
+
+
+
+```
+### Parameters
+| Name  | Alias  | Description | Required? | Pipeline Input | Default Value |
+| - | - | - | - | - | - |
+| <nobr>ClientCertThumbPrint</nobr> |  | The thumbprint of the client certificate used for authentication. It must be a 40-character hexadecimal string. This certificate is used to authenticate the application in Azure AD. | true | false |  |
+| <nobr>ClientId</nobr> |  | The Client ID \(Application ID\) of the Azure AD application. It must be a valid GUID format. | true | false |  |
+| <nobr>TenantId</nobr> |  | The Tenant ID of the Azure AD directory. It must be a valid GUID format representing your Microsoft 365 tenant. | true | false |  |
+| <nobr>OnMicrosoftUrl</nobr> |  | The URL of your onmicrosoft.com domain. It should be in the format 'example.onmicrosoft.com'. | true | false |  |
+| <nobr>SpAdminUrl</nobr> |  | The SharePoint admin URL, which should end with '-admin.sharepoint.com'. This URL is used for connecting to SharePoint Online. | true | false |  |
+### Inputs
+ - None. You cannot pipe objects to this function.
+
+### Outputs
+ - CISAuthenticationParameters The function returns an instance of the CISAuthenticationParameters class containing the authentication details.
+
+### Note
+Requires PowerShell 7.0 or later.
+
+### Examples
+**EXAMPLE 1**
+```powershell
+$authParams = New-M365SecurityAuditAuthObject -ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
+-ClientId "12345678-1234-1234-1234-123456789012" `
+-TenantId "12345678-1234-1234-1234-123456789012" `
+-OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
+-SpAdminUrl "https://yourcompany-admin.sharepoint.com"
+Creates a new CISAuthenticationParameters object with the specified credentials and URLs, validating each parameter's format and length.
+```
+
+
 ## Remove-RowsWithEmptyCSVStatus
 ### Synopsis
 Removes rows from an Excel worksheet where the 'CSV\_Status' column is empty and saves the result to a new file.
@@ -440,7 +479,6 @@ Removes rows from an Excel worksheet where the 'CSV\_Status' column is empty and
 ```powershell
 
 Remove-RowsWithEmptyCSVStatus [-FilePath] <String> [-WorksheetName] <String> [<CommonParameters>]
-
 
 
 
@@ -458,8 +496,9 @@ This function requires the ImportExcel module to be installed.
 **EXAMPLE 1**
 ```powershell
 Remove-RowsWithEmptyCSVStatus -FilePath "C:\Reports\Report.xlsx" -WorksheetName "Sheet1"
+This command imports data from the "Sheet1" worksheet in the "Report.xlsx" file, removes rows where the 'CSV_Status' column is empty, and saves the filtered data to a new file named "Report-Filtered.xlsx" in the same directory.
 ```
-This command imports data from the "Sheet1" worksheet in the "Report.xlsx" file, removes rows where the 'CSV\_Status' column is empty, and saves the filtered data to a new file named "Report-Filtered.xlsx" in the same directory.
+
 
 ## Sync-CISExcelAndCsvData
 ### Synopsis
@@ -468,7 +507,6 @@ Synchronizes and updates data in an Excel worksheet with new information from a 
 ```powershell
 
 Sync-CISExcelAndCsvData [[-ExcelPath] <String>] [[-CsvPath] <String>] [[-SheetName] <String>] [<CommonParameters>]
-
 
 
 
@@ -493,8 +531,9 @@ Sync-CISExcelAndCsvData [[-ExcelPath] <String>] [[-CsvPath] <String>] [[-SheetNa
 **EXAMPLE 1**
 ```powershell
 Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "AuditData"
-```
 Updates the 'AuditData' worksheet in 'excel.xlsx' with data from 'data.csv', adding new information and the date of the update.
+```
+
 
 ### Links
 

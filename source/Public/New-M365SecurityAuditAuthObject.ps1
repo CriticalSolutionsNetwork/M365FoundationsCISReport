@@ -5,6 +5,7 @@
         The New-M365SecurityAuditAuthObject function constructs a new CISAuthenticationParameters object
         containing the necessary credentials and URLs for authenticating to various Microsoft 365 services.
         It validates input parameters to ensure they conform to expected formats and length requirements.
+        An app registration in Azure AD with the required permissions to EXO, SPO, MSTeams and MgGraph is needed.
     .PARAMETER ClientCertThumbPrint
         The thumbprint of the client certificate used for authentication. It must be a 40-character hexadecimal string.
         This certificate is used to authenticate the application in Azure AD.
@@ -28,6 +29,8 @@
                                                             -OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
                                                             -SpAdminUrl "https://yourcompany-admin.sharepoint.com"
         Creates a new CISAuthenticationParameters object with the specified credentials and URLs, validating each parameter's format and length.
+    .NOTES
+        Requires PowerShell 7.0 or later.
 #>
 function New-M365SecurityAuditAuthObject {
     [CmdletBinding()]
