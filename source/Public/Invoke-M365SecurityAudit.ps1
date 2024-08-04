@@ -41,89 +41,38 @@
         Specifies an authentication object containing parameters for application-based authentication. If provided, this will be used for connecting to services.
     .EXAMPLE
         PS> Invoke-M365SecurityAudit
-
-            Performs a security audit using default parameters.
-                Output:
-
-                    Status      : Fail
-                    ELevel      : E3
-                    ProfileLevel: L1
-                    Connection  : Microsoft Graph
-                    Rec         : 1.1.1
-                    Result      : False
-                    Details     : Non-compliant accounts:
-                                    Username        | Roles                  | HybridStatus | Missing Licence
-                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-                    FailureReason: Non-Compliant Accounts: 2
+            # Performs a security audit using default parameters.
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ELevel "E5" -ProfileLevel "L1"
-
-            Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
-                Output:
-
-                    Status      : Fail
-                    ELevel      : E5
-                    ProfileLevel: L1
-                    Connection  : Microsoft Graph
-                    Rec         : 1.1.1
-                    Result      : False
-                    Details     : Non-compliant accounts:
-                                    Username        | Roles                  | HybridStatus | Missing Licence
-                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-                    FailureReason: Non-Compliant Accounts: 2
+            # Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -IncludeIG1
-
-            Performs an audit including all tests where IG1 is true.
-                Output:
-
-                    Status      : Fail
-                    ELevel      : E3
-                    ProfileLevel: L1
-                    Connection  : Microsoft Graph
-                    Rec         : 1.1.1
-                    Result      : False
-                    Details     : Non-compliant accounts:
-                                    Username        | Roles                  | HybridStatus | Missing Licence
-                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-                    FailureReason: Non-Compliant Accounts: 2
+            # Performs a security audit while including tests where IG1 is true.
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
-
-            Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
-                Output:
-
-                    Status      : Fail
-                    ELevel      : E3
-                    ProfileLevel: L1
-                    Connection  : Microsoft Graph
-                    Rec         : 1.1.1
-                    Result      : False
-                    Details     : Non-compliant accounts:
-                                    Username        | Roles                  | HybridStatus | Missing Licence
-                                    user1@domain.com| Global Administrator   | Cloud-Only   | AAD_PREMIUM
-                                    user2@domain.com| Global Administrator   | Hybrid       | AAD_PREMIUM, AAD_PREMIUM_P2
-                    FailureReason: Non-Compliant Accounts: 2
+            # Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
     .EXAMPLE
         PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
         PS> Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
-
-        Or:
+    .EXAMPLE
+        # (PowerShell 7.x Only) Creating a new authentication object for the security audit for app-based authentication.
+        PS> $authParams = New-M365SecurityAuditAuthObject `
+                -ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
+                -ClientId "12345678-1234-1234-1234-123456789012" `
+                -TenantId "12345678-1234-1234-1234-123456789012" `
+                -OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
+                -SpAdminUrl "https://yourcompany-admin.sharepoint.com"
+            Invoke-M365SecurityAudit -AuthParams $authParams -TenantAdminUrl "https://yourcompany-admin.sharepoint.com"
+        # Or:
         PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
-
-            Captures the audit results into a variable and exports them to a CSV file (Nested tables will be truncated).
+            # Captures the audit results into a variable and exports them to a CSV file (Nested tables will be truncated).
                 Output:
                     CISAuditResult[]
                     auditResults.csv
     .EXAMPLE
         PS> Invoke-M365SecurityAudit -WhatIf
-
             Displays what would happen if the cmdlet is run without actually performing the audit.
                 Output:
-
                     What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
     .INPUTS
         None. You cannot pipe objects to Invoke-M365SecurityAudit.

@@ -1,4 +1,4 @@
----
+﻿---
 Module Name: M365FoundationsCISReport
 Module Guid: 0d064bfb-d1ce-484b-a173-993b55984dc9
 Download Help Link: {{Please enter Link manually}}

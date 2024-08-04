@@ -1,73 +1,4 @@
 # M365FoundationsCISReport Module
-[![PSScriptAnalyzer](https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport/actions/workflows/powershell.yml/badge.svg)](https://github.com/CriticalSolutionsNetwork/M365FoundationsCISReport/actions/workflows/powershell.yml)
-## License
-
-This PowerShell module is based on CIS benchmarks and is distributed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. This means:
-
-- **Non-commercial**: You may not use the material for commercial purposes.
-- **ShareAlike**: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
-- **Attribution**: Appropriate credit must be given, provide a link to the license, and indicate if changes were made.
-
-For full license details, please visit [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en).
-
-[Register for and download CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks)
-# Table of Contents
-1. [Invoke-M365SecurityAudit](#Invoke-M365SecurityAudit)
-2. [Export-M365SecurityAuditTable](#Export-M365SecurityAuditTable)
-3. [Get-AdminRoleUserLicense](#Get-AdminRoleUserLicense)
-4. [Get-MFAStatus](#Get-MFAStatus)
-5. [Grant-M365SecurityAuditConsent](#Grant-M365SecurityAuditConsent)
-6. [New-M365SecurityAuditAuthObject](#New-M365SecurityAuditAuthObject)
-7. [Remove-RowsWithEmptyCSVStatus](#Remove-RowsWithEmptyCSVStatus)
-8. [Sync-CISExcelAndCsvData](#Sync-CISExcelAndCsvData)
-
-## Invoke-M365SecurityAudit
-
-# EXAMPLES
-```powershell
-# Example 1: Performing a security audit based on CIS benchmarks
-$auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com"
-$auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ApprovedCloudStorageProviders "DropBox" -ApprovedFederatedDomains "northwind.com"
-
-# Example 2: Exporting a security audit and it's nested tables to zipped CSV files
-Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
-    # Output Ex: 2024.07.07_14.55.55_M365FoundationsAudit_368B2E2F.zip
-
-# Example 3: Retrieving licenses for users in administrative roles
-Get-AdminRoleUserLicense
-
-# Example 4: Getting MFA status of users
-Get-MFAStatus -UserId "user@domain.com"
-
-# Example 5: Removing rows with empty status values from a CSV file
-Remove-RowsWithEmptyCSVStatus -FilePath "C:\Reports\Report.xlsx" -WorksheetName "Sheet1"
-
-# Example 6: Synchronizing CIS benchmark data with audit results
-Sync-CISExcelAndCsvData -ExcelPath "path\to\excel.xlsx" -CsvPath "path\to\data.csv" -SheetName "Combined Profiles"
-
-# Example 7: Granting Microsoft Graph permissions to the auditor
-Grant-M365SecurityAuditConsent -UserPrincipalNameForConsent 'user@example.com'
-
-# Example 8: (PowerShell 7.x Only) Creating a new authentication object for the security audit for app-based authentication.
-$authParams = New-M365SecurityAuditAuthObject -ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
-                                                            -ClientId "12345678-1234-1234-1234-123456789012" `
-                                                            -TenantId "12345678-1234-1234-1234-123456789012" `
-                                                            -OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
-                                                            -SpAdminUrl "https://yourcompany-admin.sharepoint.com"
-Invoke-M365SecurityAudit -AuthParams $authParams -TenantAdminUrl "https://yourcompany-admin.sharepoint.com"
-```
-
-# NOTE
-Ensure that you have the necessary permissions and administrative roles in your Microsoft 365 environment to run these cmdlets. Proper configuration and setup are required for accurate audit results.
-
-# TROUBLESHOOTING NOTE
-If you encounter any issues while using the cmdlets, ensure that your environment meets the module prerequisites. Check for any updates or patches that may address known bugs. For issues related to specific cmdlets, refer to the individual help files for troubleshooting tips.
-
-# SEE ALSO
-- [CIS Benchmarks](https://www.cisecurity.org/cis-benchmarks/)
-- [Microsoft 365 Security Documentation](https://docs.microsoft.com/en-us/microsoft-365/security/)
-- [PowerShell Documentation](https://docs.microsoft.com/en-us/powershell/)
-
 ## Export-M365SecurityAuditTable
 ### Synopsis
 Exports Microsoft 365 security audit results to CSV or Excel files and supports outputting specific test results as objects.
@@ -100,10 +31,10 @@ Export-M365SecurityAuditTable [-CsvPath] <String> [[-ExportNestedTables]] -Expor
 | <nobr>WhatIf</nobr> | wi |  | false | false |  |
 | <nobr>Confirm</nobr> | cf |  | false | false |  |
 ### Inputs
- - \[CISAuditResult\[\]\] - An array of CISAuditResult objects. \[string\] - A path to a CSV file.
+ - \[CISAuditResult\[\\]\\] - An array of CISAuditResult objects. \[string\\] - A path to a CSV file.
 
 ### Outputs
- - \[PSCustomObject\] - A custom object containing the path to the zip file and its hash.
+ - \[PSCustomObject\\] - A custom object containing the path to the zip file and its hash.
 
 ### Examples
 **EXAMPLE 1**
@@ -333,7 +264,7 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -Skip
  - None. You cannot pipe objects to Invoke-M365SecurityAudit.
 
 ### Outputs
- - CISAuditResult\[\] The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
+ - CISAuditResult\[\\] The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
 
 ### Note
 - This module is based on CIS benchmarks. - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. - Commercial use is not permitted. This module cannot be sold or used for commercial purposes. - Modifications and sharing are allowed under the same license. - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
@@ -342,100 +273,65 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -Skip
 **EXAMPLE 1**
 ```powershell
 Invoke-M365SecurityAudit
+# Performs a security audit using default parameters.
 ```
-Performs a security audit using default parameters.  
-Output:  
-  
-Status      : Fail  
-ELevel      : E3  
-ProfileLevel: L1  
-Connection  : Microsoft Graph  
-Rec         : 1.1.1  
-Result      : False  
-Details     : Non-compliant accounts:  
-Username        | Roles                  | HybridStatus | Missing Licence  
-user1@domain.com| Global Administrator   | Cloud-Only   | AAD\_PREMIUM  
-user2@domain.com| Global Administrator   | Hybrid       | AAD\_PREMIUM, AAD\_PREMIUM\_P2  
-FailureReason: Non-Compliant Accounts: 2
+
 
 **EXAMPLE 2**
 ```powershell
 Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ELevel "E5" -ProfileLevel "L1"
+# Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
 ```
-Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.  
-Output:  
-  
-Status      : Fail  
-ELevel      : E5  
-ProfileLevel: L1  
-Connection  : Microsoft Graph  
-Rec         : 1.1.1  
-Result      : False  
-Details     : Non-compliant accounts:  
-Username        | Roles                  | HybridStatus | Missing Licence  
-user1@domain.com| Global Administrator   | Cloud-Only   | AAD\_PREMIUM  
-user2@domain.com| Global Administrator   | Hybrid       | AAD\_PREMIUM, AAD\_PREMIUM\_P2  
-FailureReason: Non-Compliant Accounts: 2
+
 
 **EXAMPLE 3**
 ```powershell
 Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -IncludeIG1
+# Performs a security audit while including tests where IG1 is true.
 ```
-Performs an audit including all tests where IG1 is true.  
-Output:  
-  
-Status      : Fail  
-ELevel      : E3  
-ProfileLevel: L1  
-Connection  : Microsoft Graph  
-Rec         : 1.1.1  
-Result      : False  
-Details     : Non-compliant accounts:  
-Username        | Roles                  | HybridStatus | Missing Licence  
-user1@domain.com| Global Administrator   | Cloud-Only   | AAD\_PREMIUM  
-user2@domain.com| Global Administrator   | Hybrid       | AAD\_PREMIUM, AAD\_PREMIUM\_P2  
-FailureReason: Non-Compliant Accounts: 2
+
 
 **EXAMPLE 4**
 ```powershell
 Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
+# Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
 ```
-Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.  
-Output:  
-  
-Status      : Fail  
-ELevel      : E3  
-ProfileLevel: L1  
-Connection  : Microsoft Graph  
-Rec         : 1.1.1  
-Result      : False  
-Details     : Non-compliant accounts:  
-Username        | Roles                  | HybridStatus | Missing Licence  
-user1@domain.com| Global Administrator   | Cloud-Only   | AAD\_PREMIUM  
-user2@domain.com| Global Administrator   | Hybrid       | AAD\_PREMIUM, AAD\_PREMIUM\_P2  
-FailureReason: Non-Compliant Accounts: 2
+
 
 **EXAMPLE 5**
 ```powershell
 $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
 PS> Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
 ```
-Or:  
-PS\> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation  
-  
-Captures the audit results into a variable and exports them to a CSV file \(Nested tables will be truncated\).  
-Output:  
-CISAuditResult\[\]  
-auditResults.csv
+
 
 **EXAMPLE 6**
 ```powershell
-Invoke-M365SecurityAudit -WhatIf
+# (PowerShell 7.x Only) Creating a new authentication object for the security audit for app-based authentication.
+PS> $authParams = New-M365SecurityAuditAuthObject `
+-ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
+-ClientId "12345678-1234-1234-1234-123456789012" `
+-TenantId "12345678-1234-1234-1234-123456789012" `
+-OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
+-SpAdminUrl "https://yourcompany-admin.sharepoint.com"
+Invoke-M365SecurityAudit -AuthParams $authParams -TenantAdminUrl "https://yourcompany-admin.sharepoint.com"
+# Or:
+PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
+# Captures the audit results into a variable and exports them to a CSV file (Nested tables will be truncated).
+Output:
+CISAuditResult[]
+auditResults.csv
 ```
-Displays what would happen if the cmdlet is run without actually performing the audit.  
-Output:  
-  
+
+
+**EXAMPLE 7**
+```powershell
+Invoke-M365SecurityAudit -WhatIf
+Displays what would happen if the cmdlet is run without actually performing the audit.
+Output:
 What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
+```
+
 
 ### Links
 
