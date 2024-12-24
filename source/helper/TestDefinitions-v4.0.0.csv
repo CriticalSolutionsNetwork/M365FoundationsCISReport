@@ -1,7 +1,7 @@
 ﻿Index,TestFileName,Rec,RecDescription,ELevel,ProfileLevel,CISControl,CISDescription,IG1,IG2,IG3,Automated,Connection
-1,Test-AdministrativeAccountCompliance.ps1,1.1.1,Ensure Administrative accounts are cloud-only,E3,L1,5.4,Restrict Administrator Privileges to Dedicated Administrator Accounts,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
+1,Test-AdministrativeAccountCompliance4.ps1,1.1.1,Ensure Administrative accounts are cloud-only,E3,L1,5.4,Restrict Administrator Privileges to Dedicated Administrator Accounts,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
 2,Test-AdminAccountLicenses.ps1,1.1.4,Ensure administrative accounts use licenses with a reduced application footprint,E3,L1,5.4,Restrict Administrator Privileges to Dedicated Administrator Accounts,TRUE,TRUE,TRUE,TRUE,Microsoft Graph
-3,Test-AntiPhishingPolicy.ps1,2.1.7,Ensure that an anti-phishing policy has been created,E5,L2,9.7,Deploy and Maintain Email Server Anti-Malware Protections,FALSE,FALSE,TRUE,TRUE,EXO
+3,Test-AntiPhishingPolicy4.ps1,2.1.7,Ensure that an anti-phishing policy has been created,E5,L2,9.7,Deploy and Maintain Email Server Anti-Malware Protections,FALSE,FALSE,TRUE,TRUE,EXO
 4,Test-AttachmentFiltering.ps1,2.1.11,Ensure comprehensive attachment filtering is applied,E3,L2,9.6,Block unnecessary file types attempting to enter the enterprise’s email gateway,FALSE,TRUE,TRUE,TRUE,EXO
 5,Test-ConnectionFilterIPAllowList.ps1,2.1.12,(L1) Ensure the connection filter IP allow list is not used,E3,L1,9.7,Deploy and Maintain Email Server Anti-Malware Protections,FALSE,FALSE,TRUE,TRUE,EXO
 6,Test-ConnectionFilterSafeList.ps1,2.1.13,(L1) Ensure the connection filter safe list is off,E3,L1,9.7,Deploy and Maintain Email Server Anti-Malware Protections,FALSE,FALSE,TRUE,TRUE,EXO

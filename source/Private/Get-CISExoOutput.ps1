@@ -296,6 +296,7 @@ function Get-CISExoOutput {
                     return $spamPolicies
                 }
                 '2.1.7' {
+                    # v4 needs same info.
                     # Test-AntiPhishingPolicy.ps1
                     <#
                         $antiPhishPolicies = @(
@@ -339,9 +340,6 @@ function Get-CISExoOutput {
                     #>
                     $antiPhishPolicies = Get-AntiPhishPolicy
                     return $antiPhishPolicies
-                }
-                '2.1.7-v4' {
-                    # Placeholder Test-AntiPhishingPolicy.ps1
                 }
                 '2.1.9' {
                     # Test-EnableDKIM.ps1

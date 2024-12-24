@@ -38,14 +38,11 @@ function Get-CISMgOutput {
             Write-Verbose "Get-CISMgOutput: Returning data for Rec: $Rec"
             switch ($rec) {
                 '1.1.1' {
+                    # V4 needs same info
                     # 1.1.1 - MicrosoftGraphPlaceholder
                     # Test-AdministrativeAccountCompliance
                     $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
                     return $AdminRoleAssignmentsAndUsers
-                }
-                '1.1.1-v4' {
-                    # 1.1.1-v4 - MicrosoftGraphPlaceholder
-                    # Placeholder for the new v4 logic for Test-AdministrativeAccountCompliance
                 }
                 '1.1.4' {
                     # 1.1.4 - MicrosoftGraphPlaceholder
@@ -61,7 +58,7 @@ function Get-CISMgOutput {
                 }
                 '1.2.1' {
                     # Test-ManagedApprovedPublicGroups
-                    $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
+                    $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq 'Public' } | Select-Object DisplayName, Visibility
                     return $allGroups
                 }
                 '1.2.2' {
@@ -94,7 +91,7 @@ function Get-CISMgOutput {
                 '6.1.2' {
                     # Test-MailboxAuditingE3
                     $tenantSKUs = Get-MgSubscribedSku -All
-                    $e3SkuPartNumber = "SPE_E3"
+                    $e3SkuPartNumber = 'SPE_E3'
                     $foundE3Sku = $tenantSKUs | Where-Object { $_.SkuPartNumber -eq $e3SkuPartNumber }
                     if ($foundE3Sku.Count -ne 0) {
                         $allE3Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($foundE3Sku.SkuId) )" -All
@@ -107,7 +104,7 @@ function Get-CISMgOutput {
                 '6.1.3' {
                     # Test-MailboxAuditingE5
                     $tenantSKUs = Get-MgSubscribedSku -All
-                    $e5SkuPartNumber = "SPE_E5"
+                    $e5SkuPartNumber = 'SPE_E5'
                     $foundE5Sku = $tenantSKUs | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
                     if ($foundE5Sku.Count -ne 0) {
                         $allE5Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($foundE5Sku.SkuId) )" -All

@@ -25,8 +25,8 @@ function Invoke-TestFunction {
     if ('ApprovedFederatedDomains' -in $functionCmd.Parameters.Keys) {
         $paramList.ApprovedFederatedDomains = $ApprovedFederatedDomains
     }
-    # Use splatting to pass parameters
-    Write-Verbose "Running $functionName..."
+        # Version-aware logging
+    Write-Verbose "Running $functionName (Version: $($script:Version400 ? '4.0.0' : '3.0.0'))..."
     try {
         $result = & $functionName @paramList
         # Assuming each function returns an array of CISAuditResult or a single CISAuditResult

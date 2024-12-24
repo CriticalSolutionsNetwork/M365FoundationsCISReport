@@ -9,6 +9,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
 - TestDefinitions-v4.0.0.csv file to the helper folder for version choices.
 - Test Definition Placeholders
+- Added steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
 
 ## [0.1.26] - 2024-08-04
 
