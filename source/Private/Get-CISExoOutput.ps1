@@ -340,6 +340,9 @@ function Get-CISExoOutput {
                     $antiPhishPolicies = Get-AntiPhishPolicy
                     return $antiPhishPolicies
                 }
+                '2.1.7-v4' {
+                    # Placeholder Test-AntiPhishingPolicy.ps1
+                }
                 '2.1.9' {
                     # Test-EnableDKIM.ps1
                     # 2.1.9 (L1) Ensure DKIM is enabled for all Exchange Online Domains
@@ -347,6 +350,18 @@ function Get-CISExoOutput {
                     $dkimConfig = Get-DkimSigningConfig | Select-Object Domain, Enabled
                     # [object[]]
                     return $dkimConfig
+                }
+                '2.1.11' {
+                    # Placeholder - Test-AttachmentFiltering
+                }
+                '2.1.12' {
+                    # Placeholder - Test-ConnectionFilterIPAllowList
+                }
+                '2.1.13' {
+                    # Placeholder - Test-ConnectionFilterSafeList
+                }
+                '2.1.14' {
+                    # Placeholder - Test-InboundAntiSpamPolicies
                 }
                 '3.1.1' {
                     # Test-AuditLogSearch.ps1
@@ -378,6 +393,9 @@ function Get-CISExoOutput {
                     $mailboxes = Get-EXOMailbox -PropertySets Audit
                     # [object[]]
                     return $mailboxes
+                }
+                '6.1.4' {
+                    # Placeholder - Test-AuditBypassEnabled
                 }
                 '6.2.1' {
                     # Test-BlockMailForwarding.ps1

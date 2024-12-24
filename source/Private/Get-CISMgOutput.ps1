@@ -2,13 +2,10 @@ function Get-CISMgOutput {
     <#
     .SYNOPSIS
     This is a sample Private function only visible within the module.
-
     .DESCRIPTION
     This sample function is not exported to the module and only return the data passed as parameter.
-
     .EXAMPLE
     $null = Get-CISMgOutput -PrivateData 'NOTHING TO SEE HERE'
-
     .PARAMETER PrivateData
     The PrivateData parameter is what will be returned without transformation.
 
@@ -20,7 +17,6 @@ function Get-CISMgOutput {
         [Parameter(Mandatory = $false)]
         [String]$DomainName
     )
-
     begin {
         # Begin Block #
         # Tests
@@ -34,18 +30,26 @@ function Get-CISMgOutput {
             6.1.2
             6.1.3
             # Test number array
-            $testNumbers = @('1.1.1', '1.1.3', '1.2.1', '1.3.1', '5.1.2.3', '5.1.8.1', '6.1.2', '6.1.3')
+            $testNumbers = @('1.1.1', '1.1.1-v4', '1.1.3', '1.2.1', '1.3.1', '5.1.2.3', '5.1.8.1', '6.1.2', '6.1.3', '1.1.4')
         #>
     }
     process {
         try {
-            Write-Verbose "Get-CISMgOutput: Retuning data for Rec: $Rec"
+            Write-Verbose "Get-CISMgOutput: Returning data for Rec: $Rec"
             switch ($rec) {
                 '1.1.1' {
-                    # 1.1.1
+                    # 1.1.1 - MicrosoftGraphPlaceholder
                     # Test-AdministrativeAccountCompliance
                     $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
                     return $AdminRoleAssignmentsAndUsers
+                }
+                '1.1.1-v4' {
+                    # 1.1.1-v4 - MicrosoftGraphPlaceholder
+                    # Placeholder for the new v4 logic for Test-AdministrativeAccountCompliance
+                }
+                '1.1.4' {
+                    # 1.1.4 - MicrosoftGraphPlaceholder
+                    # Placeholder for Test-AdminAccountLicenses
                 }
                 '1.1.3' {
                     # Test-GlobalAdminsCount
@@ -121,7 +125,6 @@ function Get-CISMgOutput {
         }
     }
     end {
-        Write-Verbose "Retuning data for Rec: $Rec"
+        Write-Verbose "Returning data for Rec: $Rec"
     }
 } # end function Get-CISMgOutput
-
