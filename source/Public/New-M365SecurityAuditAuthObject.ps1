@@ -31,6 +31,7 @@
         Creates a new CISAuthenticationParameters object with the specified credentials and URLs, validating each parameter's format and length.
     .NOTES
         Requires PowerShell 7.0 or later.
+        https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps
 #>
 function New-M365SecurityAuditAuthObject {
     [CmdletBinding()]

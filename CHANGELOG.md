@@ -6,6 +6,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
+
+## [0.1.26] - 2024-08-04
+
+### Added
+
 - Added `New-M365SecurityAuditAuthObject` function to create a new authentication object for the security audit for app-based authentication.
 
 ### Changed
