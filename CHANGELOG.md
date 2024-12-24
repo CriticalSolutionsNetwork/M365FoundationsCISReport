@@ -7,6 +7,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Added
 
 - Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
+- TestDefinitions.csv file to the helper folder for version choices.
 
 ## [0.1.26] - 2024-08-04
 
