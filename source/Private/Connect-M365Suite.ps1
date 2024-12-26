@@ -120,7 +120,7 @@ function Connect-M365Suite {
                 #Write-Verbose "Tenant ID: $($tenant.TenantID)"
             }
             if ($script:PnpAuth) {
-                Write-Warning "`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!`nIf you use auth tokens, you will need to kill the current session before subsequent runs as the PNP.Powershell module has conflicts with MgGraph!`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!"
+                Write-Warning "`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!`nIf you use the auth object, you will need to kill the current session before subsequent runs`nas the PNP.Powershell module has conflicts with MgGraph!`nIf Invoke-M365SecurityAudit is invoked in a runspace, you can circumvent the issue!`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!"
             }
             $confirmation = Read-Host "Do you want to proceed with these connections? (Y/N)"
             if ($confirmation -notLike 'Y') {
