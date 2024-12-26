@@ -10,8 +10,8 @@ function Test-EnableDKIM {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "2.1.9"
-        Write-Verbose "Running Test-EnableDKIM for $recnum..."
+        $RecNum = "2.1.9"
+        Write-Verbose "Running Test-EnableDKIM for $RecNum..."
         <#
         Conditions for 2.1.9 (L1) Ensure DKIM is enabled for all Exchange Online Domains (Automated)
         Validate test for a pass:
@@ -30,7 +30,7 @@ function Test-EnableDKIM {
         try {
             # 2.1.9 (L1) Ensure DKIM is enabled for all Exchange Online Domains
             # Retrieve DKIM configuration for all domains
-            $dkimConfig = Get-CISExoOutput -Rec $recnum
+            $dkimConfig = Get-CISExoOutput -Rec $RecNum
             if (-not $DomainName) {
                 $dkimResult = ($dkimConfig | ForEach-Object { $_.Enabled }) -notcontains $false
                 $dkimFailedDomains = $dkimConfig | Where-Object { -not $_.Enabled } | ForEach-Object { $_.Domain }
@@ -62,7 +62,7 @@ function Test-EnableDKIM {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $dkimResult
                 Status        = if ($dkimResult) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -72,7 +72,7 @@ function Test-EnableDKIM {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

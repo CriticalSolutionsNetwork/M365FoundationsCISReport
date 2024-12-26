@@ -9,8 +9,8 @@ function Test-OrganizersPresent {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.5.6"
-        Write-Verbose "Running Test-OrganizersPresent for $recnum..."
+        $RecNum = "8.5.6"
+        Write-Verbose "Running Test-OrganizersPresent for $RecNum..."
     }
     process {
         try {
@@ -36,7 +36,7 @@ function Test-OrganizersPresent {
                     DesignatedPresenterRoleMode           = "Enabled"
                 }
             #>
-            $CsTeamsMeetingPolicyPresenters = Get-CISMSTeamsOutput -Rec $recnum
+            $CsTeamsMeetingPolicyPresenters = Get-CISMSTeamsOutput -Rec $RecNum
             $presenterRoleRestricted = $CsTeamsMeetingPolicyPresenters.DesignatedPresenterRoleMode -eq 'OrganizerOnlyUserOverride'
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $presenterRoleRestricted) {
@@ -53,7 +53,7 @@ function Test-OrganizersPresent {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $presenterRoleRestricted
                 Status        = if ($presenterRoleRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -63,7 +63,7 @@ function Test-OrganizersPresent {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

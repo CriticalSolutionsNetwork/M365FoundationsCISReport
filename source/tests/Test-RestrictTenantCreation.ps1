@@ -9,8 +9,8 @@ function Test-RestrictTenantCreation {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "5.1.2.3"
-        Write-Verbose "Starting Test-RestrictTenantCreation with Rec: $recnum"
+        $RecNum = "5.1.2.3"
+        Write-Verbose "Starting Test-RestrictTenantCreation with Rec: $RecNum"
         <#
         Conditions for 5.1.2.3 (L1) Ensure 'Restrict non-admin users from creating tenants' is set to 'Yes'
         Validate test for a pass:
@@ -29,7 +29,7 @@ function Test-RestrictTenantCreation {
         try {
             # 5.1.2.3 (L1) Ensure 'Restrict non-admin users from creating tenants' is set to 'Yes'
             # Retrieve the tenant creation policy
-            $tenantCreationPolicy = Get-CISMgOutput -Rec $recnum
+            $tenantCreationPolicy = Get-CISMgOutput -Rec $RecNum
             $tenantCreationResult = -not $tenantCreationPolicy.AllowedToCreateTenants
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($tenantCreationResult) {
@@ -41,7 +41,7 @@ function Test-RestrictTenantCreation {
             $details = "AllowedToCreateTenants: $($tenantCreationPolicy.AllowedToCreateTenants)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $tenantCreationResult
                 Status        = if ($tenantCreationResult) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -51,7 +51,7 @@ function Test-RestrictTenantCreation {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

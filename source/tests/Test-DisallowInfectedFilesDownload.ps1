@@ -9,8 +9,8 @@ function Test-DisallowInfectedFilesDownload {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.3.1"
-        Write-Verbose "Running Test-DisallowInfectedFilesDownload for $recnum..."
+        $RecNum = "7.3.1"
+        Write-Verbose "Running Test-DisallowInfectedFilesDownload for $RecNum..."
     }
     process {
         try {
@@ -36,7 +36,7 @@ function Test-DisallowInfectedFilesDownload {
                     DisallowInfectedFileDownload           = $false
                 }
             #>
-            $SPOTenantDisallowInfectedFileDownload = Get-CISSpoOutput -Rec $recnum
+            $SPOTenantDisallowInfectedFileDownload = Get-CISSpoOutput -Rec $RecNum
             # Condition A: The `DisallowInfectedFileDownload` setting is set to `True`
             $isDisallowInfectedFileDownloadEnabled = $SPOTenantDisallowInfectedFileDownload.DisallowInfectedFileDownload
             # Prepare failure reasons and details based on compliance
@@ -55,7 +55,7 @@ function Test-DisallowInfectedFilesDownload {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isDisallowInfectedFileDownloadEnabled
                 Status        = if ($isDisallowInfectedFileDownloadEnabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -65,7 +65,7 @@ function Test-DisallowInfectedFilesDownload {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

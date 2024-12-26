@@ -33,7 +33,7 @@ function Invoke-TestFunction {
         return $result
     }
     catch {
-        Write-Error "An error occurred during the test $recnum`:: $_"
+        Write-Error "An error occurred during the test $RecNum`:: $_"
         $script:FailedTests.Add([PSCustomObject]@{ Test = $functionName; Error = $_ })
 
         # Call Initialize-CISAuditResult with error parameters

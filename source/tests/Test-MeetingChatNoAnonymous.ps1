@@ -9,8 +9,8 @@ function Test-MeetingChatNoAnonymous {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.5.5"
-        Write-Verbose "Running Test-MeetingChatNoAnonymous for $recnum..."
+        $RecNum = "8.5.5"
+        Write-Verbose "Running Test-MeetingChatNoAnonymous for $RecNum..."
     }
     process {
         try {
@@ -36,7 +36,7 @@ function Test-MeetingChatNoAnonymous {
                     MeetingChatEnabledType           = "Enabled"
                 }
             #>
-            $CsTeamsMeetingPolicyChat = Get-CISMSTeamsOutput -Rec $recnum
+            $CsTeamsMeetingPolicyChat = Get-CISMSTeamsOutput -Rec $RecNum
             # Condition A: Check if the MeetingChatEnabledType is set to 'EnabledExceptAnonymous'
             $chatAnonDisabled = $CsTeamsMeetingPolicyChat.MeetingChatEnabledType -eq 'EnabledExceptAnonymous'
             # Prepare failure reasons and details based on compliance
@@ -49,7 +49,7 @@ function Test-MeetingChatNoAnonymous {
             $details = "MeetingChatEnabledType is set to $($CsTeamsMeetingPolicyChat.MeetingChatEnabledType)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $chatAnonDisabled
                 Status        = if ($chatAnonDisabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -59,7 +59,7 @@ function Test-MeetingChatNoAnonymous {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

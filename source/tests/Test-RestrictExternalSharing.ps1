@@ -24,8 +24,8 @@ function Test-RestrictExternalSharing {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.3"
-        Write-Verbose "Running Test-RestrictExternalSharing for $recnum..."
+        $RecNum = "7.2.3"
+        Write-Verbose "Running Test-RestrictExternalSharing for $RecNum..."
     }
     process {
         try {
@@ -36,7 +36,7 @@ function Test-RestrictExternalSharing {
                     SharingCapability           = "ExternalUserAndGuestSharing"
                 }
             #>
-            $SPOTenantSharingCapability = Get-CISSpoOutput -Rec $recnum
+            $SPOTenantSharingCapability = Get-CISSpoOutput -Rec $RecNum
             $isRestricted = $SPOTenantSharingCapability.SharingCapability -in @('ExternalUserSharingOnly', 'ExistingExternalUserSharingOnly', 'Disabled')
             # Prepare failure reasons and details based on compliance
             # Condition B: Using PowerShell, the SharingCapability property for the SharePoint tenant is set to "ExternalUserSharingOnly", "ExistingExternalUserSharingOnly", or "Disabled".
@@ -54,7 +54,7 @@ function Test-RestrictExternalSharing {
             $details = "SharingCapability: $($SPOTenantSharingCapability.SharingCapability)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isRestricted
                 Status        = if ($isRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -64,7 +64,7 @@ function Test-RestrictExternalSharing {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

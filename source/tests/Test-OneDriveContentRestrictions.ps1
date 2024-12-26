@@ -24,8 +24,8 @@ function Test-OneDriveContentRestrictions {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.4"
-        Write-Verbose "Running Test-OneDriveContentRestrictions for $recnum..."
+        $RecNum = "7.2.4"
+        Write-Verbose "Running Test-OneDriveContentRestrictions for $RecNum..."
     }
     process {
         try {
@@ -37,7 +37,7 @@ function Test-OneDriveContentRestrictions {
                     OneDriveSharingCapability           = "ExternalUserAndGuestSharing"
                 }
             #>
-            $SPOTenant = Get-CISSpoOutput -Rec $recnum
+            $SPOTenant = Get-CISSpoOutput -Rec $RecNum
             $isOneDriveSharingRestricted = $SPOTenant.OneDriveSharingCapability -eq 'Disabled'
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isOneDriveSharingRestricted) {
@@ -55,7 +55,7 @@ function Test-OneDriveContentRestrictions {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isOneDriveSharingRestricted
                 Status        = if ($isOneDriveSharingRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -65,7 +65,7 @@ function Test-OneDriveContentRestrictions {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

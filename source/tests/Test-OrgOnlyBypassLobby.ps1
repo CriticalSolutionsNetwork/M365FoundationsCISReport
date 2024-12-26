@@ -9,8 +9,8 @@ function Test-OrgOnlyBypassLobby {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.5.3"
-        Write-Verbose "Running Test-OrgOnlyBypassLobby for $recnum..."
+        $RecNum = "8.5.3"
+        Write-Verbose "Running Test-OrgOnlyBypassLobby for $RecNum..."
     }
     process {
         try {
@@ -31,7 +31,7 @@ function Test-OrgOnlyBypassLobby {
             #   - Condition C: Verification using the Microsoft Teams admin center indicates that the meeting join & lobby settings are not configured as recommended.
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
             # Retrieve the Teams meeting policy for lobby bypass settings
-            $CsTeamsMeetingPolicyLobby = Get-CISMSTeamsOutput -Rec $recnum
+            $CsTeamsMeetingPolicyLobby = Get-CISMSTeamsOutput -Rec $RecNum
             $lobbyBypassRestricted = $CsTeamsMeetingPolicyLobby.AutoAdmittedUsers -eq 'EveryoneInCompanyExcludingGuests'
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $lobbyBypassRestricted) {
@@ -49,7 +49,7 @@ function Test-OrgOnlyBypassLobby {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $lobbyBypassRestricted
                 Status        = if ($lobbyBypassRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -59,7 +59,7 @@ function Test-OrgOnlyBypassLobby {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

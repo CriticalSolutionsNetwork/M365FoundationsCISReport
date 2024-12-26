@@ -10,8 +10,8 @@ function Test-LinkSharingRestrictions {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.7"
-        Write-Verbose "Running Test-LinkSharingRestrictions for $recnum..."
+        $RecNum = "7.2.7"
+        Write-Verbose "Running Test-LinkSharingRestrictions for $RecNum..."
     }
     process {
         try {
@@ -37,7 +37,7 @@ function Test-LinkSharingRestrictions {
                     DefaultSharingLinkType           = "Direct"
                 }
             #>
-            $SPOTenantLinkSharing = Get-CISSpoOutput -Rec $recnum
+            $SPOTenantLinkSharing = Get-CISSpoOutput -Rec $RecNum
             $isLinkSharingRestricted = $SPOTenantLinkSharing.DefaultSharingLinkType -eq 'Direct'  # Or 'SpecificPeople' as per the recommendation
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isLinkSharingRestricted) {
@@ -50,7 +50,7 @@ function Test-LinkSharingRestrictions {
             $details = "DefaultSharingLinkType: $($SPOTenantLinkSharing.DefaultSharingLinkType)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isLinkSharingRestricted
                 Status        = if ($isLinkSharingRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -60,7 +60,7 @@ function Test-LinkSharingRestrictions {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

@@ -11,8 +11,8 @@ function Test-RestrictOutlookAddins {
         # Initialization code
         $defaultPolicyFailureDetails = @()
         $relevantRoles = @('My Custom Apps', 'My Marketplace Apps', 'My ReadWriteMailbox Apps')
-        $recnum = "6.3.1"
-        Write-Verbose "Running Test-RestrictOutlookAddins for $recnum..."
+        $RecNum = "6.3.1"
+        Write-Verbose "Running Test-RestrictOutlookAddins for $RecNum..."
         # Conditions for 6.3.1 (L2) Ensure users installing Outlook add-ins is not allowed
         #
         # Validate test for a pass:
@@ -32,7 +32,7 @@ function Test-RestrictOutlookAddins {
             # 6.3.1 (L2) Ensure users installing Outlook add-ins is not allowed
             # Check all mailboxes for custom policies with unallowed add-ins
             # Check Default Role Assignment Policy
-            $customPolicyFailures, $defaultPolicy = Get-CISExoOutput -Rec $recnum
+            $customPolicyFailures, $defaultPolicy = Get-CISExoOutput -Rec $RecNum
             $defaultPolicyRoles = $defaultPolicy.AssignedRoles | Where-Object { $_ -in $relevantRoles }
             # Condition A: Verify that the roles MyCustomApps, MyMarketplaceApps, and MyReadWriteMailboxApps are unchecked under Other roles.
             if ($defaultPolicyRoles) {
@@ -58,7 +58,7 @@ function Test-RestrictOutlookAddins {
             $isCompliant = -not ($customPolicyFailures -or $defaultPolicyFailureDetails)
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isCompliant
                 Status        = if ($isCompliant) { "Pass" } else { "Fail" }
                 Details       = $detailsString
@@ -68,7 +68,7 @@ function Test-RestrictOutlookAddins {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

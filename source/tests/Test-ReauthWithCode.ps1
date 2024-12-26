@@ -24,8 +24,8 @@ function Test-ReauthWithCode {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.10"
-        Write-Verbose "Running Test-ReauthWithCode for $recnum..."
+        $RecNum = "7.2.10"
+        Write-Verbose "Running Test-ReauthWithCode for $RecNum..."
     }
     process {
         try {
@@ -38,7 +38,7 @@ function Test-ReauthWithCode {
                     EmailAttestationReAuthDays                  = "30"
                 }
             #>
-            $SPOTenantReauthentication = Get-CISSpoOutput -Rec $recnum
+            $SPOTenantReauthentication = Get-CISSpoOutput -Rec $RecNum
             $isReauthenticationRestricted = $SPOTenantReauthentication.EmailAttestationRequired -and $SPOTenantReauthentication.EmailAttestationReAuthDays -le 15
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isReauthenticationRestricted) {
@@ -51,7 +51,7 @@ function Test-ReauthWithCode {
             $details = "EmailAttestationRequired: $($SPOTenantReauthentication.EmailAttestationRequired); EmailAttestationReAuthDays: $($SPOTenantReauthentication.EmailAttestationReAuthDays)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isReauthenticationRestricted
                 Status        = if ($isReauthenticationRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -61,7 +61,7 @@ function Test-ReauthWithCode {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {
