@@ -41,11 +41,9 @@ function Assert-ModuleAvailability {
                     Write-Verbose "Importing module $ModuleName..."
                     Import-Module -Name $ModuleName -RequiredVersion $RequiredVersion -ErrorAction Stop -WarningAction SilentlyContinue | Out-Null
                 }
-
         }
         catch {
             throw "Assert-ModuleAvailability:`n$_"
         }
     }
-
 }

@@ -119,6 +119,9 @@ function Connect-M365Suite {
                 Write-Verbose "Tenant Context: $($tenant.TenantName)`n"
                 #Write-Verbose "Tenant ID: $($tenant.TenantID)"
             }
+            if ($script:PnpAuth) {
+                Write-Warning "`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!`nIf you use auth tokens, you will need to kill the current session before subsequent runs as the PNP.Powershell module has conflicts with MgGraph!`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!"
+            }
             $confirmation = Read-Host "Do you want to proceed with these connections? (Y/N)"
             if ($confirmation -notLike 'Y') {
                 Write-Verbose "Connection setup aborted by user."
