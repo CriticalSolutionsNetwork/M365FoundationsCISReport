@@ -15,7 +15,6 @@ function Get-TestDefinitionsObject {
     )
 
     Write-Verbose "Initial test definitions count: $($TestDefinitions.Count)"
-
     switch ($ParameterSetName) {
         'ELevelFilter' {
             Write-Verbose "Applying ELevelFilter"
@@ -59,7 +58,6 @@ function Get-TestDefinitionsObject {
             $TestDefinitions = $TestDefinitions | Where-Object { $SkipRecommendation -notcontains $_.Rec }
         }
     }
-
     Write-Verbose "Filtered test definitions count: $($TestDefinitions.Count)"
     return $TestDefinitions
 }
