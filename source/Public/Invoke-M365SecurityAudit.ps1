@@ -124,24 +124,24 @@ function Invoke-M365SecurityAudit {
         # Inclusion of specific recommendation numbers
         [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter', HelpMessage = 'Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.')]
         [ValidateSet(
-            '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
-                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
-                '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
-                '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
-                '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
-                '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
+            '1.1.1', '1.1.3', '1.1.4', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
+                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '2.1.11', '2.1.12', '2.1.13', `
+                '2.1.14', '3.1.1', '5.1.2.3', '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.1.4', '6.2.1', `
+                '6.2.2', '6.2.3', '6.3.1', '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', `
+                '7.2.3', '7.2.4', '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', `
+                '8.1.1', '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
                 '8.5.7', '8.6.1'
         )]
         [string[]]$IncludeRecommendation,
         # Exclusion of specific recommendation numbers
         [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter', HelpMessage = 'Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.')]
         [ValidateSet(
-            '1.1.1', '1.1.3', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
-                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '3.1.1', '5.1.2.3', `
-                '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.2.1', '6.2.2', '6.2.3', '6.3.1', `
-                '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', '7.2.3', '7.2.4', `
-                '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', '8.1.1', `
-                '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
+            '1.1.1', '1.1.3', '1.1.4', '1.2.1', '1.2.2', '1.3.1', '1.3.3', '1.3.6', '2.1.1', '2.1.2', `
+                '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.9', '2.1.11', '2.1.12', '2.1.13', `
+                '2.1.14', '3.1.1', '5.1.2.3', '5.1.8.1', '6.1.1', '6.1.2', '6.1.3', '6.1.4', '6.2.1', `
+                '6.2.2', '6.2.3', '6.3.1', '6.5.1', '6.5.2', '6.5.3', '7.2.1', '7.2.10', '7.2.2', `
+                '7.2.3', '7.2.4', '7.2.5', '7.2.6', '7.2.7', '7.2.9', '7.3.1', '7.3.2', '7.3.4', `
+                '8.1.1', '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
                 '8.5.7', '8.6.1'
         )]
         [string[]]$SkipRecommendation,
@@ -175,6 +175,24 @@ function Invoke-M365SecurityAudit {
         }
         if ($AuthParams) {
             $script:PnpAuth = $true
+        }
+        # Check for 4.0.0 specific tests when in 3.0.0 mode
+        # Test variables for testing 3.0.0 specific tests for included 4.0.0 tests
+        $recNumbersToCheck = @('1.1.4', '2.1.11', '2.1.12', '2.1.13', '2.1.14', '6.1.4')
+        # $IncludeRecommendation = '1.1.1','1.1.4'
+        # $Version = '3.0.0'
+        if ($IncludeRecommendation) {
+            if ($Version -ne '4.0.0') {
+                $foundRecNumbers = @()
+                foreach ($rec in $recNumbersToCheck) {
+                    if ($IncludeRecommendation -contains $rec) {
+                        $foundRecNumbers += $rec
+                    }
+                }
+                if ($foundRecNumbers.Count -gt 0) {
+                    throw "Check the '-IncludeRecommendation' parameter. The following test numbers are not available in the 3.0.0 version: $($foundRecNumbers -join ', ')"
+                }
+            }
         }
         # Ensure required modules are installed
         $requiredModules = Get-RequiredModule -AuditFunction
@@ -313,6 +331,6 @@ function Invoke-M365SecurityAudit {
         }
     }
     End {
-
+        # Placeholder
     }
 }
