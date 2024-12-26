@@ -10,6 +10,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 - TestDefinitions-v4.0.0.csv file to the helper folder for version choices.
 - Test Definition Placeholders
 - Added steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
+- Test-AdministrativeAccountCompliance4 function for v4.0.0 rec# 1.1.1 test.
+- Updated Get-CISMgOutput function to include the new test definition case for 1.1.1.
+
+### Fixed
+
+- Fixed Pnp PowerShell MgGraph assembly load error with workaround to load the mggraph assembly as soon as it's imported with a call to Get-MgGroup.
 
 ## [0.1.26] - 2024-08-04
 
