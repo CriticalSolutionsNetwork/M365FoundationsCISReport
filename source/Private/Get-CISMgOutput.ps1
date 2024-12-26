@@ -38,11 +38,25 @@ function Get-CISMgOutput {
             Write-Verbose "Get-CISMgOutput: Returning data for Rec: $Rec"
             switch ($rec) {
                 '1.1.1' {
-                    # V4 needs same info
-                    # 1.1.1 - MicrosoftGraphPlaceholder
-                    # Test-AdministrativeAccountCompliance
-                    $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
-                    return $AdminRoleAssignmentsAndUsers
+                    if ($script:Version400) {
+                        $DirectoryRoles = Get-MgDirectoryRole
+                        # Get privileged role IDs
+                        $PrivilegedRoles = $DirectoryRoles | Where-Object {
+                            $_.DisplayName -like '*Administrator*' -or $_.DisplayName -eq 'Global Reader'
+                        }
+                        # Get the members of these various roles
+                        $RoleMembers = $PrivilegedRoles | ForEach-Object { Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id } |
+                        Select-Object Id -Unique
+                        $PrivilegedUsers = $RoleMembers | ForEach-Object {
+                            Get-MgUser -UserId $_.Id -Property UserPrincipalName, DisplayName, Id, OnPremisesSyncEnabled
+                        }
+                        return $PrivilegedUsers
+                    }
+                    else {
+                        # Test-AdministrativeAccountCompliance
+                        $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
+                        return $AdminRoleAssignmentsAndUsers
+                    }
                 }
                 '1.1.4' {
                     # 1.1.4 - MicrosoftGraphPlaceholder

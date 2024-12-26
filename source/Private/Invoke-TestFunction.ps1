@@ -26,7 +26,11 @@ function Invoke-TestFunction {
         $paramList.ApprovedFederatedDomains = $ApprovedFederatedDomains
     }
         # Version-aware logging
-    Write-Verbose "Running $functionName (Version: $($script:Version400 ? '4.0.0' : '3.0.0'))..."
+        if ($script:Version400) {
+            Write-Verbose "Running $functionName (Version: 4.0.0)..."
+        } else {
+            Write-Verbose "Running $functionName (Version: 3.0.0)..."
+        }
     try {
         $result = & $functionName @paramList
         # Assuming each function returns an array of CISAuditResult or a single CISAuditResult
