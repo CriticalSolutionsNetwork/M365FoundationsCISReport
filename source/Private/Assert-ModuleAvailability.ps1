@@ -21,6 +21,7 @@ function Assert-ModuleAvailability {
                     Write-Verbose "$ModuleName module is already at required version or newer."
                 }
                 if ($ModuleName -eq "Microsoft.Graph") {
+                    # "Preloading Microsoft.Graph assembly to prevent type-loading issues..."
                     Write-Verbose "Preloading Microsoft.Graph assembly to prevent type-loading issues..."
                     try {
                         # Run a harmless cmdlet to preload the assembly
