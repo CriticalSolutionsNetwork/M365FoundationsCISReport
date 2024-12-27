@@ -2,47 +2,57 @@ function Get-ScopeOverlap {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [PSCustomObject]$Policy,                      # The primary policy whose scope we are evaluating
+        [PSCustomObject]$Policy,
+
         [Parameter(Mandatory = $true)]
-        [PSCustomObject[]]$OtherPolicies              # A list of other policies to compare for scope overlap
+        [PSCustomObject[]]$OtherPolicies
     )
-    # Write a verbose message indicating the policy being evaluated for overlap
-    Write-Verbose "Checking for scope overlap with $($Policy.Name)..."
-    # Initialize variables to track overlap status and overlapping entities
-    $overlapDetected = $false                         # Tracks if any overlap is detected
-    $overlappingEntities = @()                        # Stores details of overlapping entities for logging
-    # Build the scope string of the current policy by concatenating users, groups, and domains
-    $policyScope = @(
-        $Policy.Users -join ',',                      # Users within the policy's scope
-        $Policy.Groups -join ',',                     # Groups within the policy's scope
-        $Policy.Domains -join ','                     # Domains within the policy's scope
-    ) -join ','                                       # Combine all into a single string
-    # Iterate through each policy in the list of other policies
+    Write-Verbose "Checking for scope overlap with policy: $($Policy.Name)..."
+    $overlapDetected = $false
+    $overlappingDetails = @()
+    # Extract the correct scope properties for the current policy
+    $policyScope = @{
+        Users  = $Policy.TargetedUsersToProtect
+        Domains = $Policy.TargetedDomainsToProtect
+    }
+    # Log the current policy's scope
+    foreach ($key in $policyScope.Keys) {
+        Write-Verbose "Policy $($Policy.Name) $key scope: $($policyScope[$key] -join ', ')"
+    }
+    # Compare with the scope of other policies
     foreach ($otherPolicy in $OtherPolicies) {
-        if ($null -ne $otherPolicy) {                 # Skip null or empty policies
-            # Build the scope string for the other policy
-            $otherScope = @(
-                $otherPolicy.Users -join ',',         # Users within the other policy's scope
-                $otherPolicy.Groups -join ',',        # Groups within the other policy's scope
-                $otherPolicy.Domains -join ','        # Domains within the other policy's scope
-            ) -join ','                               # Combine all into a single string
-            # Check if the current policy's scope matches any part of the other policy's scope
-            if ($policyScope -match $otherScope) {
-                $overlapDetected = $true             # Mark overlap as detected
-                # Log overlapping entities for clarity
-                $overlappingEntities += @(
-                    "Users: $($otherPolicy.Users)",
-                    "Groups: $($otherPolicy.Groups)",
-                    "Domains: $($otherPolicy.Domains)"
-                )
-                Write-Verbose "Overlap detected between $($Policy.Name) and $($otherPolicy.Name)." # Log the overlap
+        if ($null -ne $otherPolicy) {
+            # Extract the correct scope properties for the other policy
+            $otherScope = @{
+                Users  = $otherPolicy.TargetedUsersToProtect
+                Domains = $otherPolicy.TargetedDomainsToProtect
+            }
+            # Log the other policy's scope
+            Write-Verbose "Comparing with policy: $($otherPolicy.Name)..."
+            foreach ($key in $otherScope.Keys) {
+                Write-Verbose "$($otherPolicy.Name) $key scope: $($otherScope[$key] -join ', ')"
+            }
+            # Compare scopes (intersection) and detect overlap
+            foreach ($key in $policyScope.Keys) {
+                $overlap = $policyScope[$key] | Where-Object { $otherScope[$key] -contains $_ }
+                if ($overlap) {
+                    $overlapDetected = $true
+                    $overlappingDetails += "Overlap detected in $key between $($Policy.Name) and $($otherPolicy.Name): $($overlap -join ', ')"
+                    Write-Verbose "Overlap detected in $key`: $($overlap -join ', ')"
+                } else {
+                    Write-Verbose "No overlap detected for $key between $($Policy.Name) and $($otherPolicy.Name)."
+                }
             }
         }
     }
-    # If overlap is detected, log the specific overlapping entities
+    # Provide a clear summary of overlapping details
     if ($overlapDetected) {
-        Write-Verbose "Overlapping entities: $($overlappingEntities -join '; ')" # Log overlapping users, groups, or domains
+        Write-Verbose "Summary of overlaps for policy $($Policy.Name):"
+        foreach ($detail in $overlappingDetails) {
+            Write-Verbose "    $detail"
+        }
+    } else {
+        Write-Verbose "No overlapping entities found for policy $($Policy.Name)."
     }
-    # Return whether overlap was detected (true/false)
     return $overlapDetected
 }

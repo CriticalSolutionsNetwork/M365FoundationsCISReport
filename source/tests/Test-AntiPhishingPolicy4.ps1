@@ -26,11 +26,15 @@ function Test-AntiPhishingPolicy4 {
             $strictStandardCompliant = $false
             foreach ($policy in @($strictPolicy, $standardPolicy)) {
                 if ($null -ne $policy) {
-                    # Check if the strict or standard policy is compliant
+                    # Check if the Strict or Standard policy is compliant
                     $isCompliant = Get-PhishPolicyCompliance -policy $policy
                     if ($isCompliant) {
                         $strictStandardCompliant = $true
                         $compliantPolicies += $policy.Name
+                        # If Strict is compliant, stop evaluating further
+                        if ($policy.Name -eq 'Strict Preset Security Policy') {
+                            break
+                        }
                     } else {
                         $nonCompliantPolicies += $policy.Name
                     }
@@ -39,8 +43,8 @@ function Test-AntiPhishingPolicy4 {
             # Step 3: Evaluate custom policies if strict and standard are not compliant
             if (-not $strictStandardCompliant) {
                 Write-Verbose 'Evaluating custom policies for compliance...'
-                # Filter custom policies that match any rules in $antiPhishRules and sort by priority
-                $customPolicies = $antiPhishPolicies | Where-Object { $antiPhishRules.AntiPhishPolicy -contains $_.Name }
+                # Filter custom policies using $antiPhishRules to exclude default, strict, and standard
+                $customPolicies = $antiPhishPolicies | Where-Object { $antiPhishRules.AntiPhishPolicy -contains $_.Name -and $_.Name -notin @('Strict Preset Security Policy', 'Standard Preset Security Policy', 'Office365 AntiPhish Default') }
                 $customPolicies = $customPolicies | Sort-Object -Property { $antiPhishRules | Where-Object { $_.AntiPhishPolicy -eq $_.Name } | Select-Object -ExpandProperty Priority }
                 foreach ($policy in $customPolicies) {
                     # Check for scope overlap between custom policies and strict/standard policies
@@ -65,7 +69,7 @@ function Test-AntiPhishingPolicy4 {
                 $defaultPolicy = $antiPhishPolicies | Where-Object { $_.Name -eq 'Office365 AntiPhish Default' }
                 if ($null -ne $defaultPolicy) {
                     # Check for scope overlap between the default policy and other policies
-                    $scopeOverlap = Get-ScopeOverlap -Policy $defaultPolicy -OtherPolicies @($strictPolicy, $standardPolicy, $antiPhishPolicies | Where-Object { $_.Name -ne 'Office365 AntiPhish Default' })
+                    $scopeOverlap = Get-ScopeOverlap -Policy $defaultPolicy -OtherPolicies @($strictPolicy, $standardPolicy, $customPolicies)
                     if ($scopeOverlap) {
                         $failureReasons += "Default policy overlaps with other scoped policies."
                         $nonCompliantPolicies += $defaultPolicy.Name
