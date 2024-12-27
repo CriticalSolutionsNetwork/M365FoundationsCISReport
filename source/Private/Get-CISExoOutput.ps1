@@ -339,7 +339,14 @@ function Get-CISExoOutput {
                         )
                     #>
                     $antiPhishPolicies = Get-AntiPhishPolicy
-                    return $antiPhishPolicies
+                    if ($script:Version400) {
+                        Write-Verbose 'Retrieving associated AntiPhishRules...'
+                        $antiPhishRules = Get-AntiPhishRule
+                        return $antiPhishPolicies, $antiPhishRules
+                    }
+                    else {
+                        return $antiPhishPolicies
+                    }
                 }
                 '2.1.9' {
                     # Test-EnableDKIM.ps1

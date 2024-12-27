@@ -11,10 +11,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Test Definition Placeholders
 - Steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
 - Test-AdministrativeAccountCompliance4 function for v4.0.0 rec# 1.1.1 test.
-- Updated Get-CISMgOutput function to include the new test definition case for 1.1.1.
+- Updated Get-CISMgOutput function to include the new test definition case for 1.1.1,1.1.4 and 2.1.7.
 - New public function for generating version specific lists of recommendation numbers.
 - Check in main public function to check for 4.0.0 rec numbers when 3.0.0 is selected as the M365 benchmark version.
 - Rec numbers to include and exclude rec numbers for version 4.0.0 so the 'validate set' works correctly.
+- Get-PhishPolicyCompliance and Get-ScopeOverlap private functions for 2.1.7 v4.
+- Test-PhishPolicyCompliance4 function for 2.1.7 v4.
 
 ### Fixed
 
