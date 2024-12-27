@@ -16,7 +16,7 @@ function Get-CISExoOutput {
     )
     begin {
         # Begin Block #
-        <#
+    <#
         # Tests
         1.2.2
         1.3.3
@@ -262,7 +262,6 @@ function Get-CISExoOutput {
                 '2.1.6' {
                     # Test-SpamPolicyAdminNotify.ps1
                     # Retrieve the hosted outbound spam filter policies
-                    # $spamPolicies Mock Object:
                     <#
                         # Mock data representing multiple spam filter policies
                         $spamPolicies = @(
