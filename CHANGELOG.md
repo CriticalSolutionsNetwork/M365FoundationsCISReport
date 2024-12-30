@@ -12,6 +12,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
 - Test-AdministrativeAccountCompliance4 function for v4.0.0 rec# 1.1.1 test.
 - Updated Get-CISMgOutput function to include the new test definition case for 1.1.1,1.1.4 and 2.1.7.
+- Updated Get-CISExoOutput function to include the new test definition case for 2.1.7.
 - New public function for generating version specific lists of recommendation numbers.
 - Check in main public function to check for 4.0.0 rec numbers when 3.0.0 is selected as the M365 benchmark version.
 - Rec numbers to include and exclude rec numbers for version 4.0.0 so the 'validate set' works correctly.
@@ -20,7 +21,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Fixed
 
-- Fixed Pnp PowerShell MgGraph assembly load error with workaround to load the mggraph assembly as soon as it's imported with a call to Get-MgGroup.
+- Fixed Pnp PowerShell MgGraph assembly load error with workaround to load the MgGraph assembly as soon as it's imported with a call to Get-MgGroup.
+- Phish policy test to return if highest priority policy conforms to the benchmark.
 
 ## [0.1.26] - 2024-08-04
 

@@ -31,10 +31,8 @@ function Test-AntiPhishingPolicy4 {
                     if ($isCompliant) {
                         $strictStandardCompliant = $true
                         $compliantPolicies += $policy.Name
-                        # If Strict is compliant, stop evaluating further
-                        if ($policy.Name -eq 'Strict Preset Security Policy') {
-                            break
-                        }
+                        Write-Verbose "Compliant policy found: $($policy.Name). Ending evaluation."
+                        return Initialize-CISAuditResult -Rec $RecNum -Result $true -Status 'Pass' -Details "Compliant Policies: $($policy.Name)" -FailureReason 'None'
                     } else {
                         $nonCompliantPolicies += $policy.Name
                     }
@@ -57,6 +55,8 @@ function Test-AntiPhishingPolicy4 {
                         $isCompliant = Get-PhishPolicyCompliance -policy $policy
                         if ($isCompliant) {
                             $compliantPolicies += $policy.Name
+                            Write-Verbose "Compliant custom policy found: $($policy.Name). Ending evaluation."
+                            return Initialize-CISAuditResult -Rec $RecNum -Result $true -Status 'Pass' -Details "Compliant Policies: $($policy.Name)" -FailureReason 'None'
                         } else {
                             $nonCompliantPolicies += $policy.Name
                         }
@@ -78,6 +78,8 @@ function Test-AntiPhishingPolicy4 {
                         $isCompliant = Get-PhishPolicyCompliance -policy $defaultPolicy
                         if ($isCompliant) {
                             $compliantPolicies += $defaultPolicy.Name
+                            Write-Verbose "Compliant default policy found: $($defaultPolicy.Name)."
+                            return Initialize-CISAuditResult -Rec $RecNum -Result $true -Status 'Pass' -Details "Compliant Policies: $($defaultPolicy.Name)" -FailureReason 'None'
                         } else {
                             $nonCompliantPolicies += $defaultPolicy.Name
                         }

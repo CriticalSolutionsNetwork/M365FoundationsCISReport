@@ -3,7 +3,6 @@ function Get-ScopeOverlap {
     param (
         [Parameter(Mandatory = $true)]
         [PSCustomObject]$Policy,
-
         [Parameter(Mandatory = $true)]
         [PSCustomObject[]]$OtherPolicies
     )
