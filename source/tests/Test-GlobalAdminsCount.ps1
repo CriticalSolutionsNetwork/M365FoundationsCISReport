@@ -23,12 +23,12 @@ function Test-GlobalAdminsCount {
         #   - Condition B: The number of global admins is more than 4.
         #   - Condition C: Any discrepancies or errors in retrieving the list of global admin usernames.
         # Initialization code, if needed
-        $recnum = "1.1.3"
-        Write-Verbose "Starting Test-GlobalAdminsCount with Rec: $recnum"
+        $RecNum = "1.1.3"
+        Write-Verbose "Starting Test-GlobalAdminsCount with Rec: $RecNum"
     }
     process {
         try {
-            $globalAdmins = Get-CISMgOutput -Rec $recnum
+            $globalAdmins = Get-CISMgOutput -Rec $RecNum
             # Step: Count the number of global admins
             $globalAdminCount = $globalAdmins.Count
             # Step: Retrieve and format the usernames of global admins
@@ -49,7 +49,7 @@ function Test-GlobalAdminsCount {
             $details = "Count: $globalAdminCount; Users: $globalAdminUsernames"
             # Step: Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $globalAdminCount -ge 2 -and $globalAdminCount -le 4
                 Status        = if ($globalAdminCount -ge 2 -and $globalAdminCount -le 4) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -59,7 +59,7 @@ function Test-GlobalAdminsCount {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

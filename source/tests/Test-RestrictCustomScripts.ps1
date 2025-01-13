@@ -8,8 +8,8 @@ function Test-RestrictCustomScripts {
         # Dot source the class script if necessary
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.3.4"
-        Write-Verbose "Running Test-RestrictCustomScripts for $recnum..."
+        $RecNum = "7.3.4"
+        Write-Verbose "Running Test-RestrictCustomScripts for $RecNum..."
     }
     process {
         try {
@@ -37,7 +37,7 @@ function Test-RestrictCustomScripts {
                     DenyAddAndCustomizePages = "Enabled"
                 }
             #>
-            $SPOSitesCustomScript = Get-CISSpoOutput -Rec $recnum
+            $SPOSitesCustomScript = Get-CISSpoOutput -Rec $RecNum
             # Process URLs to replace 'sharepoint.com' with '<SPUrl>'
             $processedUrls = $SPOSitesCustomScript | ForEach-Object {
                 $_.Url = $_.Url -replace 'sharepoint\.com', '<SPUrl>'
@@ -99,7 +99,7 @@ function Test-RestrictCustomScripts {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $complianceResult
                 Status        = if ($complianceResult) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -109,7 +109,7 @@ function Test-RestrictCustomScripts {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
 

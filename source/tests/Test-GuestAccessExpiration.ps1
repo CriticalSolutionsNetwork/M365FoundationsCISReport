@@ -9,8 +9,8 @@ function Test-GuestAccessExpiration {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.9"
-        Write-Verbose "Running Test-GuestAccessExpiration for $recnum..."
+        $RecNum = "7.2.9"
+        Write-Verbose "Running Test-GuestAccessExpiration for $RecNum..."
     }
     process {
         try {
@@ -37,7 +37,7 @@ function Test-GuestAccessExpiration {
                     ExternalUserExpireInDays                 = "60"
                 }
             #>
-            $SPOTenantGuestAccess = Get-CISSpoOutput -Rec $recnum
+            $SPOTenantGuestAccess = Get-CISSpoOutput -Rec $RecNum
             $isGuestAccessExpirationConfiguredCorrectly = $SPOTenantGuestAccess.ExternalUserExpirationRequired -and $SPOTenantGuestAccess.ExternalUserExpireInDays -le 30
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $isGuestAccessExpirationConfiguredCorrectly) {
@@ -50,7 +50,7 @@ function Test-GuestAccessExpiration {
             $details = "ExternalUserExpirationRequired: $($SPOTenantGuestAccess.ExternalUserExpirationRequired); ExternalUserExpireInDays: $($SPOTenantGuestAccess.ExternalUserExpireInDays)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec            = $recnum
+                Rec            = $RecNum
                 Result         = $isGuestAccessExpirationConfiguredCorrectly
                 Status         = if ($isGuestAccessExpirationConfiguredCorrectly) { "Pass" } else { "Fail" }
                 Details        = $details
@@ -60,7 +60,7 @@ function Test-GuestAccessExpiration {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

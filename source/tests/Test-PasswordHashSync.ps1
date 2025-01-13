@@ -24,14 +24,14 @@ function Test-PasswordHashSync {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "5.1.8.1"
-        Write-Verbose "Starting Test-PasswordHashSync with Rec: $recnum"
+        $RecNum = "5.1.8.1"
+        Write-Verbose "Starting Test-PasswordHashSync with Rec: $RecNum"
     }
     process {
         try {
             # 5.1.8.1 (L1) Ensure password hash sync is enabled for hybrid deployments
             # Retrieve password hash sync status (Condition A and C)
-            $passwordHashSync = Get-CISMgOutput -Rec $recnum
+            $passwordHashSync = Get-CISMgOutput -Rec $RecNum
             $hashSyncResult = $passwordHashSync
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $hashSyncResult) {
@@ -43,7 +43,7 @@ function Test-PasswordHashSync {
             $details = "OnPremisesSyncEnabled: $($passwordHashSync)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $hashSyncResult
                 Status        = if ($hashSyncResult) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -53,7 +53,7 @@ function Test-PasswordHashSync {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

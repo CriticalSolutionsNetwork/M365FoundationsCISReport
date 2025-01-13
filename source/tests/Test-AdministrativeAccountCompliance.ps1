@@ -7,14 +7,14 @@ function Test-AdministrativeAccountCompliance {
         # Condition B: The account is assigned a valid license (e.g., Microsoft Entra ID P1 or P2).
         # Condition C: The administrative account does not have any other application assignments (only valid licenses).
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
-        $recnum = "1.1.1"
-        Write-Verbose "Starting Test-AdministrativeAccountCompliance with Rec: $recnum"
+        $RecNum = "1.1.1"
+        Write-Verbose "Starting Test-AdministrativeAccountCompliance with Rec: $RecNum"
     }
     process {
         try {
             # Retrieve admin roles, assignments, and user details including licenses
             Write-Verbose "Retrieving admin roles, assignments, and user details including licenses"
-            $adminRoleAssignments = Get-CISMgOutput -Rec $recnum
+            $adminRoleAssignments = Get-CISMgOutput -Rec $RecNum
             $adminRoleUsers = @()
             foreach ($roleName in $adminRoleAssignments.Keys) {
                 $assignments = $adminRoleAssignments[$roleName]
@@ -80,7 +80,7 @@ function Test-AdministrativeAccountCompliance {
             Write-Verbose "Assessment completed. Result: $status"
             # Create the parameter splat
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $result
                 Status        = $status
                 Details       = $details
@@ -90,7 +90,7 @@ function Test-AdministrativeAccountCompliance {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

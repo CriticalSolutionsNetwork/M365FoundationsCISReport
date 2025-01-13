@@ -24,8 +24,8 @@ function Test-MailboxAuditingE3 {
         #>
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
-        $recnum = "6.1.2"
-        $version = $recnum
+        $RecNum = "6.1.2"
+        $version = $RecNum
         $actionDictionaries = Get-Action -Dictionaries -Version $version
         # E3 specific actions
         $AdminActions = $actionDictionaries.AdminActions.Keys
@@ -33,13 +33,13 @@ function Test-MailboxAuditingE3 {
         $OwnerActions = $actionDictionaries.OwnerActions.Keys
         $allFailures = @()
 
-        Write-Verbose "Running Test-MailboxAuditingE3 for $recnum..."
-        $allUsers = Get-CISMgOutput -Rec $recnum
+        Write-Verbose "Running Test-MailboxAuditingE3 for $RecNum..."
+        $allUsers = Get-CISMgOutput -Rec $RecNum
         $processedUsers = @{}  # Dictionary to track processed users
     }
     process {
         if ($null -ne $allUsers) {
-            $mailboxes = Get-CISExoOutput -Rec $recnum
+            $mailboxes = Get-CISExoOutput -Rec $RecNum
             try {
                 foreach ($user in $allUsers) {
                     if ($processedUsers.ContainsKey($user.UserPrincipalName)) {
@@ -92,7 +92,7 @@ function Test-MailboxAuditingE3 {
                 }
                 # Populate the audit result
                 $params = @{
-                    Rec           = $recnum
+                    Rec           = $RecNum
                     Result        = $allFailures.Count -eq 0
                     Status        = if ($allFailures.Count -eq 0) { "Pass" } else { "Fail" }
                     Details       = $details
@@ -101,18 +101,18 @@ function Test-MailboxAuditingE3 {
                 $auditResult = Initialize-CISAuditResult @params
             }
             catch {
-                Write-Error "An error occurred during the test $recnum`:: $_"
+                Write-Error "An error occurred during the test $RecNum`:: $_"
                 # Retrieve the description from the test definitions
-                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $RecNum }
                 $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-                $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+                $script:FailedTests.Add([PSCustomObject]@{ Rec = $RecNum; Description = $description; Error = $_ })
                 # Call Initialize-CISAuditResult with error parameters
-                $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+                $auditResult = Initialize-CISAuditResult -Rec $RecNum -Failure
             }
         }
         else {
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $false
                 Status        = "Fail"
                 Details       = "No M365 E3 licenses found."

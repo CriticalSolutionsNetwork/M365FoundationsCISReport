@@ -10,8 +10,8 @@ function Test-IdentifyExternalEmail {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "6.2.3"
-        Write-Verbose "Running Test-IdentifyExternalEmail for $recnum..."
+        $RecNum = "6.2.3"
+        Write-Verbose "Running Test-IdentifyExternalEmail for $RecNum..."
         # Conditions for 6.2.3 (L1) Ensure email from external senders is identified
         #
         # Validate test for a pass:
@@ -32,7 +32,7 @@ function Test-IdentifyExternalEmail {
         try {
             # 6.2.3 (L1) Ensure email from external senders is identified
             # Retrieve external sender tagging configuration
-            $externalInOutlook = Get-CISExoOutput -Rec $recnum
+            $externalInOutlook = Get-CISExoOutput -Rec $RecNum
             $externalTaggingEnabled = ($externalInOutlook | ForEach-Object { $_.Enabled }) -contains $true
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $externalTaggingEnabled) {
@@ -46,7 +46,7 @@ function Test-IdentifyExternalEmail {
             $details = "Enabled: $($externalTaggingEnabled); AllowList: $($externalInOutlook.AllowList)"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $externalTaggingEnabled
                 Status        = if ($externalTaggingEnabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -56,7 +56,7 @@ function Test-IdentifyExternalEmail {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

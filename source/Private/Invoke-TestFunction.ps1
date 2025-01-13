@@ -25,15 +25,19 @@ function Invoke-TestFunction {
     if ('ApprovedFederatedDomains' -in $functionCmd.Parameters.Keys) {
         $paramList.ApprovedFederatedDomains = $ApprovedFederatedDomains
     }
-    # Use splatting to pass parameters
-    Write-Verbose "Running $functionName..."
+        # Version-aware logging
+        if ($script:Version400) {
+            Write-Verbose "Running $functionName (Version: 4.0.0)..."
+        } else {
+            Write-Verbose "Running $functionName (Version: 3.0.0)..."
+        }
     try {
         $result = & $functionName @paramList
         # Assuming each function returns an array of CISAuditResult or a single CISAuditResult
         return $result
     }
     catch {
-        Write-Error "An error occurred during the test $recnum`:: $_"
+        Write-Error "An error occurred during the test $RecNum`:: $_"
         $script:FailedTests.Add([PSCustomObject]@{ Test = $functionName; Error = $_ })
 
         # Call Initialize-CISAuditResult with error parameters

@@ -9,8 +9,8 @@ function Test-NoWhitelistDomains {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "6.2.2"
-        Write-Verbose "Running Test-NoWhitelistDomains for $recnum..."
+        $RecNum = "6.2.2"
+        Write-Verbose "Running Test-NoWhitelistDomains for $RecNum..."
         <#
         Conditions for 6.2.2 (L1) Ensure mail transport rules do not whitelist specific domains (Automated)
         Validate test for a pass:
@@ -32,7 +32,7 @@ function Test-NoWhitelistDomains {
             # 6.2.2 (L1) Ensure mail transport rules do not whitelist specific domains
             # Retrieve transport rules that whitelist specific domains
             # Condition A: Checking for transport rules that whitelist specific domains
-            $whitelistedRules = Get-CISExoOutput -Rec $recnum
+            $whitelistedRules = Get-CISExoOutput -Rec $RecNum
             # Prepare failure reasons and details based on compliance
             # Condition B: Prepare failure reasons based on the presence of whitelisted rules
             $failureReasons = if ($whitelistedRules) {
@@ -51,7 +51,7 @@ function Test-NoWhitelistDomains {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = -not $whitelistedRules
                 Status        = if ($whitelistedRules) { "Fail" } else { "Pass" }
                 Details       = $details
@@ -61,7 +61,7 @@ function Test-NoWhitelistDomains {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

@@ -11,8 +11,8 @@ function Test-CustomerLockbox {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
-        $recnum = "1.3.6"
-        Write-Verbose "Running Test-CustomerLockbox for $recnum..."
+        $RecNum = "1.3.6"
+        Write-Verbose "Running Test-CustomerLockbox for $RecNum..."
         # Conditions for 1.3.6 (L2) Ensure the customer lockbox feature is enabled (Automated)
         #
         # Validate test for a pass:
@@ -34,7 +34,7 @@ function Test-CustomerLockbox {
             # Step: Retrieve the organization configuration (Condition C: Pass/Fail)
             # $customerLockboxEnabled Mock Object
             # $customerLockboxEnabled = $true
-            $customerLockboxEnabled = Get-CISExoOutput -Rec $recnum
+            $customerLockboxEnabled = Get-CISExoOutput -Rec $RecNum
             # Step: Prepare failure reasons and details based on compliance (Condition A, B, & C: Fail)
             $failureReasons = if (-not $customerLockboxEnabled) {
                 "Customer lockbox feature is not enabled."
@@ -51,7 +51,7 @@ function Test-CustomerLockbox {
             }
             # Step: Create and populate the CISAuditResult object
             $params = @{
-                Rec            = $recnum
+                Rec            = $RecNum
                 Result         = $customerLockboxEnabled
                 Status         = if ($customerLockboxEnabled) { "Pass" } else { "Fail" }
                 Details        = $details
@@ -61,7 +61,7 @@ function Test-CustomerLockbox {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

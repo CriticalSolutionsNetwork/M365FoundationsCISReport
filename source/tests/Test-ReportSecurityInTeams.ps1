@@ -9,8 +9,8 @@ function Test-ReportSecurityInTeams {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.6.1"
-        Write-Verbose "Running Test-ReportSecurityInTeams for $recnum..."
+        $RecNum = "8.6.1"
+        Write-Verbose "Running Test-ReportSecurityInTeams for $RecNum..."
     }
     process {
         try {
@@ -24,7 +24,7 @@ function Test-ReportSecurityInTeams {
                     AllowSecurityEndUserReporting           = $true
                 }
             #>
-            $CsTeamsMessagingPolicy = Get-CISMSTeamsOutput -Rec $recnum
+            $CsTeamsMessagingPolicy = Get-CISMSTeamsOutput -Rec $RecNum
             # Condition B: Verify that 'Monitor reported messages in Microsoft Teams' is checked in the Microsoft 365 Defender portal.
             # Condition C: Ensure the 'Send reported messages to' setting in the Microsoft 365 Defender portal is set to 'My reporting mailbox only' with the correct report email addresses.
             # $ReportSubmissionPolicy Mock Object
@@ -40,7 +40,7 @@ function Test-ReportSecurityInTeams {
                     ReportChatMessageToCustomizedAddressEnabled = $false
                 }
             #>
-            $ReportSubmissionPolicy = Get-CISExoOutput -Rec $recnum
+            $ReportSubmissionPolicy = Get-CISExoOutput -Rec $RecNum
             # Check if all the required settings are enabled
             $securityReportEnabled = $CsTeamsMessagingPolicy.AllowSecurityEndUserReporting -and
             $ReportSubmissionPolicy.ReportJunkToCustomizedAddress -and
@@ -92,7 +92,7 @@ ReportChatMessageToCustomizedAddressEnabled: True
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $securityReportEnabled
                 Status        = if ($securityReportEnabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -102,7 +102,7 @@ ReportChatMessageToCustomizedAddressEnabled: True
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

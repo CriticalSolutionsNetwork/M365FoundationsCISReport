@@ -24,8 +24,8 @@ function Test-SharePointAADB2B {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.2"
-        Write-Verbose "Running Test-SharePointAADB2B for $recnum..."
+        $RecNum = "7.2.2"
+        Write-Verbose "Running Test-SharePointAADB2B for $RecNum..."
     }
     process {
         try {
@@ -36,10 +36,10 @@ function Test-SharePointAADB2B {
                     EnableAzureADB2BIntegration           = $false
                 }
             #>
-            $SPOTenantAzureADB2B = Get-CISSpoOutput -Rec $recnum
+            $SPOTenantAzureADB2B = Get-CISSpoOutput -Rec $RecNum
             # Populate the auditResult object with the required properties
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $SPOTenantAzureADB2B.EnableAzureADB2BIntegration
                 Status        = if ($SPOTenantAzureADB2B.EnableAzureADB2BIntegration) { "Pass" } else { "Fail" }
                 Details       = "EnableAzureADB2BIntegration: $($SPOTenantAzureADB2B.EnableAzureADB2BIntegration)"
@@ -49,7 +49,7 @@ function Test-SharePointAADB2B {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

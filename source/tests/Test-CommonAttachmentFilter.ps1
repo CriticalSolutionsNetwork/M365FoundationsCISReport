@@ -24,8 +24,8 @@ function Test-CommonAttachmentFilter {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "2.1.2"
-        Write-Verbose "Running Test-CommonAttachmentFilter for $recnum..."
+        $RecNum = "2.1.2"
+        Write-Verbose "Running Test-CommonAttachmentFilter for $RecNum..."
     }
     process {
         try {
@@ -35,7 +35,7 @@ function Test-CommonAttachmentFilter {
             # Retrieve the attachment filter policy
             # $result Mock Object
             # $result = $true
-            $result = Get-CISExoOutput -Rec $recnum
+            $result = Get-CISExoOutput -Rec $RecNum
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $result) {
                 # Condition A: The Common Attachment Types Filter is not enabled in the Microsoft 365 Security & Compliance Center.
@@ -53,7 +53,7 @@ function Test-CommonAttachmentFilter {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $result
                 Status        = if ($result) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -63,7 +63,7 @@ function Test-CommonAttachmentFilter {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

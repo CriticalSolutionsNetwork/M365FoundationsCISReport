@@ -11,7 +11,7 @@ function Test-ExternalSharingCalendars {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
-        $recnum = "1.3.3"
+        $RecNum = "1.3.3"
 
         # Conditions for 1.3.3 (L2) Ensure 'External sharing' of calendars is not available (Automated)
         #
@@ -31,7 +31,7 @@ function Test-ExternalSharingCalendars {
     process {
         try {
             # Step: Retrieve sharing policies related to calendar sharing
-            $sharingPolicies = Get-CISExoOutput -Rec $recnum
+            $sharingPolicies = Get-CISExoOutput -Rec $RecNum
 
             # Step (Condition A & B: Pass/Fail): Check if calendar sharing is disabled in all applicable policies
             $isExternalSharingDisabled = $true
@@ -85,7 +85,7 @@ foreach ($mailbox in $mailboxes) {
 
             # Step: Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isExternalSharingDisabled
                 Status        = if ($isExternalSharingDisabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -95,7 +95,7 @@ foreach ($mailbox in $mailboxes) {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
 
