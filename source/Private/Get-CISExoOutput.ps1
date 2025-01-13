@@ -16,7 +16,7 @@ function Get-CISExoOutput {
     )
     begin {
         # Begin Block #
-    <#
+        <#
         # Tests
         1.2.2
         1.3.3
@@ -146,11 +146,11 @@ function Get-CISExoOutput {
                             # Check each required property and record failures
                             # Condition A: Checking policy settings
                             $failures = @()
-                            if ($policyDetails.EnableSafeLinksForEmail -ne $true) { $failures += "EnableSafeLinksForEmail: False" } # Email: On
-                            if ($policyDetails.EnableSafeLinksForTeams -ne $true) { $failures += "EnableSafeLinksForTeams: False" } # Teams: On
-                            if ($policyDetails.EnableSafeLinksForOffice -ne $true) { $failures += "EnableSafeLinksForOffice: False" } # Office 365 Apps: On
-                            if ($policyDetails.TrackClicks -ne $true) { $failures += "TrackClicks: False" } # Click protection settings: On
-                            if ($policyDetails.AllowClickThrough -ne $false) { $failures += "AllowClickThrough: True" } # Do not track when users click safe links: Off
+                            if ($policyDetails.EnableSafeLinksForEmail -ne $true) { $failures += 'EnableSafeLinksForEmail: False' } # Email: On
+                            if ($policyDetails.EnableSafeLinksForTeams -ne $true) { $failures += 'EnableSafeLinksForTeams: False' } # Teams: On
+                            if ($policyDetails.EnableSafeLinksForOffice -ne $true) { $failures += 'EnableSafeLinksForOffice: False' } # Office 365 Apps: On
+                            if ($policyDetails.TrackClicks -ne $true) { $failures += 'TrackClicks: False' } # Click protection settings: On
+                            if ($policyDetails.AllowClickThrough -ne $false) { $failures += 'AllowClickThrough: True' } # Do not track when users click safe links: Off
                             # Only add details for policies that have misconfigurations
                             if ($failures.Count -gt 0) {
                                 $misconfiguredDetails += "Policy: $($policy.Name); Failures: $($failures -join ', ')"
@@ -225,7 +225,7 @@ function Get-CISExoOutput {
                         # [object[]]
                         return $safeAttachmentPolicies, $safeAttachmentRules
                         else {
-                            return 1,1
+                            return 1, 1
                         }
                     }
                 }
@@ -356,7 +356,38 @@ function Get-CISExoOutput {
                     return $dkimConfig
                 }
                 '2.1.11' {
-                    # Placeholder - Test-AttachmentFiltering
+                    # Test-CommonAttachmentFilter.ps1 for Comprehensive Attachment Filtering
+                    Write-Verbose 'Retrieving Malware Filter Policies, Rules, and Extensions for 2.1.11...'
+                    # Retrieve all malware filter policies
+                    $malwarePolicies = Get-MalwareFilterPolicy
+                    # Retrieve all malware filter rules
+                    $malwareRules = Get-MalwareFilterRule
+                    # Predefined list of L2 extensions from the benchmark
+                    $L2Extensions = @(
+                        '7z', 'a3x', 'ace', 'ade', 'adp', 'ani', 'app', 'appinstaller',
+                        'applescript', 'application', 'appref-ms', 'appx', 'appxbundle', 'arj',
+                        'asd', 'asx', 'bas', 'bat', 'bgi', 'bz2', 'cab', 'chm', 'cmd', 'com',
+                        'cpl', 'crt', 'cs', 'csh', 'daa', 'dbf', 'dcr', 'deb',
+                        'desktopthemepackfile', 'dex', 'diagcab', 'dif', 'dir', 'dll', 'dmg',
+                        'doc', 'docm', 'dot', 'dotm', 'elf', 'eml', 'exe', 'fxp', 'gadget', 'gz',
+                        'hlp', 'hta', 'htc', 'htm', 'htm', 'html', 'html', 'hwpx', 'ics', 'img',
+                        'inf', 'ins', 'iqy', 'iso', 'isp', 'jar', 'jnlp', 'js', 'jse', 'kext',
+                        'ksh', 'lha', 'lib', 'library-ms', 'lnk', 'lzh', 'macho', 'mam', 'mda',
+                        'mdb', 'mde', 'mdt', 'mdw', 'mdz', 'mht', 'mhtml', 'mof', 'msc', 'msi',
+                        'msix', 'msp', 'msrcincident', 'mst', 'ocx', 'odt', 'ops', 'oxps', 'pcd',
+                        'pif', 'plg', 'pot', 'potm', 'ppa', 'ppam', 'ppkg', 'pps', 'ppsm', 'ppt',
+                        'pptm', 'prf', 'prg', 'ps1', 'ps11', 'ps11xml', 'ps1xml', 'ps2',
+                        'ps2xml', 'psc1', 'psc2', 'pub', 'py', 'pyc', 'pyo', 'pyw', 'pyz',
+                        'pyzw', 'rar', 'reg', 'rev', 'rtf', 'scf', 'scpt', 'scr', 'sct',
+                        'searchConnector-ms', 'service', 'settingcontent-ms', 'sh', 'shb', 'shs',
+                        'shtm', 'shtml', 'sldm', 'slk', 'so', 'spl', 'stm', 'svg', 'swf', 'sys',
+                        'tar', 'theme', 'themepack', 'timer', 'uif', 'url', 'uue', 'vb', 'vbe',
+                        'vbs', 'vhd', 'vhdx', 'vxd', 'wbk', 'website', 'wim', 'wiz', 'ws', 'wsc',
+                        'wsf', 'wsh', 'xla', 'xlam', 'xlc', 'xll', 'xlm', 'xls', 'xlsb', 'xlsm',
+                        'xlt', 'xltm', 'xlw', 'xnk', 'xps', 'xsl', 'xz', 'z'
+                    )
+                    # Return all required objects for evaluation
+                    return $malwarePolicies, $malwareRules, $L2Extensions
                 }
                 '2.1.12' {
                     # Placeholder - Test-ConnectionFilterIPAllowList
@@ -450,7 +481,7 @@ function Get-CISExoOutput {
                         }
                     }
                     # Check Default Role Assignment Policy
-                    $defaultPolicy = Get-RoleAssignmentPolicy "Default Role Assignment Policy"
+                    $defaultPolicy = Get-RoleAssignmentPolicy 'Default Role Assignment Policy'
                     return $customPolicyFailures, $defaultPolicy
                 }
                 '6.5.1' {
