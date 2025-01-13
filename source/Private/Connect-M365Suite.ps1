@@ -2,135 +2,143 @@ function Connect-M365Suite {
     [OutputType([void])]
     [CmdletBinding()]
     param (
-        [Parameter(
-            Mandatory = $false
-        )]
+        [Parameter(Mandatory = $false)]
         [string]$TenantAdminUrl,
-        [Parameter(
-            Mandatory = $false
-        )]
-        [CISAuthenticationParameters]$AuthParams, # Custom authentication parameters
-        [Parameter(
-            Mandatory
-        )]
+
+        [Parameter(Mandatory = $false)]
+        [CISAuthenticationParameters]$AuthParams,
+
+        [Parameter(Mandatory)]
         [string[]]$RequiredConnections,
-        [Parameter(
-            Mandatory = $false
-        )]
+
+        [Parameter(Mandatory = $false)]
         [switch]$SkipConfirmation
     )
-    if (!$SkipConfirmation) {
-        $VerbosePreference = "Continue"
-    }
-    else {
-        $VerbosePreference = "SilentlyContinue"
-    }
+
+    $VerbosePreference = if ($SkipConfirmation) { 'SilentlyContinue' } else { 'Continue' }
     $tenantInfo = @()
     $connectedServices = @()
+
     try {
-        if ($RequiredConnections -contains "Microsoft Graph" -or $RequiredConnections -contains "EXO | Microsoft Graph") {
-            Write-Verbose "Connecting to Microsoft Graph"
-            if ($AuthParams) {
-                # Use application-based authentication
-                Connect-MgGraph -CertificateThumbprint $AuthParams.ClientCertThumbPrint -AppId $AuthParams.ClientId -TenantId $AuthParams.TenantId -NoWelcome | Out-Null
+        if ($RequiredConnections -contains 'Microsoft Graph' -or $RequiredConnections -contains 'EXO | Microsoft Graph') {
+            try {
+                Write-Verbose 'Connecting to Microsoft Graph...'
+                if ($AuthParams) {
+                    Connect-MgGraph -CertificateThumbprint $AuthParams.ClientCertThumbPrint -AppId $AuthParams.ClientId -TenantId $AuthParams.TenantId -NoWelcome | Out-Null
+                }
+                else {
+                    Connect-MgGraph -Scopes 'Directory.Read.All', 'Domain.Read.All', 'Policy.Read.All', 'Organization.Read.All' -NoWelcome | Out-Null
+                }
+                $graphOrgDetails = Get-MgOrganization
+                $tenantInfo += [PSCustomObject]@{
+                    Service    = 'Microsoft Graph'
+                    TenantName = $graphOrgDetails.DisplayName
+                    TenantID   = $graphOrgDetails.Id
+                }
+                $connectedServices += 'Microsoft Graph'
+                Write-Verbose 'Successfully connected to Microsoft Graph.'
             }
-            else {
-                # Use interactive authentication with scopes
-                Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome | Out-Null
+            catch {
+                throw "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
             }
-            $graphOrgDetails = Get-MgOrganization
-            $tenantInfo += [PSCustomObject]@{
-                Service    = "Microsoft Graph"
-                TenantName = $graphOrgDetails.DisplayName
-                TenantID   = $graphOrgDetails.Id
-            }
-            $connectedServices += "Microsoft Graph"
-            Write-Verbose "Successfully connected to Microsoft Graph.`n"
         }
-        if ($RequiredConnections -contains "EXO" -or $RequiredConnections -contains "AzureAD | EXO" -or $RequiredConnections -contains "Microsoft Teams | EXO" -or $RequiredConnections -contains "EXO | Microsoft Graph") {
-            Write-Verbose "Connecting to Exchange Online..."
-            if ($AuthParams) {
-                # Use application-based authentication
-                Connect-ExchangeOnline -AppId $AuthParams.ClientId -CertificateThumbprint $AuthParams.ClientCertThumbPrint -Organization $AuthParams.OnMicrosoftUrl -ShowBanner:$false | Out-Null
+
+        if ($RequiredConnections -contains 'EXO' -or $RequiredConnections -contains 'AzureAD | EXO' -or $RequiredConnections -contains 'Microsoft Teams | EXO' -or $RequiredConnections -contains 'EXO | Microsoft Graph') {
+            try {
+                Write-Verbose 'Connecting to Exchange Online...'
+                if ($AuthParams) {
+                    Connect-ExchangeOnline -AppId $AuthParams.ClientId -CertificateThumbprint $AuthParams.ClientCertThumbPrint -Organization $AuthParams.OnMicrosoftUrl -ShowBanner:$false | Out-Null
+                }
+                else {
+                    Connect-ExchangeOnline -ShowBanner:$false | Out-Null
+                }
+                $exoTenant = (Get-OrganizationConfig).Identity
+                $tenantInfo += [PSCustomObject]@{
+                    Service    = 'Exchange Online'
+                    TenantName = $exoTenant
+                    TenantID   = 'N/A'
+                }
+                $connectedServices += 'EXO'
+                Write-Verbose 'Successfully connected to Exchange Online.'
             }
-            else {
-                # Use interactive authentication
-                Connect-ExchangeOnline -ShowBanner:$false | Out-Null
+            catch {
+                throw "Failed to connect to Exchange Online: $($_.Exception.Message)"
             }
-            $exoTenant = (Get-OrganizationConfig).Identity
-            $tenantInfo += [PSCustomObject]@{
-                Service    = "Exchange Online"
-                TenantName = $exoTenant
-                TenantID   = "N/A"
-            }
-            $connectedServices += "EXO"
-            Write-Verbose "Successfully connected to Exchange Online.`n"
         }
-        if ($RequiredConnections -contains "SPO") {
-            Write-Verbose "Connecting to SharePoint Online..."
-            if ($AuthParams) {
-                # Use application-based authentication
-                Connect-PnPOnline -Url $AuthParams.SpAdminUrl -ClientId $AuthParams.ClientId -Tenant $AuthParams.OnMicrosoftUrl -Thumbprint $AuthParams.ClientCertThumbPrint | Out-Null
+
+        if ($RequiredConnections -contains 'SPO') {
+            try {
+                Write-Verbose 'Connecting to SharePoint Online...'
+                if ($AuthParams) {
+                    Connect-PnPOnline -Url $AuthParams.SpAdminUrl -ClientId $AuthParams.ClientId -Tenant $AuthParams.OnMicrosoftUrl -Thumbprint $AuthParams.ClientCertThumbPrint | Out-Null
+                }
+                else {
+                    Connect-SPOService -Url $TenantAdminUrl | Out-Null
+                }
+                $tenantName = if ($AuthParams) {
+                    (Get-PnPSite).Url
+                }
+                else {
+                    $sites =  Get-SPOSite
+                    # Get the URL from the first site collection
+                    $url = $sites[0].Url
+                    # Use regex to extract the base URL up to the .com portion
+                    $baseUrl = [regex]::Match($url, 'https://[^/]+.com').Value
+                    # Output the base URL
+                    $baseUrl
+                }
+                $tenantInfo += [PSCustomObject]@{
+                    Service    = 'SharePoint Online'
+                    TenantName = $tenantName
+                }
+                $connectedServices += 'SPO'
+                Write-Verbose 'Successfully connected to SharePoint Online.'
             }
-            else {
-                # Use interactive authentication
-                Connect-SPOService -Url $TenantAdminUrl | Out-Null
+            catch {
+                throw "Failed to connect to SharePoint Online: $($_.Exception.Message)"
             }
-            # Assuming that Get-SPOCrossTenantHostUrl and Get-UrlLine are valid commands in your context
-            if ($AuthParams) {
-                $spoContext = Get-PnPSite
-                $tenantName = $spoContext.Url
-            }
-            else {
-                $spoContext = Get-SPOCrossTenantHostUrl
-                $tenantName = Get-UrlLine -Output $spoContext
-            }
-            $tenantInfo += [PSCustomObject]@{
-                Service    = "SharePoint Online"
-                TenantName = $tenantName
-            }
-            $connectedServices += "SPO"
-            Write-Verbose "Successfully connected to SharePoint Online.`n"
         }
-        if ($RequiredConnections -contains "Microsoft Teams" -or $RequiredConnections -contains "Microsoft Teams | EXO") {
-            Write-Verbose "Connecting to Microsoft Teams..."
-            if ($AuthParams) {
-                # Use application-based authentication
-                Connect-MicrosoftTeams -TenantId $AuthParams.TenantId -CertificateThumbprint $AuthParams.ClientCertThumbPrint -ApplicationId $AuthParams.ClientId | Out-Null
+
+        if ($RequiredConnections -contains 'Microsoft Teams' -or $RequiredConnections -contains 'Microsoft Teams | EXO') {
+            try {
+                Write-Verbose 'Connecting to Microsoft Teams...'
+                if ($AuthParams) {
+                    Connect-MicrosoftTeams -TenantId $AuthParams.TenantId -CertificateThumbprint $AuthParams.ClientCertThumbPrint -ApplicationId $AuthParams.ClientId | Out-Null
+                }
+                else {
+                    Connect-MicrosoftTeams | Out-Null
+                }
+                $teamsTenantDetails = Get-CsTenant
+                $tenantInfo += [PSCustomObject]@{
+                    Service    = 'Microsoft Teams'
+                    TenantName = $teamsTenantDetails.DisplayName
+                    TenantID   = $teamsTenantDetails.TenantId
+                }
+                $connectedServices += 'Microsoft Teams'
+                Write-Verbose 'Successfully connected to Microsoft Teams.'
             }
-            else {
-                # Use interactive authentication
-                Connect-MicrosoftTeams | Out-Null
+            catch {
+                throw "Failed to connect to Microsoft Teams: $($_.Exception.Message)"
             }
-            $teamsTenantDetails = Get-CsTenant
-            $tenantInfo += [PSCustomObject]@{
-                Service    = "Microsoft Teams"
-                TenantName = $teamsTenantDetails.DisplayName
-                TenantID   = $teamsTenantDetails.TenantId
-            }
-            $connectedServices += "Microsoft Teams"
-            Write-Verbose "Successfully connected to Microsoft Teams.`n"
         }
-        # Display tenant information and confirm with the user
+
         if (-not $SkipConfirmation) {
-            Write-Verbose "Connected to the following tenants:"
+            Write-Verbose 'Connected to the following tenants:'
             foreach ($tenant in $tenantInfo) {
-                Write-Verbose "Service: $($tenant.Service)"
-                Write-Verbose "Tenant Context: $($tenant.TenantName)`n"
-                #Write-Verbose "Tenant ID: $($tenant.TenantID)"
+                Write-Verbose "Service: $($tenant.Service) | Tenant: $($tenant.TenantName)"
             }
-            $confirmation = Read-Host "Do you want to proceed with these connections? (Y/N)"
-            if ($confirmation -notLike 'Y') {
-                Write-Verbose "Connection setup aborted by user."
+            $confirmation = Read-Host 'Do you want to proceed with these connections? (Y/N)'
+            if ($confirmation -notlike 'Y') {
                 Disconnect-M365Suite -RequiredConnections $connectedServices
-                throw "User aborted connection setup."
+                throw 'User aborted connection setup.'
             }
         }
     }
     catch {
-        $CatchError = $_
-        $VerbosePreference = "Continue"
-        throw $CatchError
+        $VerbosePreference = 'Continue'
+        throw "Connection failed: $($_.Exception.Message)"
     }
-    $VerbosePreference = "Continue"
+    finally {
+        $VerbosePreference = 'Continue'
+    }
 }
