@@ -8,6 +8,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Added additional error handling to connect function to identify problematic steps when they occur.
 - Added new method of verifying spo tenant for Connect-SPOService branch of connect function.
+- Added method to avoid "assembly already loaded" error in PNP Powershell function on first run, subsequent runs in the same session will still throw the error.
 
 ## [0.1.26] - 2024-08-04
 
