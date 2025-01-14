@@ -4,6 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Get-SPOSite command to return all but voided output for no code runs (Ex: PowerAutomate)
+
+## [0.1.27] - 2025-01-13
+
 ### Added
 
 - Added additional error handling to connect function to identify problematic steps when they occur.

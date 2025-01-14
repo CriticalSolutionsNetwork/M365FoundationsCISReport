@@ -79,7 +79,8 @@ function Connect-M365Suite {
                     (Get-PnPSite).Url
                 }
                 else {
-                    $sites =  Get-SPOSite
+                    # Supress output from Get-SPOSite for powerautomate to avoid errors
+                    [void]($sites =  Get-SPOSite -Limit All)
                     # Get the URL from the first site collection
                     $url = $sites[0].Url
                     # Use regex to extract the base URL up to the .com portion
