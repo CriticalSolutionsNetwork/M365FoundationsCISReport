@@ -175,6 +175,7 @@ function Invoke-M365SecurityAudit {
         }
         if ($AuthParams) {
             $script:PnpAuth = $true
+            $env:PNPPOWERSHELL_UPDATECHECK = 'Off'
         }
         # Check for 4.0.0 specific tests when in 3.0.0 mode
         # Test variables for testing 3.0.0 specific tests for included 4.0.0 tests
