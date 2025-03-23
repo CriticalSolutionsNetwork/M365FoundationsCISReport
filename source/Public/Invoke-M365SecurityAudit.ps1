@@ -175,6 +175,7 @@ function Invoke-M365SecurityAudit {
         }
         if ($AuthParams) {
             $script:PnpAuth = $true
+            $defaultPNPUpdateCheck = $env:PNPPOWERSHELL_UPDATECHECK
             $env:PNPPOWERSHELL_UPDATECHECK = 'Off'
         }
         # Check for 4.0.0 specific tests when in 3.0.0 mode
@@ -333,5 +334,6 @@ function Invoke-M365SecurityAudit {
     }
     End {
         # Placeholder
+        $env:PNPPOWERSHELL_UPDATECHECK = $defaultPNPUpdateCheck
     }
 }

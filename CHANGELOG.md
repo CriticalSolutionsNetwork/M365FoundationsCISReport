@@ -4,6 +4,14 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- Adds new CSV for PowerShell commands and updates PnP update check handling
+- Introduces a new CSV file listing various PowerShell commands for different Microsoft services.
+- Updates the `Invoke-M365SecurityAudit` script to temporarily disable PnP PowerShell update checks during execution and restores the original setting afterward.
+
+## [v0.1.28] - 2025-01-14
+
 ### Fixed
 
 - Get-SPOSite command to return all but voided output for no code runs (Ex: PowerAutomate)
