@@ -46,4 +46,5 @@ function Assert-ModuleAvailability {
             throw "Assert-ModuleAvailability:`n$_"
         }
     }
+
 }

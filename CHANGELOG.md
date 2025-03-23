@@ -4,6 +4,20 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Fixed
+
+- Get-SPOSite command to return all but voided output for no code runs (Ex: PowerAutomate)
+
+## [0.1.27] - 2025-01-13
+
+### Added
+
+- Added additional error handling to connect function to identify problematic steps when they occur.
+- Added new method of verifying spo tenant for Connect-SPOService branch of connect function.
+- Added method to avoid "assembly already loaded" error in PNP Powershell function on first run, subsequent runs in the same session will still throw the error.
+
+## [0.1.26] - 2024-08-04
+
 ### Added
 
 - Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
@@ -40,7 +54,6 @@ The format is based on and uses the types of changes according to [Keep a Change
 ### Fixed
 
 - Fixed test 1.3.1 as notification window for password expiration is no longer required.
-
 
 ## [0.1.24] - 2024-07-07
 
