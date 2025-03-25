@@ -8,12 +8,12 @@ function Assert-ModuleAvailability {
     )
     process {
         try {
-                $module = Get-Module -ListAvailable -Name $ModuleName | Where-Object { $_.Version -ge [version]$RequiredVersion }
+                $module = Get-Module -ListAvailable -Name $ModuleName | Where-Object { $_.Version -ge $RequiredVersion }
                 if ($null -eq $module) {
                     Write-Verbose "Installing $ModuleName module..."
                     Install-Module -Name $ModuleName -RequiredVersion $RequiredVersion -Force -AllowClobber -Scope CurrentUser | Out-Null
                 }
-                elseif ($module.Version -lt [version]$RequiredVersion) {
+                elseif ($module.Version -lt $RequiredVersion) {
                     Write-Verbose "Updating $ModuleName module to required version..."
                     Update-Module -Name $ModuleName -RequiredVersion $RequiredVersion -Force | Out-Null
                 }
