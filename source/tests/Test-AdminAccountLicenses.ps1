@@ -7,19 +7,19 @@ function Test-AdminAccountLicenses {
         # Condition B: The account is assigned a valid license (e.g., Microsoft Entra ID P1 or P2).
         # Condition C: The administrative account does not have any other application assignments (only valid licenses).
         $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
-        $RecNum = "1.1.4"
+        $RecNum = '1.1.4'
         Write-Verbose "Starting Test-AdministrativeAccountCompliance with Rec: $RecNum"
     }
     process {
         try {
             # Retrieve admin roles, assignments, and user details including licenses
-            Write-Verbose "Retrieving admin roles, assignments, and user details including licenses"
+            Write-Verbose 'Retrieving admin roles, assignments, and user details including licenses'
             $Report = Get-CISMgOutput -Rec $RecNum
-            $NonCompliantUsers = $Report | Where-Object {$_.License -notin $validLicenses}
+            $NonCompliantUsers = $Report | Where-Object { $_.License -notin $validLicenses }
             # Generate failure reasons
-            Write-Verbose "Generating failure reasons for non-compliant users"
+            Write-Verbose 'Generating failure reasons for non-compliant users'
             $failureReasons = $nonCompliantUsers | ForEach-Object {
-                "$($_.DisplayName)|$($_.UserPrincipalName)|$(if ($_.License) {$_.License}else{"No licenses found"})"
+                "$($_.DisplayName)|$($_.UserPrincipalName)|$(if ($_.License) {$_.License}else{'No licenses found'})"
             }
             $failureReasons = $failureReasons -join "`n"
             $failureReason = if ($nonCompliantUsers) {
@@ -30,7 +30,7 @@ function Test-AdminAccountLicenses {
             }
             $result = $nonCompliantUsers.Count -eq 0
             $status = if ($result) { 'Pass' } else { 'Fail' }
-            $details = if ($nonCompliantUsers) { "DisplayName | UserPrincipalName | License`n$failureReasons" } else { "N/A" }
+            $details = if ($nonCompliantUsers) { "DisplayName | UserPrincipalName | License`n$failureReasons" } else { 'N/A' }
             Write-Verbose "Assessment completed. Result: $status"
             # Create the parameter splat
             $params = @{
@@ -52,4 +52,4 @@ function Test-AdminAccountLicenses {
         return $auditResult
     }
 }
- #   $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')
+#   $validLicenses = @('AAD_PREMIUM', 'AAD_PREMIUM_P2')

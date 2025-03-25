@@ -6,9 +6,26 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
+- Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
+- TestDefinitions-v4.0.0.csv file to the helper folder for version choices.
+- Test Definition Placeholders
+- Steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
+- Test-AdministrativeAccountCompliance4 function for v4.0.0 rec# 1.1.1 test.
+- Updated Get-CISMgOutput function to include the new test definition case for 1.1.1,1.1.4 and 2.1.7.
+- Updated Get-CISExoOutput function to include the new test definition case for 2.1.7.
+- New public function for generating version specific lists of recommendation numbers.
+- Check in main public function to check for 4.0.0 rec numbers when 3.0.0 is selected as the M365 benchmark version.
+- Rec numbers to include and exclude rec numbers for version 4.0.0 so the 'validate set' works correctly.
+- Get-PhishPolicyCompliance and Get-ScopeOverlap private functions for 2.1.7 v4.
+- Test-PhishPolicyCompliance4 function for 2.1.7 v4.
 - Adds new CSV for PowerShell commands and updates PnP update check handling
 - Introduces a new CSV file listing various PowerShell commands for different Microsoft services.
 - Updates the `Invoke-M365SecurityAudit` script to temporarily disable PnP PowerShell update checks during execution and restores the original setting afterward.
+
+### Fixed
+
+- Fixed Pnp PowerShell MgGraph assembly load error with workaround to load the MgGraph assembly as soon as it's imported with a call to Get-MgGroup.
+- Phish policy test to return if highest priority policy conforms to the benchmark.
 
 ## [v0.1.28] - 2025-01-14
 
@@ -23,28 +40,6 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Added additional error handling to connect function to identify problematic steps when they occur.
 - Added new method of verifying spo tenant for Connect-SPOService branch of connect function.
 - Added method to avoid "assembly already loaded" error in PNP Powershell function on first run, subsequent runs in the same session will still throw the error.
-
-## [0.1.26] - 2024-08-04
-
-### Added
-
-- Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
-- TestDefinitions-v4.0.0.csv file to the helper folder for version choices.
-- Test Definition Placeholders
-- Steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
-- Test-AdministrativeAccountCompliance4 function for v4.0.0 rec# 1.1.1 test.
-- Updated Get-CISMgOutput function to include the new test definition case for 1.1.1,1.1.4 and 2.1.7.
-- Updated Get-CISExoOutput function to include the new test definition case for 2.1.7.
-- New public function for generating version specific lists of recommendation numbers.
-- Check in main public function to check for 4.0.0 rec numbers when 3.0.0 is selected as the M365 benchmark version.
-- Rec numbers to include and exclude rec numbers for version 4.0.0 so the 'validate set' works correctly.
-- Get-PhishPolicyCompliance and Get-ScopeOverlap private functions for 2.1.7 v4.
-- Test-PhishPolicyCompliance4 function for 2.1.7 v4.
-
-### Fixed
-
-- Fixed Pnp PowerShell MgGraph assembly load error with workaround to load the MgGraph assembly as soon as it's imported with a call to Get-MgGroup.
-- Phish policy test to return if highest priority policy conforms to the benchmark.
 
 ## [0.1.26] - 2024-08-04
 
