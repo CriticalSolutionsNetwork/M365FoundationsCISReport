@@ -103,24 +103,31 @@ function Invoke-M365SecurityAudit {
     param (
         [Parameter(Mandatory = $false, HelpMessage = "The SharePoint tenant admin URL, which should end with '-admin.sharepoint.com'. If not specified none of the Sharepoint Online tests will run.")]
         [ValidatePattern('^https://[a-zA-Z0-9-]+-admin\.sharepoint\.com$')]
-        [string]$TenantAdminUrl,
+        [string]
+        $TenantAdminUrl,
         [Parameter(Mandatory = $false, HelpMessage = "Specify this to test only the default domain for password expiration and DKIM Config for tests '1.3.1' and 2.1.9. The domain name of your organization, e.g., 'example.com'.")]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
-        [string]$DomainName,
+        [string]
+        $DomainName,
         # E-Level with optional ProfileLevel selection
         [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter', HelpMessage = 'Specifies the E-Level (E3 or E5) for the audit.')]
         [ValidateSet('E3', 'E5')]
-        [string]$ELevel,
+        [string]
+        $ELevel,
         [Parameter(Mandatory = $true, ParameterSetName = 'ELevelFilter', HelpMessage = 'Specifies the profile level (L1 or L2) for the audit.')]
         [ValidateSet('L1', 'L2')]
-        [string]$ProfileLevel,
+        [string]
+        $ProfileLevel,
         # IG Filters, one at a time
         [Parameter(Mandatory = $true, ParameterSetName = 'IG1Filter', HelpMessage = 'Includes tests where IG1 is true.')]
-        [switch]$IncludeIG1,
+        [switch]
+        $IncludeIG1,
         [Parameter(Mandatory = $true, ParameterSetName = 'IG2Filter', HelpMessage = 'Includes tests where IG2 is true.')]
-        [switch]$IncludeIG2,
+        [switch]
+        $IncludeIG2,
         [Parameter(Mandatory = $true, ParameterSetName = 'IG3Filter', HelpMessage = 'Includes tests where IG3 is true.')]
-        [switch]$IncludeIG3,
+        [switch]
+        $IncludeIG3,
         # Inclusion of specific recommendation numbers
         [Parameter(Mandatory = $true, ParameterSetName = 'RecFilter', HelpMessage = 'Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.')]
         [ValidateSet(
@@ -132,7 +139,8 @@ function Invoke-M365SecurityAudit {
                 '8.1.1', '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
                 '8.5.7', '8.6.1'
         )]
-        [string[]]$IncludeRecommendation,
+        [string[]]
+        $IncludeRecommendation,
         # Exclusion of specific recommendation numbers
         [Parameter(Mandatory = $true, ParameterSetName = 'SkipRecFilter', HelpMessage = 'Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.')]
         [ValidateSet(
@@ -144,29 +152,38 @@ function Invoke-M365SecurityAudit {
                 '8.1.1', '8.1.2', '8.2.1', '8.5.1', '8.5.2', '8.5.3', '8.5.4', '8.5.5', '8.5.6', `
                 '8.5.7', '8.6.1'
         )]
-        [string[]]$SkipRecommendation,
+        [string[]]
+        $SkipRecommendation,
         # Common parameters for all parameter sets
         [Parameter(Mandatory = $false, HelpMessage = 'Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names.')]
         [ValidateSet(
             'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
         )]
-        [string[]]$ApprovedCloudStorageProviders = @(),
+        [string[]]
+        $ApprovedCloudStorageProviders = @(),
         [Parameter(Mandatory = $false, HelpMessage = 'Specifies the approved federated domains for the audit test 8.2.1. Accepts an array of allowed domain names.')]
         [ValidatePattern('^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$')]
-        [string[]]$ApprovedFederatedDomains,
+        [string[]]
+        $ApprovedFederatedDomains,
         [Parameter(Mandatory = $false, HelpMessage = 'Specifies that the cmdlet will not establish a connection to Microsoft 365 services.')]
-        [switch]$DoNotConnect,
+        [switch]
+        $DoNotConnect,
         [Parameter(Mandatory = $false, HelpMessage = 'Specifies that the cmdlet will not disconnect from Microsoft 365 services after execution.')]
-        [switch]$DoNotDisconnect,
+        [switch]
+        $DoNotDisconnect,
         [Parameter(Mandatory = $false, HelpMessage = 'Specifies that the cmdlet will not check for the presence of required modules.')]
-        [switch]$NoModuleCheck,
+        [switch]
+        $NoModuleCheck,
         [Parameter(Mandatory = $false, HelpMessage = 'Specifies that the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.')]
-        [switch]$DoNotConfirmConnections,
+        [switch]
+        $DoNotConfirmConnections,
         [Parameter(Mandatory = $false, HelpMessage = 'Specifies an authentication object containing parameters for application-based authentication.')]
-        [CISAuthenticationParameters]$AuthParams,
+        [CISAuthenticationParameters]
+        $AuthParams,
         [Parameter(Mandatory = $false, HelpMessage = "Specifies the CIS benchmark definitions version to use. Default is 4.0.0. Valid values are '3.0.0' or '4.0.0'.")]
         [ValidateSet('3.0.0', '4.0.0')]
-        [string]$Version = '4.0.0'
+        [string]
+        $Version = '4.0.0'
     )
     Begin {
         if ($script:MaximumFunctionCount -lt 8192) {
@@ -277,6 +294,8 @@ function Invoke-M365SecurityAudit {
         catch {
             Throw "Connection execution aborted: $_"
         }
+    }
+    End {
         try {
             if ($PSCmdlet.ShouldProcess("Measure and display audit results for $($totalTests) tests", 'Measure')) {
                 Write-Information "A total of $($totalTests) tests were selected to run..."
@@ -326,14 +345,11 @@ function Invoke-M365SecurityAudit {
             $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
         }
         finally {
+            $env:PNPPOWERSHELL_UPDATECHECK = $defaultPNPUpdateCheck
             if (!($DoNotDisconnect) -and $PSCmdlet.ShouldProcess("Disconnect from Microsoft 365 services: $($actualUniqueConnections -join ', ')", 'Disconnect')) {
                 # Clean up sessions
                 Disconnect-M365Suite -RequiredConnections $requiredConnections
             }
         }
-    }
-    End {
-        # Placeholder
-        $env:PNPPOWERSHELL_UPDATECHECK = $defaultPNPUpdateCheck
     }
 }
