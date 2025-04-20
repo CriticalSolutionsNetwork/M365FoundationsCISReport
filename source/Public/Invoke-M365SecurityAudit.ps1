@@ -218,7 +218,7 @@ function Invoke-M365SecurityAudit {
         # Format the required modules list
         $requiredModulesFormatted = Format-RequiredModuleList -RequiredModules $requiredModules
         # Check and install required modules if necessary
-        if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Modules: $requiredModulesFormatted", 'Assert-ModuleAvailability')) {
+        if (!($NoModuleCheck) -and $PSCmdlet.ShouldProcess("Install Modules: $requiredModulesFormatted", 'Assert-ModuleAvailability')) {
             Write-Information 'Checking for and installing required modules...'
             foreach ($module in $requiredModules) {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
