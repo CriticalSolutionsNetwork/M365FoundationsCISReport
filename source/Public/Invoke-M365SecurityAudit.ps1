@@ -225,11 +225,13 @@ function Invoke-M365SecurityAudit {
             }
         }
         elseif ($script:PnpAuth = $true) {
+            # Ensure MgGraph assemblies are loaded prior to running PnP cmdlets
             Get-MgGroup -Top 1 -ErrorAction SilentlyContinue | Out-Null
         }
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'helper\TestDefinitions.csv'
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
+        # ################ Check for $Version -eq '4.0.0' ################
         if ($Version -eq '4.0.0') {
             $script:Version400 = $true
             $testDefinitionsV4Path = Join-Path -Path $PSScriptRoot -ChildPath 'helper\TestDefinitions-v4.0.0.csv'

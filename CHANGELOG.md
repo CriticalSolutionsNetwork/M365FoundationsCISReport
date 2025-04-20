@@ -21,6 +21,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Adds new CSV for PowerShell commands and updates PnP update check handling
 - Introduces a new CSV file listing various PowerShell commands for different Microsoft services.
 - Updates the `Invoke-M365SecurityAudit` script to temporarily disable PnP PowerShell update checks during execution and restores the original setting afterward.
+- Pre-Test cmdlet call to `Get-MgGroup` to load the MgGraph assembly prior to running PnP PowerShell commands when using app authentication.
+- Output Verbosity for test score.
 
 ### Fixed
 
