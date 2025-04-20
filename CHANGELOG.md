@@ -6,8 +6,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ### Added
 
-- Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
 - TestDefinitions-v4.0.0.csv file to the helper folder for version choices.
+- Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
 - Test Definition Placeholders
 - Steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
 - Test-AdministrativeAccountCompliance4 function for v4.0.0 rec# 1.1.1 test.
@@ -26,6 +26,8 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 - Fixed Pnp PowerShell MgGraph assembly load error with workaround to load the MgGraph assembly as soon as it's imported with a call to Get-MgGroup.
 - Phish policy test to return if highest priority policy conforms to the benchmark.
+- Module assertion to check for minimum version of required modules.
+- Module assertion to not import the module if it already exists.
 
 ## [v0.1.28] - 2025-01-14
 

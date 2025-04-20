@@ -224,6 +224,9 @@ function Invoke-M365SecurityAudit {
                 Assert-ModuleAvailability -ModuleName $module.ModuleName -RequiredVersion $module.RequiredVersion -SubModules $module.SubModules
             }
         }
+        elseif ($script:PnpAuth = $true) {
+            Get-MgGroup -Top 1 -ErrorAction SilentlyContinue | Out-Null
+        }
         # Load test definitions from CSV
         $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'helper\TestDefinitions.csv'
         $testDefinitions = Import-Csv -Path $testDefinitionsPath
