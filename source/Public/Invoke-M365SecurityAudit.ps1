@@ -194,10 +194,9 @@ function Invoke-M365SecurityAudit {
             # Ensure MgGraph assemblies are loaded prior to running PnP cmdlets
             Get-MgGroup -Top 1 -ErrorAction SilentlyContinue | Out-Null
         }
-        # Define a function to load and merge test definitions
-
+        $Script:CISVersion = $Version
         # Call the function to load and merge test definitions
-        $testDefinitions = Get-TestDefinitions -Version $Version
+        $testDefinitions = Get-TestDefinition -Version $Version
         # Load the Test Definitions into the script scope for use in other functions
         $script:TestDefinitionsObject = $testDefinitions
         # Apply filters based on parameter sets

@@ -87,7 +87,7 @@ function Export-M365SecurityAuditTable {
     )
     Begin {
         # Load v4.0 definitions
-        $Version = '4.0.0'
+        $AuditResults[0].M365AuditVersion
         $script:TestDefinitionsObject = Get-TestDefinition -Version $Version
         # Ensure Excel support if requested
         if ($ExportToExcel) {

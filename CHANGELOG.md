@@ -24,6 +24,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Pre-Test cmdlet call to `Get-MgGroup` to load the MgGraph assembly prior to running PnP PowerShell commands when using app authentication.
 - Output Verbosity for test score.
 - Get-TestDefinition private function for v4.0.0 to get the test definition for the test.
+- CIS M365 Foundations version to output object to ensure tests display the version of the benchmark being used and for use in verifying the test definitions needed for the export function.
 
 ### Fixed
 
