@@ -1,97 +1,63 @@
 <#
     .SYNOPSIS
-        Invokes a security audit for Microsoft 365 environments.
+        Perform a CIS‑aligned security audit of a Microsoft 365 tenant.
     .DESCRIPTION
-        The Invoke-M365SecurityAudit cmdlet performs a comprehensive security audit based on the specified parameters.
-        It allows auditing of various configurations and settings within a Microsoft 365 environment in alignment with CIS benchmarks designated "Automatic".
-        Supports selection of CIS benchmark definitions version (default is 4.0.0).
+        Invoke-M365SecurityAudit runs a series of CIS benchmark tests (v3.0.0 or v4.0.0) against your
+        Microsoft 365 environment.  You can filter by domain, license level (E3/E5), profile level (L1/L2),
+        IG levels, include or skip specific recommendations, and supply app‑based credentials.
+        Results are returned as an array of CISAuditResult objects.
     .PARAMETER TenantAdminUrl
-        The URL of the tenant admin. If not specified, none of the SharePoint Online tests will run.
+        The SharePoint admin URL (e.g. https://contoso-admin.sharepoint.com).  If omitted, SPO tests are skipped.
     .PARAMETER DomainName
-        The domain name of the Microsoft 365 environment to test. It is optional and will trigger various tests to run only for the specified domain.
-            Tests Affected: 2.1.9/Test-EnableDKIM, 1.3.1/Test-PasswordNeverExpirePolicy, 2.1.4/Test-SafeAttachmentsPolicy
+        Limit domain‐specific tests (1.3.1, 2.1.9) to this domain (e.g. “contoso.com”).
     .PARAMETER ELevel
-        Specifies the E-Level (E3 or E5) for the audit. This parameter is optional and can be combined with the ProfileLevel parameter.
+        License audit level (“E3” or “E5”).  Requires -ProfileLevel to also be specified.
     .PARAMETER ProfileLevel
-        Specifies the profile level (L1 or L2) for the audit. This parameter is mandatory, but only when ELevel is selected. Otherwise, it is not required.
+        CIS profile level (“L1” or “L2”).  Mandatory when -ELevel is used.
     .PARAMETER IncludeIG1
-        If specified, includes tests where IG1 is true.
+        Include IG1‐only tests in the audit.
     .PARAMETER IncludeIG2
-        If specified, includes tests where IG2 is true.
+        Include IG2‐only tests in the audit.
     .PARAMETER IncludeIG3
-        If specified, includes tests where IG3 is true.
+        Include IG3‐only tests in the audit.
     .PARAMETER IncludeRecommendation
-        Specifies specific recommendations to include in the audit. Accepts an array of recommendation numbers.
+        An array of specific recommendation IDs to include (e.g. '1.1.3','2.1.1').
     .PARAMETER SkipRecommendation
-        Specifies specific recommendations to exclude from the audit. Accepts an array of recommendation numbers.
+        An array of specific recommendation IDs to exclude.
     .PARAMETER ApprovedCloudStorageProviders
-        Specifies the approved cloud storage providers for the audit. Accepts an array of cloud storage provider names for test 8.1.1/Test-TeamsExternalFileSharing.
-            Acceptable values: 'GoogleDrive', 'ShareFile', 'Box', 'DropBox', 'Egnyte'
+        For test 8.1.1, list allowed storage providers (‘GoogleDrive’,’Box’,’ShareFile’,’DropBox’,’Egnyte’).
     .PARAMETER ApprovedFederatedDomains
-        Specifies the approved federated domains for the audit test 8.2.1/Test-TeamsExternalAccess. Accepts an array of allowed domain names.
-            Additional Tests may include this parameter in the future.
+        For test 8.2.1, list allowed federated domains (e.g. 'microsoft.com').
     .PARAMETER DoNotConnect
-        If specified, the cmdlet will not establish a connection to Microsoft 365 services.
+        Skip connecting to Microsoft 365 services; you must have an existing session.
     .PARAMETER DoNotDisconnect
-        If specified, the cmdlet will not disconnect from Microsoft 365 services after execution.
+        Skip disconnecting from Microsoft 365 services at the end.
     .PARAMETER NoModuleCheck
-        If specified, the cmdlet will not check for the presence of required modules.
+        Skip installing/checking required PowerShell modules.
     .PARAMETER DoNotConfirmConnections
-        If specified, the cmdlet will not prompt for confirmation before proceeding with established connections and will disconnect from all of them.
+        When connecting, do not prompt for “Proceed?” before authenticating.
     .PARAMETER AuthParams
-        Specifies an authentication object containing parameters for application-based authentication. If provided, this will be used for connecting to services.
+        A CISAuthenticationParameters object for certificate‑based app authentication.
     .PARAMETER Version
-        Specifies the CIS benchmark definitions version to use. Default is 4.0.0. Valid values are "3.0.0" or "4.0.0".
-    .EXAMPLE
-        PS> Invoke-M365SecurityAudit
-            # Performs a security audit using default parameters.
-    .EXAMPLE
-        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -ELevel "E5" -ProfileLevel "L1"
-            # Performs a security audit for the E5 level and L1 profile in the specified Microsoft 365 environment.
-    .EXAMPLE
-        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -IncludeIG1
-            # Performs a security audit while including tests where IG1 is true.
-    .EXAMPLE
-        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -SkipRecommendation '1.1.3', '2.1.1'
-            # Performs an audit while excluding specific recommendations 1.1.3 and 2.1.1.
-    .EXAMPLE
-        PS> Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com" -Version "3.0.0"
-            # Performs a security audit using the CIS benchmark definitions version 3.0.0.
-    .EXAMPLE
-        PS> $auditResults = Invoke-M365SecurityAudit -TenantAdminUrl "https://contoso-admin.sharepoint.com" -DomainName "contoso.com"
-        PS> Export-M365SecurityAuditTable -AuditResults $auditResults -ExportPath "C:\temp" -ExportOriginalTests -ExportAllTests
-    .EXAMPLE
-        # (PowerShell 7.x Only) Creating a new authentication object for the security audit for app-based authentication.
-        PS> $authParams = New-M365SecurityAuditAuthObject `
-                -ClientCertThumbPrint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
-                -ClientId "12345678-1234-1234-1234-123456789012" `
-                -TenantId "12345678-1234-1234-1234-123456789012" `
-                -OnMicrosoftUrl "yourcompany.onmicrosoft.com" `
-                -SpAdminUrl "https://yourcompany-admin.sharepoint.com"
-            Invoke-M365SecurityAudit -AuthParams $authParams -TenantAdminUrl "https://yourcompany-admin.sharepoint.com"
-        # Or:
-        PS> $auditResults | Export-Csv -Path "auditResults.csv" -NoTypeInformation
-            # Captures the audit results into a variable and exports them to a CSV file (Nested tables will be truncated).
-                Output:
-                    CISAuditResult[]
-                    auditResults.csv
-    .EXAMPLE
-        PS> Invoke-M365SecurityAudit -WhatIf
-            Displays what would happen if the cmdlet is run without actually performing the audit.
-                Output:
-                    What if: Performing the operation "Invoke-M365SecurityAudit" on target "Microsoft 365 environment".
+        CIS definitions version (“3.0.0” or “4.0.0”; default “4.0.0”).
     .INPUTS
-        None. You cannot pipe objects to Invoke-M365SecurityAudit.
+        None; this cmdlet does not accept pipeline input.
     .OUTPUTS
-        CISAuditResult[]
-            The cmdlet returns an array of CISAuditResult objects representing the results of the security audit.
-    .NOTES
-        - This module is based on CIS benchmarks.
-        - Governed by the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
-        - Commercial use is not permitted. This module cannot be sold or used for commercial purposes.
-        - Modifications and sharing are allowed under the same license.
-        - For full license details, visit: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en
-        - Register for CIS Benchmarks at: https://www.cisecurity.org/cis-benchmarks
+        CISAuditResult[] — an array of PSCustomObjects representing each test’s outcome.
+    .EXAMPLE
+        # Quick audit with defaults (v4.0.0)
+        Invoke-M365SecurityAudit
+    .EXAMPLE
+        # Audit E5, level L1, for a single domain:
+        Invoke-M365SecurityAudit -TenantAdminUrl 'https://contoso-admin.sharepoint.com' `
+            -DomainName 'contoso.com' -ELevel E5 -ProfileLevel L1
+    .EXAMPLE
+        # Only include specific recommendations:
+        Invoke-M365SecurityAudit -IncludeRecommendation '1.1.3','2.1.1'
+    .EXAMPLE
+        # App‑only auth + skip confirmation:
+        $auth = New-M365SecurityAuditAuthObject -ClientId ... -ClientCertThumbPrint ...
+        Invoke-M365SecurityAudit -AuthParams $auth -DoNotConfirmConnections
     .LINK
         https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Invoke-M365SecurityAudit
 #>
@@ -185,7 +151,7 @@ function Invoke-M365SecurityAudit {
         [string]
         $Version = '4.0.0'
     )
-    Begin {
+    begin {
         if ($script:MaximumFunctionCount -lt 8192) {
             Write-Verbose "Setting the `$script:MaximumFunctionCount to 8192 for the test run."
             $script:MaximumFunctionCount = 8192
@@ -228,28 +194,10 @@ function Invoke-M365SecurityAudit {
             # Ensure MgGraph assemblies are loaded prior to running PnP cmdlets
             Get-MgGroup -Top 1 -ErrorAction SilentlyContinue | Out-Null
         }
-        # Load test definitions from CSV
-        $testDefinitionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'helper\TestDefinitions.csv'
-        $testDefinitions = Import-Csv -Path $testDefinitionsPath
-        # ################ Check for $Version -eq '4.0.0' ################
-        if ($Version -eq '4.0.0') {
-            $script:Version400 = $true
-            $testDefinitionsV4Path = Join-Path -Path $PSScriptRoot -ChildPath 'helper\TestDefinitions-v4.0.0.csv'
-            $testDefinitionsV4 = Import-Csv -Path $testDefinitionsV4Path
-            # Merge the definitions, prioritizing version 4.0.0
-            $mergedDefinitions = @{}
-            foreach ($test in $testDefinitions) {
-                $mergedDefinitions[$test.Rec] = $test
-            }
-            foreach ($testV4 in $testDefinitionsV4) {
-                $mergedDefinitions[$testV4.Rec] = $testV4  # Overwrite if Rec exists
-            }
-            # Convert back to an array
-            $testDefinitions = $mergedDefinitions.Values
-            Write-Verbose "Total tests after merging: $(($testDefinitions).Count)"
-            $overwrittenTests = $testDefinitionsV4 | Where-Object { $testDefinitions[$_.Rec] }
-            Write-Verbose "Overwritten tests: $($overwrittenTests.Rec -join ', ')"
-        }
+        # Define a function to load and merge test definitions
+
+        # Call the function to load and merge test definitions
+        $testDefinitions = Get-TestDefinitions -Version $Version
         # Load the Test Definitions into the script scope for use in other functions
         $script:TestDefinitionsObject = $testDefinitions
         # Apply filters based on parameter sets
@@ -280,7 +228,7 @@ function Invoke-M365SecurityAudit {
         # Initialize a collection to hold failed test details
         $script:FailedTests = [System.Collections.ArrayList]::new()
     } # End Begin
-    Process {
+    process {
         $allAuditResults = [System.Collections.ArrayList]::new() # Initialize a collection to hold all results
         # Dynamically dot-source the test scripts
         $testsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
@@ -297,10 +245,10 @@ function Invoke-M365SecurityAudit {
             }
         }
         catch {
-            Throw "Connection execution aborted: $_"
+            throw "Connection execution aborted: $_"
         }
     }
-    End {
+    end {
         try {
             if ($PSCmdlet.ShouldProcess("Measure and display audit results for $($totalTests) tests", 'Measure')) {
                 Write-Information "A total of $($totalTests) tests were selected to run..."
@@ -308,11 +256,11 @@ function Invoke-M365SecurityAudit {
                 $testFiles | ForEach-Object {
                     $currentTestIndex++
                     Write-Progress -Activity 'Loading Test Scripts' -Status "Loading $($currentTestIndex) of $($totalTests): $($_.Name)" -PercentComplete (($currentTestIndex / $totalTests) * 100)
-                    Try {
+                    try {
                         # Dot source the test function
                         . $_.FullName
                     }
-                    Catch {
+                    catch {
                         # Log the error and add the test to the failed tests collection
                         Write-Verbose "Failed to load test function $($_.Name): $_"
                         $script:FailedTests.Add([PSCustomObject]@{ Test = $_.Name; Error = $_ })
@@ -341,7 +289,9 @@ function Invoke-M365SecurityAudit {
                     Write-Information "( Assuming the results were instantiated. Ex: `$object = invoke-M365SecurityAudit )`nUse the following command and adjust as necessary to view the full details of the test results:"
                     Write-Information "Export-M365SecurityAuditTable -ExportAllTests -AuditResults `$object -ExportPath `"C:\temp`" -ExportOriginalTests"
                 }
-                return $allAuditResults.ToArray() | Sort-Object -Property Rec
+                # return $allAuditResults.ToArray() | Sort-Object -Property Rec
+                # TODO Check if this fixes export-table.
+                return $allAuditResults | Sort-Object -Property Rec
             }
         }
         catch {
