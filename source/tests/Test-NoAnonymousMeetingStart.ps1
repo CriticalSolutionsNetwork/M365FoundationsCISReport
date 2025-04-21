@@ -9,8 +9,8 @@ function Test-NoAnonymousMeetingStart {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.5.2"
-        Write-Verbose "Running Test-NoAnonymousMeetingStart for $recnum..."
+        $RecNum = "8.5.2"
+        Write-Verbose "Running Test-NoAnonymousMeetingStart for $RecNum..."
     }
     process {
         try {
@@ -31,7 +31,7 @@ function Test-NoAnonymousMeetingStart {
             #   - Condition C: Verification using the UI indicates that the setting `Anonymous users and dial-in callers can start a meeting` is not set to `Off`.
             # Connect to Teams PowerShell using Connect-MicrosoftTeams
             # Retrieve the Teams meeting policy for the global scope and check if anonymous users can start meetings
-            $CsTeamsMeetingPolicyAnonymous = Get-CISMSTeamsOutput -Rec $recnum
+            $CsTeamsMeetingPolicyAnonymous = Get-CISMSTeamsOutput -Rec $RecNum
             $anonymousStartDisabled = -not $CsTeamsMeetingPolicyAnonymous.AllowAnonymousUsersToStartMeeting
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($anonymousStartDisabled) {
@@ -43,7 +43,7 @@ function Test-NoAnonymousMeetingStart {
             $details = "AllowAnonymousUsersToStartMeeting is set to $($CsTeamsMeetingPolicyAnonymous.AllowAnonymousUsersToStartMeeting)" # Condition C
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $anonymousStartDisabled
                 Status        = if ($anonymousStartDisabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -53,7 +53,7 @@ function Test-NoAnonymousMeetingStart {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

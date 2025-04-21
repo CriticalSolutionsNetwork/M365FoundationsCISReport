@@ -9,8 +9,8 @@ function Test-BlockChannelEmails {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.1.2"
-        Write-Verbose "Running Test-BlockChannelEmails for $recnum..."
+        $RecNum = "8.1.2"
+        Write-Verbose "Running Test-BlockChannelEmails for $RecNum..."
     }
     process {
         try {
@@ -30,7 +30,7 @@ function Test-BlockChannelEmails {
             #   - Condition B: The setting `Users can send emails to a channel email address` is not set to `Off` in the Teams admin center.
             #   - Condition C: Verification using PowerShell indicates that the `AllowEmailIntoChannel` setting is enabled.
             # Retrieve Teams client configuration
-            $teamsClientConfig = Get-CISMSTeamsOutput -Rec $recnum
+            $teamsClientConfig = Get-CISMSTeamsOutput -Rec $RecNum
             $allowEmailIntoChannel = $teamsClientConfig.AllowEmailIntoChannel
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($allowEmailIntoChannel) {
@@ -47,7 +47,7 @@ function Test-BlockChannelEmails {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec            = $recnum
+                Rec            = $RecNum
                 Result         = -not $allowEmailIntoChannel
                 Status         = if (-not $allowEmailIntoChannel) { "Pass" } else { "Fail" }
                 Details        = $details
@@ -57,7 +57,7 @@ function Test-BlockChannelEmails {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

@@ -1,235 +1,201 @@
 <#
     .SYNOPSIS
-        Exports Microsoft 365 security audit results to CSV or Excel files and supports outputting specific test results as objects.
+        Export Microsoft 365 CIS audit results into CSV/Excel and package with hashes.
     .DESCRIPTION
-        The Export-M365SecurityAuditTable function exports Microsoft 365 security audit results from an array of CISAuditResult objects or a CSV file.
-        It can export all results to a specified path, output a specific test result as an object, and includes options for exporting results to Excel.
-        Additionally, it computes hashes for the exported files and includes them in the zip archive for verification purposes.
+        Export-M365SecurityAuditTable processes an array of CISAuditResult objects, exporting per-test nested tables
+        and/or a full audit summary (with oversized fields truncated) to CSV or Excel.  All output files are
+        hashed (SHA256) and bundled into a ZIP archive whose filename includes a short hash for integrity.
     .PARAMETER AuditResults
-        An array of CISAuditResult objects containing the audit results. This parameter is mandatory when exporting from audit results.
-    .PARAMETER CsvPath
-        The path to a CSV file containing the audit results. This parameter is mandatory when exporting from a CSV file.
-    .PARAMETER OutputTestNumber
-        The test number to output as an object. Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4". This parameter is used to output a specific test result.
-    .PARAMETER ExportNestedTables
-        Switch to export all test results. When specified, all test results are exported to the specified path.
+        An array of PSCustomObject (CISAuditResult) objects containing the audit results to export or query.
     .PARAMETER ExportPath
-        The path where the CSV or Excel files will be exported. This parameter is mandatory when exporting all tests.
-    .PARAMETER ExportOriginalTests
-        Switch to export the original audit results to a CSV file. When specified, the original test results are exported along with the processed results.
+        Path to the directory where CSV/Excel files and the final ZIP archive will be placed. Required for
+        any file-based export (DefaultExport or OnlyExportNestedTables).
     .PARAMETER ExportToExcel
-        Switch to export the results to an Excel file. When specified, results are exported in Excel format.
+        Switch to export files in Excel (.xlsx) format instead of CSV. Requires the ImportExcel module.
+    .PARAMETER Prefix
+        A short prefix (0–5 characters, default 'Corp') appended to the summary audit filename and hashes.
+    .PARAMETER OnlyExportNestedTables
+        Switch to export only the per-test nested tables to files, skipping the full audit summary.
+    .PARAMETER OutputTestNumber
+        Specify one test number (valid values: '1.1.1','1.3.1','6.1.2','6.1.3','7.3.4') to return that test’s
+        details in-memory as objects without writing any files.
     .INPUTS
-        [CISAuditResult[]] - An array of CISAuditResult objects.
-            [string] - A path to a CSV file.
+        System.Object[] (array of CISAuditResult PSCustomObjects)
     .OUTPUTS
-        [PSCustomObject] - A custom object containing the path to the zip file and its hash.
+        PSCustomObject with property ZipFilePath indicating the final ZIP archive location, or raw test details
+        when using -OutputTestNumber.
     .EXAMPLE
-        Export-M365SecurityAuditTable -AuditResults $object -OutputTestNumber 6.1.2
-            # Outputs the result of test number 6.1.2 from the provided audit results as an object.
+        # Return details for test 6.1.2
+        Export-M365SecurityAuditTable -AuditResults $audits -OutputTestNumber 6.1.2
     .EXAMPLE
-        Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp"
-            # Exports all audit results to the specified path in CSV format.
+        # Full export (nested tables + summary) to CSV
+        Export-M365SecurityAuditTable -AuditResults $audits -ExportPath "C:\temp"
     .EXAMPLE
-        Export-M365SecurityAuditTable -CsvPath "C:\temp\auditresultstoday1.csv" -OutputTestNumber 6.1.2
-            # Outputs the result of test number 6.1.2 from the CSV file as an object.
+        # Only export nested tables to Excel
+        Export-M365SecurityAuditTable -AuditResults $audits -ExportPath "C:\temp" -OnlyExportNestedTables -ExportToExcel
     .EXAMPLE
-        Export-M365SecurityAuditTable -ExportNestedTables -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp"
-            # Exports all audit results from the CSV file to the specified path in CSV format.
-    .EXAMPLE
-        Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp" -ExportOriginalTests
-            # Exports all audit results along with the original test results to the specified path in CSV format.
-    .EXAMPLE
-        Export-M365SecurityAuditTable -ExportNestedTables -CsvPath "C:\temp\auditresultstoday1.csv" -ExportPath "C:\temp" -ExportOriginalTests
-            # Exports all audit results from the CSV file along with the original test results to the specified path in CSV format.
-    .EXAMPLE
-        Export-M365SecurityAuditTable -ExportNestedTables -AuditResults $object -ExportPath "C:\temp" -ExportToExcel
-            # Exports all audit results to the specified path in Excel format.
+        # Custom prefix for filenames
+        Export-M365SecurityAuditTable -AuditResults $audits -ExportPath "C:\temp" -Prefix Dev
     .LINK
         https://criticalsolutionsnetwork.github.io/M365FoundationsCISReport/#Export-M365SecurityAuditTable
 #>
 function Export-M365SecurityAuditTable {
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    [CmdletBinding(
+        DefaultParameterSetName = 'DefaultExport',
+        SupportsShouldProcess,
+        ConfirmImpact = 'High'
+    )]
     [OutputType([PSCustomObject])]
-    param (
-        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "OutputObjectFromAuditResultsSingle")]
-        [CISAuditResult[]]$AuditResults,
-        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "ExportAllResultsFromCsv")]
-        [Parameter(Mandatory = $true, Position = 2, ParameterSetName = "OutputObjectFromCsvSingle")]
-        [ValidateScript({ (Test-Path $_) -and ((Get-Item $_).PSIsContainer -eq $false) })]
-        [string]$CsvPath,
-        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "OutputObjectFromAuditResultsSingle")]
-        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "OutputObjectFromCsvSingle")]
-        [ValidateSet("1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4")]
-        [string]$OutputTestNumber,
-        [Parameter(Mandatory = $false, Position = 0, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $false, Position = 0, ParameterSetName = "ExportAllResultsFromCsv")]
-        [switch]$ExportNestedTables,
-        [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $true, ParameterSetName = "ExportAllResultsFromCsv")]
-        [string]$ExportPath,
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
-        [switch]$ExportOriginalTests,
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
-        [switch]$ExportToExcel,
-        # Add Prefix to filename after date when outputting to excel or csv.
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromAuditResults")]
-        [Parameter(Mandatory = $false, ParameterSetName = "ExportAllResultsFromCsv")]
-        # Validate that the count of letters in the prefix is less than 5.
-        [ValidateLength(0, 5)]
-        [string]$Prefix = "Corp"
+    param(
+        #───────────────────────────────────────────────────────────────────────────
+        # 1) DefaultExport: full audit export (nested tables + summary) into ZIP
+        #    -AuditResults, -ExportPath, [-ExportToExcel], [-Prefix]
+        #───────────────────────────────────────────────────────────────────────────
+        [Parameter(Mandatory, ParameterSetName = 'DefaultExport')]
+        [Parameter(Mandatory, ParameterSetName = 'OnlyExportNestedTables')]
+        [Parameter(Mandatory, ParameterSetName = 'SingleObject')]
+        [psobject[]]
+        $AuditResults,
+        [Parameter(Mandatory, ParameterSetName = 'DefaultExport')]
+        [Parameter(Mandatory, ParameterSetName = 'OnlyExportNestedTables')]
+        [string]
+        $ExportPath,
+        [Parameter(ParameterSetName = 'DefaultExport')]
+        [Parameter(ParameterSetName = 'OnlyExportNestedTables')]
+        [switch]
+        $ExportToExcel,
+        [Parameter(ParameterSetName = 'DefaultExport')]
+        [Parameter(ParameterSetName = 'OnlyExportNestedTables')]
+        [ValidateLength(0,5)]
+        [string]
+        $Prefix = 'Corp',
+        #───────────────────────────────────────────────────────────────────────────
+        # 2) OnlyExportNestedTables: nested tables only into ZIP
+        #    -AuditResults, -ExportPath, -OnlyExportNestedTables
+        #───────────────────────────────────────────────────────────────────────────
+        [Parameter(Mandatory, ParameterSetName = 'OnlyExportNestedTables')]
+        [switch]
+        $OnlyExportNestedTables,
+        #───────────────────────────────────────────────────────────────────────────
+        # 3) SingleObject: in-memory output of one test’s details
+        #    -AuditResults, -OutputTestNumber
+        #───────────────────────────────────────────────────────────────────────────
+        [Parameter(Mandatory, ParameterSetName = 'SingleObject')]
+        [ValidateSet('1.1.1','1.3.1','6.1.2','6.1.3','7.3.4')]
+        [string]
+        $OutputTestNumber
     )
     Begin {
-        $createdFiles = @() # Initialize an array to keep track of created files
-
+        # Load v4.0 definitions
+        $AuditResults[0].M365AuditVersion
+        $script:TestDefinitionsObject = Get-TestDefinition -Version $Version
+        # Ensure Excel support if requested
         if ($ExportToExcel) {
-            if ($PSCmdlet.ShouldProcess("ImportExcel v7.8.9", "Assert-ModuleAvailability")) {
-                Assert-ModuleAvailability -ModuleName ImportExcel -RequiredVersion "7.8.9"
-            }
+            Assert-ModuleAvailability -ModuleName ImportExcel -RequiredVersion '7.8.9'
         }
-        if ($PSCmdlet.ParameterSetName -like "ExportAllResultsFromCsv" -or $PSCmdlet.ParameterSetName -eq "OutputObjectFromCsvSingle") {
-            $AuditResults = Import-Csv -Path $CsvPath | ForEach-Object {
-                $params = @{
-                    Rec           = $_.Rec
-                    Result        = [bool]$_.Result
-                    Status        = $_.Status
-                    Details       = $_.Details
-                    FailureReason = $_.FailureReason
-                }
-                Initialize-CISAuditResult @params
-            }
+        # Tests producing nested tables
+        $nestedTests = '1.1.1','1.3.1','6.1.2','6.1.3','7.3.4'
+        # Initialize collections
+        $results      = @()
+        $createdFiles = [System.Collections.Generic.List[string]]::new()
+        # Determine which tests to process
+        if ($PSCmdlet.ParameterSetName -eq 'SingleObject') {
+            $testsToProcess = @($OutputTestNumber)
+        } else {
+            $testsToProcess = $nestedTests
         }
-        if ($ExportNestedTables) {
-            $TestNumbers = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-        }
-        $results = @()
-        $testsToProcess = if ($OutputTestNumber) { @($OutputTestNumber) } else { $TestNumbers }
     }
     Process {
         foreach ($test in $testsToProcess) {
-            $auditResult = $AuditResults | Where-Object { $_.Rec -eq $test }
-            if (-not $auditResult) {
-                Write-Information "No audit results found for the test number $test."
-                continue
-            }
+            $item = $AuditResults | Where-Object Rec -EQ $test
+            if (-not $item) { continue }
             switch ($test) {
-                "6.1.2" {
-                    $details = $auditResult.Details
-                    $newObjectDetails = Get-AuditMailboxDetail -Details $details -Version '6.1.2'
-                    $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
-                }
-                "6.1.3" {
-                    $details = $auditResult.Details
-                    $newObjectDetails = Get-AuditMailboxDetail -Details $details -Version '6.1.3'
-                    $results += [PSCustomObject]@{ TestNumber = $test; Details = $newObjectDetails }
-                }
-                Default {
-                    $details = $auditResult.Details
-                    $csv = $details | ConvertFrom-Csv -Delimiter '|'
-                    $results += [PSCustomObject]@{ TestNumber = $test; Details = $csv }
-                }
+                '6.1.2' { $parsed = Get-AuditMailboxDetail -Details $item.Details -Version '6.1.2' }
+                '6.1.3' { $parsed = Get-AuditMailboxDetail -Details $item.Details -Version '6.1.3' }
+                Default { $parsed = $item.Details | ConvertFrom-Csv -Delimiter '|' }
             }
+            $results += [PSCustomObject]@{ TestNumber = $test; Details = $parsed }
         }
     }
     End {
-        if ($ExportPath) {
-            if ($PSCmdlet.ShouldProcess("Export-M365SecurityAuditTable", "Exporting results to $ExportPath")) {
-                $timestamp = (Get-Date).ToString("yyyy.MM.dd_HH.mm.ss")
-                $exportedTests = @()
-                foreach ($result in $results) {
-                    $testDef = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $result.TestNumber }
-                    if ($testDef) {
-                        $fileName = "$ExportPath\$($timestamp)_$($result.TestNumber).$($testDef.TestFileName -replace '\.ps1$').csv"
-                        if ($result.Details.Count -eq 0) {
-                            Write-Information "No results found for test number $($result.TestNumber)."
-                        }
-                        else {
-                            if (($result.Details -ne "No M365 E3 licenses found.") -and ($result.Details -ne "No M365 E5 licenses found.")) {
-                                if ($ExportToExcel) {
-                                    $xlsxPath = [System.IO.Path]::ChangeExtension($fileName, '.xlsx')
-                                    $result.Details | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
-                                    $createdFiles += $xlsxPath # Add the created file to the array
-                                }
-                                else {
-                                    $result.Details | Export-Csv -Path $fileName -NoTypeInformation
-                                    $createdFiles += $fileName # Add the created file to the array
-                                }
-                                $exportedTests += $result.TestNumber
-                            }
-                        }
-                    }
-                }
-                if ($exportedTests.Count -gt 0) {
-                    Write-Information "The following tests were exported: $($exportedTests -join ', ')"
-                }
-                else {
-                    if ($ExportOriginalTests) {
-                        Write-Information "Full audit results exported however, none of the following tests had exports: `n1.1.1, 1.3.1, 6.1.2, 6.1.3, 7.3.4"
-                    }
-                    else {
-                        Write-Information "No specified tests were included in the export."
-                    }
-                }
-                if ($ExportOriginalTests) {
-                    # Define the test numbers to check
-                    $TestNumbersToCheck = "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4"
-                    # Check for large details and update the AuditResults array
-                    $updatedAuditResults = Get-ExceededLengthResultDetail -AuditResults $AuditResults -TestNumbersToCheck $TestNumbersToCheck -ExportedTests $exportedTests -DetailsLengthLimit 30000 -PreviewLineCount 25
-                    $originalFileName = "$ExportPath\$timestamp`_$Prefix-M365FoundationsAudit.csv"
-                    if ($ExportToExcel) {
-                        $xlsxPath = [System.IO.Path]::ChangeExtension($originalFileName, '.xlsx')
-                        $updatedAuditResults | Export-Excel -Path $xlsxPath -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
-                        $createdFiles += $xlsxPath # Add the created file to the array
-                    }
-                    else {
-                        $updatedAuditResults | Export-Csv -Path $originalFileName -NoTypeInformation
-                        $createdFiles += $originalFileName # Add the created file to the array
-                    }
-                }
-                # Hash each file and add it to a dictionary
-                # Hash each file and save the hashes to a text file
-                $hashFilePath = "$ExportPath\$timestamp`_Hashes.txt"
-                $fileHashes = @()
-                foreach ($file in $createdFiles) {
-                    $hash = Get-FileHash -Path $file -Algorithm SHA256
-                    $fileHashes += "$($file): $($hash.Hash)"
-                }
-                $fileHashes | Set-Content -Path $hashFilePath
-                $createdFiles += $hashFilePath # Add the hash file to the array
-                # Create a zip file and add all the created files
-                $zipFilePath = "$ExportPath\$timestamp`_$Prefix-M365FoundationsAudit.zip"
-                Compress-Archive -Path $createdFiles -DestinationPath $zipFilePath
-                # Remove the original files after they have been added to the zip
-                foreach ($file in $createdFiles) {
-                    Remove-Item -Path $file -Force
-                }
-                # Compute the hash for the zip file and rename it
-                $zipHash = Get-FileHash -Path $zipFilePath -Algorithm SHA256
-                $newZipFilePath = "$ExportPath\$timestamp`_$Prefix-M365FoundationsAudit_$($zipHash.Hash.Substring(0, 8)).zip"
-                Rename-Item -Path $zipFilePath -NewName $newZipFilePath
-                # Output the zip file path with hash
-                return [PSCustomObject]@{
-                    ZipFilePath = $newZipFilePath
-                }
-            }
-        } # End of ExportPath
-        elseif ($OutputTestNumber) {
-            if ($results[0].Details) {
+        #--- SingleObject: return in-memory details ---
+        if ($PSCmdlet.ParameterSetName -eq 'SingleObject') {
+            if ($results.Count -and $results[0].Details) {
                 return $results[0].Details
             }
-            else {
-                Write-Information "No results found for test number $($OutputTestNumber)."
+            throw "No results found for test $OutputTestNumber."
+        }
+        #--- File export: DefaultExport or OnlyExportNestedTables ---
+        if (-not $ExportPath) {
+            throw 'ExportPath is required for file export.'
+        }
+        if ($PSCmdlet.ShouldProcess($ExportPath, 'Export and archive audit results')) {
+            # Ensure directory
+            if (-not (Test-Path $ExportPath)) { New-Item -Path $ExportPath -ItemType Directory -Force | Out-Null }
+            $timestamp     = (Get-Date).ToString('yyyy.MM.dd_HH.mm.ss')
+            $exportedTests = @()
+            # Always truncate large details before writing files
+            Write-Verbose 'Truncating oversized details...'
+            $truncatedAudit = Get-ExceededLengthResultDetail `
+                -AuditResults       $AuditResults `
+                -TestNumbersToCheck $nestedTests `
+                -ExportedTests      $exportedTests `
+                -DetailsLengthLimit 30000 `
+                -PreviewLineCount   25
+            #--- Export nested tables ---
+            Write-Verbose "[$($PSCmdlet.ParameterSetName)] exporting nested table CSV/XLSX..."
+            foreach ($entry in $results) {
+                if (-not $entry.Details) { continue }
+                $name = "$timestamp`_$($entry.TestNumber)"
+                $csv  = Join-Path $ExportPath "$name.csv"
+                if ($ExportToExcel) {
+                    $xlsx = [IO.Path]::ChangeExtension($csv, '.xlsx')
+                    $entry.Details | Export-Excel -Path $xlsx -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
+                    $createdFiles.Add($xlsx)
+                } else {
+                    $entry.Details | Export-Csv -Path $csv -NoTypeInformation
+                    $createdFiles.Add($csv)
+                }
+                $exportedTests += $entry.TestNumber
             }
+            if ($exportedTests.Count) {
+                Write-Information "Exported nested tables: $($exportedTests -join ', ')"
+            } elseif ($OnlyExportNestedTables) {
+                Write-Warning 'No nested data to export.'
+            }
+            #--- Summary export (DefaultExport only) ---
+            if ($PSCmdlet.ParameterSetName -eq 'DefaultExport') {
+                Write-Verbose 'Exporting full summary with truncated details...'
+                $base = "${timestamp}_${Prefix}-M365FoundationsAudit"
+                $out  = Join-Path $ExportPath "$base.csv"
+                if ($ExportToExcel) {
+                    $xlsx = [IO.Path]::ChangeExtension($out, '.xlsx')
+                    $truncatedAudit | select-object * | Export-Excel -Path $xlsx -WorksheetName Table -TableName Table -AutoSize -TableStyle Medium2
+                    $createdFiles.Add($xlsx)
+                } else {
+                    Write-Verbose "Exporting to Path: $out"
+                    $truncatedAudit | select-object * | Export-Csv -Path $out -NoTypeInformation
+                    $createdFiles.Add($out)
+                }
+                Write-Information 'Exported summary of all audit results.'
+            }
+            #--- Hash & ZIP ---
+            Write-Verbose 'Computing file hashes...'
+            $hashFile = Join-Path $ExportPath "$timestamp`_${Prefix}-Hashes.txt"
+            $createdFiles | ForEach-Object {
+                $h = Get-FileHash -Path $_ -Algorithm SHA256
+                "$([IO.Path]::GetFileName($_)): $($h.Hash)"
+            } | Set-Content -Path $hashFile
+            $createdFiles.Add($hashFile)
+            Write-Verbose 'Creating ZIP archive...'
+            $zip = Join-Path $ExportPath "$timestamp`_${Prefix}-M365FoundationsAudit.zip"
+            Compress-Archive -Path $createdFiles -DestinationPath $zip -Force
+            $createdFiles | Remove-Item -Force
+            # Rename to include short hash
+            $zHash  = Get-FileHash -Path $zip -Algorithm SHA256
+            $final  = Join-Path $ExportPath ("$timestamp`_${Prefix}-M365FoundationsAudit_$($zHash.Hash.Substring(0,8)).zip")
+            Rename-Item -Path $zip -NewName (Split-Path $final -Leaf)
+            return [PSCustomObject]@{ ZipFilePath = $final }
         }
-        else {
-            Write-Error "No valid operation specified. Please provide valid parameters."
-        }
-        # Output the created files at the end
-        #if ($createdFiles.Count -gt 0) {
-        ###########    $createdFiles
-        #}
     }
 }

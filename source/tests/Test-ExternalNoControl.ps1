@@ -9,8 +9,8 @@ function Test-ExternalNoControl {
         # Dot source the class script if necessary
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.5.7"
-        Write-Verbose "Running Test-ExternalNoControl for $recnum..."
+        $RecNum = "8.5.7"
+        Write-Verbose "Running Test-ExternalNoControl for $RecNum..."
     }
     process {
         try {
@@ -36,7 +36,7 @@ function Test-ExternalNoControl {
                     AllowExternalParticipantGiveRequestControl           = $true
                 }
             #>
-            $CsTeamsMeetingPolicyControl = Get-CISMSTeamsOutput -Rec $recnum
+            $CsTeamsMeetingPolicyControl = Get-CISMSTeamsOutput -Rec $RecNum
             # Check if external participants can give or request control
             $externalControlRestricted = -not $CsTeamsMeetingPolicyControl.AllowExternalParticipantGiveRequestControl
             # Prepare failure reasons and details based on compliance
@@ -54,7 +54,7 @@ function Test-ExternalNoControl {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec            = $recnum
+                Rec            = $RecNum
                 Result         = $externalControlRestricted
                 Status         = if ($externalControlRestricted) { "Pass" } else { "Fail" }
                 Details        = $details
@@ -64,7 +64,7 @@ function Test-ExternalNoControl {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

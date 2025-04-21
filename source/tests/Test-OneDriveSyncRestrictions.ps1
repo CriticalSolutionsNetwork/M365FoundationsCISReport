@@ -9,8 +9,8 @@ function Test-OneDriveSyncRestrictions {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.3.2"
-        Write-Verbose "Running Test-OneDriveSyncRestrictions for $recnum..."
+        $RecNum = "7.3.2"
+        Write-Verbose "Running Test-OneDriveSyncRestrictions for $RecNum..."
     }
     process {
         try {
@@ -30,7 +30,7 @@ function Test-OneDriveSyncRestrictions {
             #   - Condition B: "TenantRestrictionEnabled" is set to False.
             #   - Condition C: "AllowedDomainList" does not contain the trusted domain GUIDs from the on-premises environment.
             # Retrieve OneDrive sync client restriction settings
-            $SPOTenantSyncClientRestriction = Get-CISSpoOutput -Rec $recnum
+            $SPOTenantSyncClientRestriction = Get-CISSpoOutput -Rec $RecNum
             $isSyncRestricted = $SPOTenantSyncClientRestriction.TenantRestrictionEnabled -and $SPOTenantSyncClientRestriction.AllowedDomainList
             # Condition A: Check if TenantRestrictionEnabled is True
             # Condition B: Ensure AllowedDomainList contains trusted domains GUIDs
@@ -52,7 +52,7 @@ function Test-OneDriveSyncRestrictions {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isSyncRestricted
                 Status        = if ($isSyncRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -62,7 +62,7 @@ function Test-OneDriveSyncRestrictions {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

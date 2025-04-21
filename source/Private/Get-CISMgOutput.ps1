@@ -2,13 +2,10 @@ function Get-CISMgOutput {
     <#
     .SYNOPSIS
     This is a sample Private function only visible within the module.
-
     .DESCRIPTION
     This sample function is not exported to the module and only return the data passed as parameter.
-
     .EXAMPLE
     $null = Get-CISMgOutput -PrivateData 'NOTHING TO SEE HERE'
-
     .PARAMETER PrivateData
     The PrivateData parameter is what will be returned without transformation.
 
@@ -20,7 +17,6 @@ function Get-CISMgOutput {
         [Parameter(Mandatory = $false)]
         [String]$DomainName
     )
-
     begin {
         # Begin Block #
         # Tests
@@ -34,18 +30,33 @@ function Get-CISMgOutput {
             6.1.2
             6.1.3
             # Test number array
-            $testNumbers = @('1.1.1', '1.1.3', '1.2.1', '1.3.1', '5.1.2.3', '5.1.8.1', '6.1.2', '6.1.3')
+            $testNumbers = @('1.1.1', '1.1.1-v4', '1.1.3', '1.2.1', '1.3.1', '5.1.2.3', '5.1.8.1', '6.1.2', '6.1.3', '1.1.4')
         #>
     }
     process {
         try {
-            Write-Verbose "Get-CISMgOutput: Retuning data for Rec: $Rec"
+            Write-Verbose "Get-CISMgOutput: Returning data for Rec: $Rec"
             switch ($rec) {
                 '1.1.1' {
-                    # 1.1.1
-                    # Test-AdministrativeAccountCompliance
-                    $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
-                    return $AdminRoleAssignmentsAndUsers
+                    if ($script:Version400) {
+                        $DirectoryRoles = Get-MgDirectoryRole
+                        # Get privileged role IDs
+                        $PrivilegedRoles = $DirectoryRoles | Where-Object {
+                            $_.DisplayName -like '*Administrator*' -or $_.DisplayName -eq 'Global Reader'
+                        }
+                        # Get the members of these various roles
+                        $RoleMembers = $PrivilegedRoles | ForEach-Object { Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id } |
+                        Select-Object Id -Unique
+                        $PrivilegedUsers = $RoleMembers | ForEach-Object {
+                            Get-MgUser -UserId $_.Id -Property UserPrincipalName, DisplayName, Id, OnPremisesSyncEnabled
+                        }
+                        return $PrivilegedUsers
+                    }
+                    else {
+                        # Test-AdministrativeAccountCompliance
+                        $AdminRoleAssignmentsAndUsers = Get-AdminRoleUserAndAssignment
+                        return $AdminRoleAssignmentsAndUsers
+                    }
                 }
                 '1.1.3' {
                     # Test-GlobalAdminsCount
@@ -55,9 +66,35 @@ function Get-CISMgOutput {
                     $globalAdmins = Get-MgDirectoryRoleMember -DirectoryRoleId $globalAdminRole.Id
                     return $globalAdmins
                 }
+                '1.1.4' {
+                    # 1.1.4 - MicrosoftGraphPlaceholder
+                    $DirectoryRoles = Get-MgDirectoryRole
+                    # Get privileged role IDs
+                    $PrivilegedRoles = $DirectoryRoles |
+                    Where-Object { $_.DisplayName -like '*Administrator*' -or $_.DisplayName -eq 'Global Reader' }
+                    # Get the members of these various roles
+                    $RoleMembers = $PrivilegedRoles | ForEach-Object { Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id } |
+                    Select-Object Id -Unique
+                    # Retrieve details about the members in these roles
+                    $PrivilegedUsers = $RoleMembers | ForEach-Object {
+                        Get-MgUser -UserId $_.Id -Property UserPrincipalName, DisplayName, Id
+                    }
+                    $Report = [System.Collections.Generic.List[Object]]::new()
+                    foreach ($Admin in $PrivilegedUsers) {
+                        $License = $null
+                        $License = (Get-MgUserLicenseDetail -UserId $Admin.id).SkuPartNumber -join ', '
+                        $Object = [pscustomobject][ordered]@{
+                            DisplayName       = $Admin.DisplayName
+                            UserPrincipalName = $Admin.UserPrincipalName
+                            License           = $License
+                        }
+                        $Report.Add($Object)
+                    }
+                    return $Report
+                }
                 '1.2.1' {
                     # Test-ManagedApprovedPublicGroups
-                    $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq "Public" } | Select-Object DisplayName, Visibility
+                    $allGroups = Get-MgGroup -All | Where-Object { $_.Visibility -eq 'Public' } | Select-Object DisplayName, Visibility
                     return $allGroups
                 }
                 '1.2.2' {
@@ -90,7 +127,7 @@ function Get-CISMgOutput {
                 '6.1.2' {
                     # Test-MailboxAuditingE3
                     $tenantSKUs = Get-MgSubscribedSku -All
-                    $e3SkuPartNumber = "SPE_E3"
+                    $e3SkuPartNumber = 'SPE_E3'
                     $foundE3Sku = $tenantSKUs | Where-Object { $_.SkuPartNumber -eq $e3SkuPartNumber }
                     if ($foundE3Sku.Count -ne 0) {
                         $allE3Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($foundE3Sku.SkuId) )" -All
@@ -103,7 +140,7 @@ function Get-CISMgOutput {
                 '6.1.3' {
                     # Test-MailboxAuditingE5
                     $tenantSKUs = Get-MgSubscribedSku -All
-                    $e5SkuPartNumber = "SPE_E5"
+                    $e5SkuPartNumber = 'SPE_E5'
                     $foundE5Sku = $tenantSKUs | Where-Object { $_.SkuPartNumber -eq $e5SkuPartNumber }
                     if ($foundE5Sku.Count -ne 0) {
                         $allE5Users = Get-MgUser -Filter "assignedLicenses/any(x:x/skuId eq $($foundE5Sku.SkuId) )" -All
@@ -121,7 +158,6 @@ function Get-CISMgOutput {
         }
     }
     end {
-        Write-Verbose "Retuning data for Rec: $Rec"
+        Write-Verbose "Returning data for Rec: $Rec"
     }
 } # end function Get-CISMgOutput
-

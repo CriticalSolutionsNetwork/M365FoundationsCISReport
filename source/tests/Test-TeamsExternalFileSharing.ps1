@@ -9,8 +9,8 @@ function Test-TeamsExternalFileSharing {
         # Dot source the class script if necessary
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.1.1"
-        Write-Verbose "Running Test-TeamsExternalFileSharing for $recnum..."
+        $RecNum = "8.1.1"
+        Write-Verbose "Running Test-TeamsExternalFileSharing for $RecNum..."
     }
     process {
         try {
@@ -24,7 +24,7 @@ function Test-TeamsExternalFileSharing {
             # Assuming that 'approvedProviders' is a list of approved cloud storage service names
             # This list must be defined according to your organization's approved cloud storage services
             # Retrieve the current Teams client configuration
-            $clientConfig = Get-CISMSTeamsOutput -Rec $recnum
+            $clientConfig = Get-CISMSTeamsOutput -Rec $RecNum
             # Testing
             #$clientconfig.AllowGoogleDrive = $false
             #$clientconfig.AllowBox = $false
@@ -57,7 +57,7 @@ function Test-TeamsExternalFileSharing {
             }
             # Create an instance of CISAuditResult and populate it
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isCompliant
                 Status        = if ($isCompliant) { "Pass" } else { "Fail" }
                 Details       = if (-not $isCompliant) { "Non-approved providers enabled: $($nonCompliantProviders -join ', ')" } else { $basePassDetails }
@@ -67,7 +67,7 @@ function Test-TeamsExternalFileSharing {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

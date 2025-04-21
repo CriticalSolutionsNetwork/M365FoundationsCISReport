@@ -1,4 +1,5 @@
 class CISAuditResult {
+    [string]$M365AuditVersion
     [string]$Status
     [string]$ELevel
     [string]$ProfileLevel

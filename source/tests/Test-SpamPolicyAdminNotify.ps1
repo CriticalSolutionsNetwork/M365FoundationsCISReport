@@ -23,8 +23,8 @@ function Test-SpamPolicyAdminNotify {
             Note:
             - While the primary focus is on the default policy, the function also retrieves and displays settings from additional policies that are not default, providing comprehensive insight into the organization's configuration. These additional policies are not used to determine the test's pass/fail status but are included in the details for informational purposes.
         #>
-        $recnum = "2.1.6"
-        Write-Verbose "Running Test-SpamPolicyAdminNotify for $recnum..."
+        $RecNum = "2.1.6"
+        Write-Verbose "Running Test-SpamPolicyAdminNotify for $RecNum..."
     }
     process {
         try {
@@ -57,7 +57,7 @@ function Test-SpamPolicyAdminNotify {
                     }
                 )
             #>
-            $spamPolicies = Get-CISExoOutput -Rec $recnum
+            $spamPolicies = Get-CISExoOutput -Rec $RecNum
             $defaultPolicy = $spamPolicies | Where-Object { $_.IsDefault -eq $true }
             $additionalPolicies = $spamPolicies | Where-Object { $_.IsDefault -eq $false }
             $details = @()
@@ -99,7 +99,7 @@ function Test-SpamPolicyAdminNotify {
             $failureReasonsString = $failureReasons -join "`n"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $result
                 Status        = if ($result) { "Pass" } else { "Fail" }
                 Details       = $detailsString
@@ -108,8 +108,8 @@ function Test-SpamPolicyAdminNotify {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test $recnum`:: $_"
-            $auditResult = Get-TestError -LastError $_ -recnum $recnum
+            Write-Error "An error occurred during the test $RecNum`:: $_"
+            $auditResult = Get-TestError -LastError $_ -RecNum $RecNum
         }
     }
     end {

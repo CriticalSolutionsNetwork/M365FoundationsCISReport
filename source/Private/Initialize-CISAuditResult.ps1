@@ -20,7 +20,7 @@ function Initialize-CISAuditResult {
         [Parameter(ParameterSetName = 'Error')]
         [switch]$Failure
     )
-
+    $M365AuditVersion = $Script:CISVersion
     # Import the test definitions CSV file
     $testDefinitions = $script:TestDefinitionsObject
 
@@ -45,6 +45,7 @@ function Initialize-CISAuditResult {
     $auditResult.Automated = [bool]::Parse($testDefinition.Automated)
     $auditResult.Connection = $testDefinition.Connection
     $auditResult.CISControlVer = 'v8'
+    $auditResult.M365AuditVersion = $M365AuditVersion
 
     if ($PSCmdlet.ParameterSetName -eq 'Full') {
         $auditResult.Result = $Result

@@ -8,8 +8,8 @@ function Test-ManagedApprovedPublicGroups {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "1.2.1"
-        Write-Verbose "Starting Test-ManagedApprovedPublicGroups with Rec: $recnum"
+        $RecNum = "1.2.1"
+        Write-Verbose "Starting Test-ManagedApprovedPublicGroups with Rec: $RecNum"
         # Conditions for 1.2.1 (L2) Ensure that only organizationally managed/approved public groups exist (Automated)
         #
         # Validate test for a pass:
@@ -27,7 +27,7 @@ function Test-ManagedApprovedPublicGroups {
     process {
         try {
             # Step: Retrieve all groups with visibility set to 'Public'
-            $allGroups = Get-CISMgOutput -Rec $recnum
+            $allGroups = Get-CISMgOutput -Rec $RecNum
             # Step: Determine failure reasons based on the presence of public groups
             $failureReasons = if ($null -ne $allGroups -and $allGroups.Count -gt 0) {
                 "There are public groups present that are not organizationally managed/approved."
@@ -45,7 +45,7 @@ function Test-ManagedApprovedPublicGroups {
             }
             # Step: Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $null -eq $allGroups -or $allGroups.Count -eq 0
                 Status        = if ($null -eq $allGroups -or $allGroups.Count -eq 0) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -55,7 +55,7 @@ function Test-ManagedApprovedPublicGroups {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

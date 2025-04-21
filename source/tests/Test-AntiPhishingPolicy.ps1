@@ -3,8 +3,8 @@ function Test-AntiPhishingPolicy {
     [OutputType([CISAuditResult])]
     param ()
     begin {
-        $recnum = "2.1.7"
-        Write-Verbose "Running Test-AntiPhishingPolicy for $recnum..."
+        $RecNum = "2.1.7"
+        Write-Verbose "Running Test-AntiPhishingPolicy for $RecNum..."
         #. .\source\Classes\CISAuditResult.ps1
         <#
         Conditions for 2.1.7 (L1) Ensure robust anti-phishing policies are enforced
@@ -26,7 +26,7 @@ function Test-AntiPhishingPolicy {
             # Step 1: Retrieve all anti-phishing policies
             #$VerbosePreference = "Continue"
             Write-Verbose "Retrieving all anti-phishing policies..."
-            $antiPhishPolicies = Get-CISExoOutput -Rec $recnum
+            $antiPhishPolicies = Get-CISExoOutput -Rec $RecNum
             # Step 2: Initialize variables to track compliance and details
             $compliantPolicy = $null
             $details = @()
@@ -205,7 +205,7 @@ function Test-AntiPhishingPolicy {
             #$VerbosePreference = "SilentlyContinue"
             # Prepare the parameters for the audit result
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isOverallCompliant
                 Status        = if ($isOverallCompliant) { "Pass" } else { "Fail" }
                 Details       = $resultDetails
@@ -215,8 +215,8 @@ function Test-AntiPhishingPolicy {
             $auditResult = Initialize-CISAuditResult @params
         }
         catch {
-            Write-Error "An error occurred during the test $recnum`:: $_"
-            $auditResult = Get-TestError -LastError $_ -recnum $recnum
+            Write-Error "An error occurred during the test $RecNum`:: $_"
+            $auditResult = Get-TestError -LastError $_ -RecNum $RecNum
         }
     }
     end {

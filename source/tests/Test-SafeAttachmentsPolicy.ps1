@@ -6,8 +6,8 @@ function Test-SafeAttachmentsPolicy {
         [string]$DomainName
     )
     begin {
-        $recnum = "2.1.4"
-        Write-Verbose "Running Test-SafeAttachmentsPolicy for $recnum..."
+        $RecNum = "2.1.4"
+        Write-Verbose "Running Test-SafeAttachmentsPolicy for $RecNum..."
         <#
             Conditions for 2.1.4 (L2) Ensure Safe Attachments policy is enabled:
             Validate test for a pass:
@@ -36,7 +36,7 @@ function Test-SafeAttachmentsPolicy {
                 }
             )
         #>
-        $safeAttachmentPolicies, $safeAttachmentRules = Get-CISExoOutput -Rec $recnum
+        $safeAttachmentPolicies, $safeAttachmentRules = Get-CISExoOutput -Rec $RecNum
         $safeAttachmentPolicies = $safeAttachmentPolicies | Where-Object { $_.Identity -in $safeAttachmentRules.SafeAttachmentPolicy }
         if ($safeAttachmentPolicies -ne 1) {
             try {
@@ -81,7 +81,7 @@ function Test-SafeAttachmentsPolicy {
                 $failureReasonsString = ($failureReasons -join "`n")
                 # Create and populate the CISAuditResult object
                 $params = @{
-                    Rec           = $recnum
+                    Rec           = $RecNum
                     Result        = $result
                     Status        = if ($result) { "Pass" } else { "Fail" }
                     Details       = $detailsString
@@ -90,18 +90,18 @@ function Test-SafeAttachmentsPolicy {
                 $auditResult = Initialize-CISAuditResult @params
             }
             catch {
-                Write-Error "An error occurred during the test $recnum`:: $_"
+                Write-Error "An error occurred during the test $RecNum`:: $_"
                 # Retrieve the description from the test definitions
-                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $RecNum }
                 $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-                $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+                $script:FailedTests.Add([PSCustomObject]@{ Rec = $RecNum; Description = $description; Error = $_ })
                 # Call Initialize-CISAuditResult with error parameters
-                $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+                $auditResult = Initialize-CISAuditResult -Rec $RecNum -Failure
             }
         }
         else {
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $false
                 Status        = "Fail"
                 Details       = "No Safe Attachments policies found."

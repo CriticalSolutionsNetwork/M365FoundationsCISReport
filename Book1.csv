@@ -1,0 +1,37 @@
+﻿Product,Command
+SharePoint,Get-SPOTenant
+SharePoint,Get-SPOSite
+SharePoint,Get-SPOTenantSyncClientRestriction
+SharePoint,Get-PnPTenant
+SharePoint,Get-PnPTenantSite
+SharePoint,Get-PnPTenantSyncClientRestriction
+Microsoft Graph,Get-MgDirectoryRole
+Microsoft Graph,Get-MgDirectoryRoleMember
+Microsoft Graph,Get-MgUser
+Microsoft Graph,Get-MgGroup
+Microsoft Graph,Get-MgDomain
+Microsoft Graph,Get-MgOrganization
+Microsoft Graph,Get-MgSubscribedSku
+Microsoft Graph,Get-MgUserLicenseDetail
+Teams,Get-CsTeamsClientConfiguration
+Teams,Get-CsTeamsMeetingPolicy
+Teams,Get-CsTenantFederationConfiguration
+Teams,Get-CsTeamsMessagingPolicy
+Exchange Online,Get-EXOMailbox
+Exchange Online,Get-OrganizationConfig
+Exchange Online,Get-SharingPolicy
+Exchange Online,Get-RoleAssignmentPolicy
+Exchange Online,Get-OwaMailboxPolicy
+Exchange Online,Get-SafeLinksPolicy
+Exchange Online,Get-SafeAttachmentPolicy
+Exchange Online,Get-SafeAttachmentRule
+Exchange Online,Get-MalwareFilterPolicy
+Exchange Online,Get-HostedOutboundSpamFilterPolicy
+Exchange Online,Get-AntiPhishPolicy
+Exchange Online,Get-AntiPhishRule
+Exchange Online,Get-DkimSigningConfig
+Exchange Online,Get-TransportRule
+Exchange Online,Get-ExternalInOutlook
+Exchange Online,Get-AdminAuditLogConfig
+Exchange Online,Get-AtpPolicyForO365
+Exchange Online,Get-ReportSubmissionPolicy

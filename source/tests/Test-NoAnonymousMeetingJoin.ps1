@@ -9,8 +9,8 @@ function Test-NoAnonymousMeetingJoin {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.5.1"
-        Write-Verbose "Running Test-NoAnonymousMeetingJoin for $recnum..."
+        $RecNum = "8.5.1"
+        Write-Verbose "Running Test-NoAnonymousMeetingJoin for $RecNum..."
     }
     process {
         try {
@@ -36,7 +36,7 @@ function Test-NoAnonymousMeetingJoin {
                     AllowAnonymousUsersToJoinMeeting            = $true
                 }
             #>
-            $teamsMeetingPolicy = Get-CISMSTeamsOutput -Rec $recnum
+            $teamsMeetingPolicy = Get-CISMSTeamsOutput -Rec $RecNum
             $allowAnonymousUsersToJoinMeeting = $teamsMeetingPolicy.AllowAnonymousUsersToJoinMeeting
             # Prepare failure reasons and details based on compliance
             $failureReasons = if ($allowAnonymousUsersToJoinMeeting) {
@@ -48,7 +48,7 @@ function Test-NoAnonymousMeetingJoin {
             $details = "AllowAnonymousUsersToJoinMeeting is set to $allowAnonymousUsersToJoinMeeting"
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = -not $allowAnonymousUsersToJoinMeeting
                 Status        = if (-not $allowAnonymousUsersToJoinMeeting) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -58,7 +58,7 @@ function Test-NoAnonymousMeetingJoin {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

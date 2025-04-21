@@ -24,8 +24,8 @@ function Test-SafeAttachmentsTeams {
         #   - Condition B: Safe Attachments for OneDrive is not enabled.
         #   - Condition C: Safe Attachments for Microsoft Teams is not enabled.
         # Initialization code, if needed
-        $recnum = "2.1.5"
-        Write-Verbose "Running Test-SafeAttachmentsTeams for $recnum..."
+        $RecNum = "2.1.5"
+        Write-Verbose "Running Test-SafeAttachmentsTeams for $RecNum..."
     }
     process {
         # $atpPolicyResult Mock Object
@@ -39,7 +39,7 @@ function Test-SafeAttachmentsTeams {
                 }
             )
         #>
-        $atpPolicyResult = Get-CISExoOutput -Rec $recnum
+        $atpPolicyResult = Get-CISExoOutput -Rec $RecNum
         if ($atpPolicyResult -ne 1) {
             try {
                 # Condition A: Check Safe Attachments for SharePoint
@@ -79,7 +79,7 @@ AllowSafeDocsOpen: $($_.AllowSafeDocsOpen)
                 }
                 # Create and populate the CISAuditResult object
                 $params = @{
-                    Rec           = $recnum
+                    Rec           = $RecNum
                     Result        = $result
                     Status        = if ($result) { "Pass" } else { "Fail" }
                     Details       = $details
@@ -88,18 +88,18 @@ AllowSafeDocsOpen: $($_.AllowSafeDocsOpen)
                 $auditResult = Initialize-CISAuditResult @params
             }
             catch {
-                Write-Error "An error occurred during the test $recnum`:: $_"
+                Write-Error "An error occurred during the test $RecNum`:: $_"
                 # Retrieve the description from the test definitions
-                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $RecNum }
                 $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-                $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+                $script:FailedTests.Add([PSCustomObject]@{ Rec = $RecNum; Description = $description; Error = $_ })
                 # Call Initialize-CISAuditResult with error parameters
-                $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+                $auditResult = Initialize-CISAuditResult -Rec $RecNum -Failure
             }
         }
         else {
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $false
                 Status        = "Fail"
                 Details       = "No M365 E5 licenses found."

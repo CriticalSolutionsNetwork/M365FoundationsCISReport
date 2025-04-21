@@ -9,8 +9,8 @@ function Test-BlockSharedMailboxSignIn {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "1.2.2"
-        Write-Verbose "Running Test-BlockSharedMailboxSignIn for $recnum..."
+        $RecNum = "1.2.2"
+        Write-Verbose "Running Test-BlockSharedMailboxSignIn for $RecNum..."
         # Conditions for 1.2.2 (L1) Ensure sign-in to shared mailboxes is blocked
         #
         # Validate test for a pass:
@@ -36,7 +36,7 @@ function Test-BlockSharedMailboxSignIn {
                     "abcddcba-98fe-76dc-a456-426614174000"
                 )
             #>
-            $objectids = Get-CISExoOutput -Rec $recnum
+            $objectids = Get-CISExoOutput -Rec $RecNum
             # Step: Retrieve user details from Azure AD
             # $users Mock Object
             <#
@@ -58,7 +58,7 @@ function Test-BlockSharedMailboxSignIn {
                     }
                 )
             #>
-            $users = Get-CISMgOutput -Rec $recnum
+            $users = Get-CISMgOutput -Rec $RecNum
             # Step: Retrieve details of shared mailboxes from Azure AD (Condition B: Pass/Fail)
             $sharedMailboxDetails = $users | Where-Object {$_.id -in $objectids}
             # Step: Identify enabled mailboxes (Condition B: Pass/Fail)
@@ -80,7 +80,7 @@ function Test-BlockSharedMailboxSignIn {
             }
             # Step: Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $allBlocked  # Pass: Condition A, Condition B
                 Status        = if ($allBlocked) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -90,7 +90,7 @@ function Test-BlockSharedMailboxSignIn {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

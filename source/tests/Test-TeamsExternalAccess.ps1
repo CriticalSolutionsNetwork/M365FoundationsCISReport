@@ -9,8 +9,8 @@ function Test-TeamsExternalAccess {
         # Dot source the class script if necessary
         # . .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "8.2.1"
-        Write-Verbose "Running Test-TeamsExternalAccess for $recnum..."
+        $RecNum = "8.2.1"
+        Write-Verbose "Running Test-TeamsExternalAccess for $RecNum..."
     }
     process {
         try {
@@ -45,7 +45,7 @@ function Test-TeamsExternalAccess {
                     AllowTeamsConsumerInbound                   = $true
                 }
             #>
-            $externalAccessConfig = Get-CISMSTeamsOutput -Rec $recnum
+            $externalAccessConfig = Get-CISMSTeamsOutput -Rec $RecNum
             # Testing
             #$externalAccessConfig.AllowedDomains = @("msn.com", "google.com")
             #$externalAccessConfig.AllowTeamsConsumer = $false
@@ -71,7 +71,7 @@ function Test-TeamsExternalAccess {
             $isCompliant = -not $externalAccessConfig.AllowTeamsConsumer -and -not $externalAccessConfig.AllowPublicUsers -and (-not $externalAccessConfig.AllowFederatedUsers -or ($allowedDomainsLimited -and $allowedDomainsMatch))
             # Create an instance of CISAuditResult and populate it
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isCompliant
                 Status        = if ($isCompliant) { "Pass" } else { "Fail" }
                 Details       = "AllowTeamsConsumer: $($externalAccessConfig.AllowTeamsConsumer); AllowPublicUsers: $($externalAccessConfig.AllowPublicUsers); AllowFederatedUsers: $($externalAccessConfig.AllowFederatedUsers); AllowedDomains limited: $allowedDomainsLimited; AllowedDomains match: $allowedDomainsMatch; Invalid Domains: $($invalidDomains -join ', ')"
@@ -81,7 +81,7 @@ function Test-TeamsExternalAccess {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

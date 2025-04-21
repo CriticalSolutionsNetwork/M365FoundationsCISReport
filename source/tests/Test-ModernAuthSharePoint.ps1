@@ -11,8 +11,8 @@ function Test-ModernAuthSharePoint {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
-        $recnum = "7.2.1"
-        Write-Verbose "Running Test-ModernAuthSharePoint for $recnum..."
+        $RecNum = "7.2.1"
+        Write-Verbose "Running Test-ModernAuthSharePoint for $RecNum..."
         <#
         # Conditions for 7.2.1 (L1) Ensure modern authentication for SharePoint applications is required
         ## Validate test for a pass:
@@ -36,7 +36,7 @@ function Test-ModernAuthSharePoint {
                     LegacyAuthProtocolsEnabled           = $true
                 }
             #>
-            $SPOTenant = Get-CISSpoOutput -Rec $recnum
+            $SPOTenant = Get-CISSpoOutput -Rec $RecNum
             $modernAuthForSPRequired = -not $SPOTenant.LegacyAuthProtocolsEnabled
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $modernAuthForSPRequired) {
@@ -48,7 +48,7 @@ function Test-ModernAuthSharePoint {
             $details = "LegacyAuthProtocolsEnabled: $($SPOTenant.LegacyAuthProtocolsEnabled)" # Details for Condition B
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $modernAuthForSPRequired
                 Status        = if ($modernAuthForSPRequired) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -58,7 +58,7 @@ function Test-ModernAuthSharePoint {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

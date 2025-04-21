@@ -9,8 +9,8 @@ function Test-SharePointExternalSharingDomains {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.6"
-        Write-Verbose "Running Test-SharePointExternalSharingDomains for $recnum..."
+        $RecNum = "7.2.6"
+        Write-Verbose "Running Test-SharePointExternalSharingDomains for $RecNum..."
         # Conditions for 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
         #
         # Validate test for a pass:
@@ -30,7 +30,7 @@ function Test-SharePointExternalSharingDomains {
     process {
         try {
             # 7.2.6 (L2) Ensure SharePoint external sharing is managed through domain whitelist/blacklists
-            $SPOTenant = Get-CISSpoOutput -Rec $recnum
+            $SPOTenant = Get-CISSpoOutput -Rec $RecNum
             # $SPOTenant Mock Object
             <#
                 $SPOTenant = [PSCustomObject]@{
@@ -41,7 +41,7 @@ function Test-SharePointExternalSharingDomains {
             $isDomainRestrictionConfigured = $SPOTenant.SharingDomainRestrictionMode -eq 'AllowList'
             # Populate the auditResult object with the required properties
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isDomainRestrictionConfigured
                 Status        = if ($isDomainRestrictionConfigured) { "Pass" } else { "Fail" }
                 Details       = "SharingDomainRestrictionMode: $($SPOTenant.SharingDomainRestrictionMode); SharingAllowedDomainList: $($SPOTenant.SharingAllowedDomainList)"
@@ -51,7 +51,7 @@ function Test-SharePointExternalSharingDomains {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

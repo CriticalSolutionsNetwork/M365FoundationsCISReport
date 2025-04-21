@@ -24,14 +24,14 @@ function Test-RestrictStorageProvidersOutlook {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "6.5.3"
-        Write-Verbose "Running Test-RestrictStorageProvidersOutlook for $recnum..."
+        $RecNum = "6.5.3"
+        Write-Verbose "Running Test-RestrictStorageProvidersOutlook for $RecNum..."
     }
     process {
         try {
             # 6.5.3 (L2) Ensure additional storage providers are restricted in Outlook on the web
             # Retrieve all OwaMailbox policies
-            $owaPolicies = Get-CISExoOutput -Rec $recnum
+            $owaPolicies = Get-CISExoOutput -Rec $RecNum
             # Condition A: Check if AdditionalStorageProvidersAvailable is set to False
             $nonCompliantPolicies = $owaPolicies | Where-Object { $_.AdditionalStorageProvidersAvailable }
             # Determine compliance
@@ -51,7 +51,7 @@ function Test-RestrictStorageProvidersOutlook {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $allPoliciesRestricted
                 Status        = if ($allPoliciesRestricted) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -61,7 +61,7 @@ function Test-RestrictStorageProvidersOutlook {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

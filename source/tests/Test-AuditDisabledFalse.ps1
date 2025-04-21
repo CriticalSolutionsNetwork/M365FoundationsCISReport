@@ -24,14 +24,14 @@ function Test-AuditDisabledFalse {
         #   - Condition B: Using PowerShell, the `AuditDisabled` property in the organization's configuration is set to `True`.
         #   - Condition C: Mailbox auditing is not enabled by default at the organizational level.
         # Initialization code, if needed
-        $recnum = "6.1.1"
-        Write-Verbose "Running Test-AuditDisabledFalse for $recnum..."
+        $RecNum = "6.1.1"
+        Write-Verbose "Running Test-AuditDisabledFalse for $RecNum..."
     }
     process {
         try {
             # 6.1.1 (L1) Ensure 'AuditDisabled' organizationally is set to 'False'
             # Retrieve the AuditDisabled configuration (Condition B)
-            $auditNotDisabled = Get-CISExoOutput -Rec $recnum
+            $auditNotDisabled = Get-CISExoOutput -Rec $RecNum
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $auditNotDisabled) {
                 "AuditDisabled is set to True"  # Condition A Fail
@@ -47,7 +47,7 @@ function Test-AuditDisabledFalse {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $auditNotDisabled
                 Status        = if ($auditNotDisabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -57,7 +57,7 @@ function Test-AuditDisabledFalse {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

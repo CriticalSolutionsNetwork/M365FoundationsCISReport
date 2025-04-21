@@ -11,7 +11,7 @@ function Test-GuestUsersBiweeklyReview {
         #. .\source\Classes\CISAuditResult.ps1
 
         # Initialization code, if needed
-        $recnum = "1.1.4"
+        $RecNum = "1.1.4"
     }
 
     process {
@@ -41,7 +41,7 @@ function Test-GuestUsersBiweeklyReview {
 
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = -not $guestUsers
                 Status        = if ($guestUsers) { "Fail" } else { "Pass" }
                 Details       = $details
@@ -51,7 +51,7 @@ function Test-GuestUsersBiweeklyReview {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
 

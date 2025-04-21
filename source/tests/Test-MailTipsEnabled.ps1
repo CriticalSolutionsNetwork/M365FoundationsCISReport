@@ -9,8 +9,8 @@ function Test-MailTipsEnabled {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "6.5.2"
-        Write-Verbose "Running Test-MailTipsEnabled for $recnum..."
+        $RecNum = "6.5.2"
+        Write-Verbose "Running Test-MailTipsEnabled for $RecNum..."
         # Conditions for 6.5.2 (L2) Ensure MailTips are enabled for end users
         #
         # Validate test for a pass:
@@ -33,7 +33,7 @@ function Test-MailTipsEnabled {
         try {
             # 6.5.2 (L2) Ensure MailTips are enabled for end users
             # Retrieve organization configuration for MailTips settings
-            $orgConfig = Get-CISExoOutput -Rec $recnum
+            $orgConfig = Get-CISExoOutput -Rec $RecNum
             # Check the MailTips settings (Conditions A, B, C, D)
             $allTipsEnabled = $orgConfig.MailTipsAllTipsEnabled -and $orgConfig.MailTipsGroupMetricsEnabled -and $orgConfig.MailTipsLargeAudienceThreshold -eq 25
             $externalRecipientsTipsEnabled = $orgConfig.MailTipsExternalRecipientsTipsEnabled
@@ -52,7 +52,7 @@ function Test-MailTipsEnabled {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $allTipsEnabled -and $externalRecipientsTipsEnabled
                 Status        = if ($allTipsEnabled -and $externalRecipientsTipsEnabled) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -62,7 +62,7 @@ function Test-MailTipsEnabled {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

@@ -8,8 +8,8 @@ function Test-BlockMailForwarding {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "6.2.1"
-        Write-Verbose "Running Test-BlockMailForwarding for $recnum..."
+        $RecNum = "6.2.1"
+        Write-Verbose "Running Test-BlockMailForwarding for $RecNum..."
         <#
         Conditions for 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
         Validate test for a pass:
@@ -30,7 +30,7 @@ function Test-BlockMailForwarding {
         try {
             # 6.2.1 (L1) Ensure all forms of mail forwarding are blocked and/or disabled
             # Step 1: Retrieve the transport rules that redirect messages
-            $transportRules,$nonCompliantSpamPolicies = Get-CISExoOutput -Rec $recnum
+            $transportRules,$nonCompliantSpamPolicies = Get-CISExoOutput -Rec $RecNum
             $transportForwardingBlocked = $transportRules.Count -eq 0
             # Step 2: Check all anti-spam outbound policies
             $nonCompliantSpamPoliciesArray = @($nonCompliantSpamPolicies)
@@ -67,7 +67,7 @@ function Test-BlockMailForwarding {
             }
             # Populate the audit result
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $forwardingBlocked
                 Status        = if ($forwardingBlocked) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -77,7 +77,7 @@ function Test-BlockMailForwarding {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

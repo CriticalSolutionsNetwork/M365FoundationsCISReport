@@ -19,15 +19,15 @@ function Get-TestError {
     [cmdletBinding()]
     param (
         $LastError,
-        $recnum
+        $RecNum
     )
     # Retrieve the description from the test definitions
-    $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+    $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $RecNum }
     $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-    $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $LastError })
+    $script:FailedTests.Add([PSCustomObject]@{ Rec = $RecNum; Description = $description; Error = $LastError })
     # Call Initialize-CISAuditResult with error parameters
-    $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
-    Write-Verbose "An error occurred during the test $recnum`: `n$LastError" -Verbose
+    $auditResult = Initialize-CISAuditResult -Rec $RecNum -Failure
+    Write-Verbose "An error occurred during the test $RecNum`: `n$LastError" -Verbose
     return $auditResult
 }
 

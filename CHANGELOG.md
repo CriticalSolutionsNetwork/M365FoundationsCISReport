@@ -4,6 +4,38 @@ The format is based on and uses the types of changes according to [Keep a Change
 
 ## [Unreleased]
 
+### Added
+
+- TestDefinitions-v4.0.0.csv file to the helper folder for version choices.
+- Link to App Authentication documentation in `New-M365SecurityAuditAuthObject` help file.
+- Test Definition Placeholders
+- Steps to function to account for new logic and create an updated test definition object when version 4.0.0 is selected.
+- Test-AdministrativeAccountCompliance4 function for v4.0.0 rec# 1.1.1 test.
+- Updated Get-CISMgOutput function to include the new test definition case for 1.1.1,1.1.4 and 2.1.7.
+- Updated Get-CISExoOutput function to include the new test definition case for 2.1.7.
+- New public function for generating version specific lists of recommendation numbers.
+- Check in main public function to check for 4.0.0 rec numbers when 3.0.0 is selected as the M365 benchmark version.
+- Rec numbers to include and exclude rec numbers for version 4.0.0 so the 'validate set' works correctly.
+- Get-PhishPolicyCompliance and Get-ScopeOverlap private functions for 2.1.7 v4.
+- Test-PhishPolicyCompliance4 function for 2.1.7 v4.
+- Adds new CSV for PowerShell commands and updates PnP update check handling
+- Introduces a new CSV file listing various PowerShell commands for different Microsoft services.
+- Updates the `Invoke-M365SecurityAudit` script to temporarily disable PnP PowerShell update checks during execution and restores the original setting afterward.
+- Pre-Test cmdlet call to `Get-MgGroup` to load the MgGraph assembly prior to running PnP PowerShell commands when using app authentication.
+- Output Verbosity for test score.
+- Get-TestDefinition private function for v4.0.0 to get the test definition for the test.
+- CIS M365 Foundations version to output object to ensure tests display the version of the benchmark being used and for use in verifying the test definitions needed for the export function.
+
+### Fixed
+
+- Fixed Pnp PowerShell MgGraph assembly load error with workaround to load the MgGraph assembly as soon as it's imported with a call to Get-MgGroup.
+- Phish policy test to return if highest priority policy conforms to the benchmark.
+- Module assertion to check for minimum version of required modules.
+- Module assertion to not import the module if it already exists.
+- Fixed Export-M365SecurityAuditTable to ensure there are only 3 parameter sets: One for specific nested test output, one to export only nested tables, and one to export all tests along with options to export to CSV or Excel.
+
+## [v0.1.28] - 2025-01-14
+
 ### Fixed
 
 - Get-SPOSite command to return all but voided output for no code runs (Ex: PowerAutomate)

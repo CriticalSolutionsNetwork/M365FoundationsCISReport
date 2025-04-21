@@ -3,22 +3,21 @@ function Connect-M365Suite {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
-        [string]$TenantAdminUrl,
-
+        [string]
+        $TenantAdminUrl,
         [Parameter(Mandatory = $false)]
-        [CISAuthenticationParameters]$AuthParams,
-
+        [CISAuthenticationParameters]
+        $AuthParams,
         [Parameter(Mandatory)]
-        [string[]]$RequiredConnections,
-
+        [string[]]
+        $RequiredConnections,
         [Parameter(Mandatory = $false)]
-        [switch]$SkipConfirmation
+        [switch]
+        $SkipConfirmation
     )
-
     $VerbosePreference = if ($SkipConfirmation) { 'SilentlyContinue' } else { 'Continue' }
     $tenantInfo = @()
     $connectedServices = @()
-
     try {
         if ($RequiredConnections -contains 'Microsoft Graph' -or $RequiredConnections -contains 'EXO | Microsoft Graph') {
             try {
@@ -42,7 +41,6 @@ function Connect-M365Suite {
                 throw "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
             }
         }
-
         if ($RequiredConnections -contains 'EXO' -or $RequiredConnections -contains 'AzureAD | EXO' -or $RequiredConnections -contains 'Microsoft Teams | EXO' -or $RequiredConnections -contains 'EXO | Microsoft Graph') {
             try {
                 Write-Verbose 'Connecting to Exchange Online...'
@@ -65,7 +63,6 @@ function Connect-M365Suite {
                 throw "Failed to connect to Exchange Online: $($_.Exception.Message)"
             }
         }
-
         if ($RequiredConnections -contains 'SPO') {
             try {
                 Write-Verbose 'Connecting to SharePoint Online...'
@@ -79,7 +76,8 @@ function Connect-M365Suite {
                     (Get-PnPSite).Url
                 }
                 else {
-                    # Supress output from Get-SPOSite for powerautomate to avoid errors
+                    # Returns the first site base URL from the tenant
+                    # Suppress output from Get-SPOSite for powerautomate to avoid errors
                     [void]($sites =  Get-SPOSite -Limit All)
                     # Get the URL from the first site collection
                     $url = $sites[0].Url
@@ -99,7 +97,6 @@ function Connect-M365Suite {
                 throw "Failed to connect to SharePoint Online: $($_.Exception.Message)"
             }
         }
-
         if ($RequiredConnections -contains 'Microsoft Teams' -or $RequiredConnections -contains 'Microsoft Teams | EXO') {
             try {
                 Write-Verbose 'Connecting to Microsoft Teams...'
@@ -122,14 +119,17 @@ function Connect-M365Suite {
                 throw "Failed to connect to Microsoft Teams: $($_.Exception.Message)"
             }
         }
-
         if (-not $SkipConfirmation) {
             Write-Verbose 'Connected to the following tenants:'
             foreach ($tenant in $tenantInfo) {
                 Write-Verbose "Service: $($tenant.Service) | Tenant: $($tenant.TenantName)"
             }
-            $confirmation = Read-Host 'Do you want to proceed with these connections? (Y/N)'
-            if ($confirmation -notlike 'Y') {
+            if ($script:PnpAuth) {
+                Write-Warning "`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!`nIf you use the auth object, you may need to kill the current session before subsequent runs`nas the PNP.Powershell module has conflicts with MgGraph authentication modules!`n!!!!!!!!!!!!Important!!!!!!!!!!!!!!"
+            }
+            $confirmation = Read-Host "Do you want to proceed with these connections? (Y/N)"
+            if ($confirmation -notLike 'Y') {
+                Write-Verbose "Connection setup aborted by user."
                 Disconnect-M365Suite -RequiredConnections $connectedServices
                 throw 'User aborted connection setup.'
             }

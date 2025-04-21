@@ -9,8 +9,8 @@ function Test-SafeLinksOfficeApps {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "2.1.1"
-        Write-Verbose "Running Test-SafeLinksOfficeApps for $recnum..."
+        $RecNum = "2.1.1"
+        Write-Verbose "Running Test-SafeLinksOfficeApps for $RecNum..."
         <#
         Conditions for 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
         Validate test for a pass:
@@ -38,7 +38,7 @@ function Test-SafeLinksOfficeApps {
     process {
         # 2.1.1 (L2) Ensure Safe Links for Office Applications is Enabled
         # Retrieve all Safe Links policies
-        $misconfiguredDetails = Get-CISExoOutput -Rec $recnum
+        $misconfiguredDetails = Get-CISExoOutput -Rec $RecNum
         # Misconfigured details returns 1 if EXO Commands needed for the test are not available
         if ($misconfiguredDetails -ne 1) {
             try {
@@ -49,7 +49,7 @@ function Test-SafeLinksOfficeApps {
                 $failureReasons = if ($result) { "N/A" } else { "The following Safe Links policies settings do not meet the recommended configuration: $($misconfiguredDetails -join ' | ')" }
                 # Create and populate the CISAuditResult object
                 $params = @{
-                    Rec           = $recnum
+                    Rec           = $RecNum
                     Result        = $result
                     Status        = if ($result) { "Pass" } else { "Fail" }
                     Details       = $details
@@ -58,18 +58,18 @@ function Test-SafeLinksOfficeApps {
                 $auditResult = Initialize-CISAuditResult @params
             }
             catch {
-                Write-Error "An error occurred during the test $recnum`:: $_"
+                Write-Error "An error occurred during the test $RecNum`:: $_"
                 # Retrieve the description from the test definitions
-                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $recnum }
+                $testDefinition = $script:TestDefinitionsObject | Where-Object { $_.Rec -eq $RecNum }
                 $description = if ($testDefinition) { $testDefinition.RecDescription } else { "Description not found" }
-                $script:FailedTests.Add([PSCustomObject]@{ Rec = $recnum; Description = $description; Error = $_ })
+                $script:FailedTests.Add([PSCustomObject]@{ Rec = $RecNum; Description = $description; Error = $_ })
                 # Call Initialize-CISAuditResult with error parameters
-                $auditResult = Initialize-CISAuditResult -Rec $recnum -Failure
+                $auditResult = Initialize-CISAuditResult -Rec $RecNum -Failure
             }
         }
         else {
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $false
                 Status        = "Fail"
                 Details       = "No M365 E5 licenses found."

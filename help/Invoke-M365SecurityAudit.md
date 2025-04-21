@@ -17,7 +17,7 @@ Invokes a security audit for Microsoft 365 environments.
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>]
  [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>]
- [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Version <String>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### ELevelFilter
@@ -25,8 +25,8 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>]
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -ELevel <String>
  -ProfileLevel <String> [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>]
  [-DoNotConnect] [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections]
- [-AuthParams <CISAuthenticationParameters>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ [-AuthParams <CISAuthenticationParameters>] [-Version <String>] [-ProgressAction <ActionPreference>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ### IG1Filter
@@ -34,7 +34,7 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -ELev
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG1]
  [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>]
- [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Version <String>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### IG2Filter
@@ -42,7 +42,7 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-Inc
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG2]
  [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>]
- [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Version <String>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### IG3Filter
@@ -50,7 +50,7 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-Inc
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-IncludeIG3]
  [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>]
- [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Version <String>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### RecFilter
@@ -58,7 +58,7 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] [-Inc
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -IncludeRecommendation <String[]>
  [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>]
- [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Version <String>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### SkipRecFilter
@@ -66,7 +66,7 @@ Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -Incl
 Invoke-M365SecurityAudit [-TenantAdminUrl <String>] [-DomainName <String>] -SkipRecommendation <String[]>
  [-ApprovedCloudStorageProviders <String[]>] [-ApprovedFederatedDomains <String[]>] [-DoNotConnect]
  [-DoNotDisconnect] [-NoModuleCheck] [-DoNotConfirmConnections] [-AuthParams <CISAuthenticationParameters>]
- [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Version <String>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -413,6 +413,21 @@ Aliases:
 Required: False
 Position: Named
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Version
+Specifies the CIS benchmark definitions version to use. Default is 4.0.0. Valid values are "3.0.0" or "4.0.0".
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: 4.0.0
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

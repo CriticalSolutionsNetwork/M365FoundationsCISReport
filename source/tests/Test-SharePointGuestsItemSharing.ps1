@@ -9,8 +9,8 @@ function Test-SharePointGuestsItemSharing {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "7.2.5"
-        Write-Verbose "Running Test-SharePointGuestsItemSharing for $recnum..."
+        $RecNum = "7.2.5"
+        Write-Verbose "Running Test-SharePointGuestsItemSharing for $RecNum..."
         # Conditions for 7.2.5 (L2) Ensure that SharePoint guest users cannot share items they don't own
         #
         # Validate test for a pass:
@@ -36,11 +36,11 @@ function Test-SharePointGuestsItemSharing {
                     PreventExternalUsersFromResharing           = $false
                 }
             #>
-            $SPOTenant = Get-CISSpoOutput -Rec $recnum
+            $SPOTenant = Get-CISSpoOutput -Rec $RecNum
             $isGuestResharingPrevented = $SPOTenant.PreventExternalUsersFromResharing
             # Populate the auditResult object with the required properties
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $isGuestResharingPrevented
                 Status        = if ($isGuestResharingPrevented) { "Pass" } else { "Fail" }
                 Details       = "PreventExternalUsersFromResharing: $isGuestResharingPrevented"
@@ -50,7 +50,7 @@ function Test-SharePointGuestsItemSharing {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

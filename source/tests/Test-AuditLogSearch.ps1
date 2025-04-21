@@ -9,8 +9,8 @@ function Test-AuditLogSearch {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "3.1.1"
-        Write-Verbose "Running Test-AuditLogSearch for $recnum..."
+        $RecNum = "3.1.1"
+        Write-Verbose "Running Test-AuditLogSearch for $RecNum..."
         <#
         Conditions for 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
         Validate test for a pass:
@@ -30,7 +30,7 @@ function Test-AuditLogSearch {
     process {
         try {
             # 3.1.1 (L1) Ensure Microsoft 365 audit log search is Enabled
-            $auditLogResult = Get-CISExoOutput -Rec $recnum
+            $auditLogResult = Get-CISExoOutput -Rec $RecNum
             # Prepare failure reasons and details based on compliance
             $failureReasons = if (-not $auditLogResult) {
                 # Condition A (Fail): Audit log search is not enabled in the Microsoft Purview compliance portal
@@ -48,7 +48,7 @@ function Test-AuditLogSearch {
             }
             # Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $auditLogResult
                 Status        = if ($auditLogResult) { "Pass" } else { "Fail" }
                 Details       = $details
@@ -58,7 +58,7 @@ function Test-AuditLogSearch {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

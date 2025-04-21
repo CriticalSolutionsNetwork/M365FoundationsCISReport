@@ -11,7 +11,7 @@ function Test-PasswordNeverExpirePolicy {
         # Dot source the class script if necessary
         #. .\source\Classes\CISAuditResult.ps1
         # Initialization code, if needed
-        $recnum = "1.3.1"
+        $RecNum = "1.3.1"
         $overallResult = $true
         $detailsList = @()
         $failureReasonsList = @()
@@ -39,7 +39,7 @@ function Test-PasswordNeverExpirePolicy {
     process {
         try {
             # Step: Retrieve all domains or a specific domain
-            $domains = Get-CISMgOutput -Rec $recnum -DomainName $DomainName
+            $domains = Get-CISMgOutput -Rec $RecNum -DomainName $DomainName
             foreach ($domain in $domains) {
                 $domainName = $domain.Id
                 $isDefault = $domain.IsDefault
@@ -68,7 +68,7 @@ function Test-PasswordNeverExpirePolicy {
             $finalDetails = $detailsList -join "`n"
             # Step: Create and populate the CISAuditResult object
             $params = @{
-                Rec           = $recnum
+                Rec           = $RecNum
                 Result        = $overallResult
                 Status        = if ($overallResult) { "Pass" } else { "Fail" }
                 Details       = $finalDetails
@@ -78,7 +78,7 @@ function Test-PasswordNeverExpirePolicy {
         }
         catch {
             $LastError = $_
-            $auditResult = Get-TestError -LastError $LastError -recnum $recnum
+            $auditResult = Get-TestError -LastError $LastError -RecNum $RecNum
         }
     }
     end {

@@ -34,7 +34,7 @@ function Get-AdminRoleUserLicense {
 
     begin {
         if (-not $SkipGraphConnection) {
-            Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome
+            Connect-MgGraph -Scopes "Directory.Read.All", "Domain.Read.All", "Policy.Read.All", "Organization.Read.All" | Out-Null
         }
 
         $adminRoleUsers = [System.Collections.ArrayList]::new()
