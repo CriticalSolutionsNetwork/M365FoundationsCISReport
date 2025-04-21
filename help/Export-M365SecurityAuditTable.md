@@ -12,30 +12,23 @@ Exports M365 security audit results to a CSV file or outputs a specific test res
 
 ## SYNTAX
 
-### OutputObjectFromAuditResultsSingle
+### DefaultExport (Default)
 ```
-Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-OutputTestNumber] <String>
+Export-M365SecurityAuditTable -AuditResults <PSObject[]> -ExportPath <String> [-ExportToExcel]
+ [-Prefix <String>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+```
+
+### SingleObject
+```
+Export-M365SecurityAuditTable -AuditResults <PSObject[]> -OutputTestNumber <String>
  [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
-### ExportAllResultsFromAuditResults
+### OnlyExportNestedTables
 ```
-Export-M365SecurityAuditTable [-AuditResults] <CISAuditResult[]> [-ExportNestedTables] -ExportPath <String>
- [-ExportOriginalTests] [-ExportToExcel] [-Prefix <String>] [-ProgressAction <ActionPreference>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
-```
-
-### OutputObjectFromCsvSingle
-```
-Export-M365SecurityAuditTable [-CsvPath] <String> [-OutputTestNumber] <String>
- [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-### ExportAllResultsFromCsv
-```
-Export-M365SecurityAuditTable [-CsvPath] <String> [-ExportNestedTables] -ExportPath <String>
- [-ExportOriginalTests] [-ExportToExcel] [-Prefix <String>] [-ProgressAction <ActionPreference>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Export-M365SecurityAuditTable -AuditResults <PSObject[]> -ExportPath <String> [-ExportToExcel]
+ [-Prefix <String>] [-OnlyExportNestedTables] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -86,59 +79,13 @@ Export-M365SecurityAuditTable -ExportAllTests -CsvPath "C:\temp\auditresultstoda
 An array of CISAuditResult objects containing the audit results.
 
 ```yaml
-Type: CISAuditResult[]
-Parameter Sets: OutputObjectFromAuditResultsSingle, ExportAllResultsFromAuditResults
+Type: PSObject[]
+Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 3
+Position: Named
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -CsvPath
-The path to a CSV file containing the audit results.
-
-```yaml
-Type: String
-Parameter Sets: OutputObjectFromCsvSingle, ExportAllResultsFromCsv
-Aliases:
-
-Required: True
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -OutputTestNumber
-The test number to output as an object.
-Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
-
-```yaml
-Type: String
-Parameter Sets: OutputObjectFromAuditResultsSingle, OutputObjectFromCsvSingle
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExportNestedTables
-Switch to export all test results. When specified, all test results are exported to the specified path.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
-Aliases:
-
-Required: False
-Position: 1
-Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -148,7 +95,7 @@ The path where the CSV files will be exported.
 
 ```yaml
 Type: String
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Parameter Sets: DefaultExport, OnlyExportNestedTables
 Aliases:
 
 Required: True
@@ -158,27 +105,12 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExportOriginalTests
-Switch to export the original audit results to a CSV file.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ExportToExcel
 Switch to export the results to an Excel file.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Parameter Sets: DefaultExport, OnlyExportNestedTables
 Aliases:
 
 Required: False
@@ -194,12 +126,46 @@ Validate that the count of letters in the prefix is less than 5.
 
 ```yaml
 Type: String
-Parameter Sets: ExportAllResultsFromAuditResults, ExportAllResultsFromCsv
+Parameter Sets: DefaultExport, OnlyExportNestedTables
 Aliases:
 
 Required: False
 Position: Named
 Default value: Corp
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OnlyExportNestedTables
+───────────────────────────────────────────────────────────────────────────
+ 2) OnlyExportNestedTables: nested tables only into ZIP
+    -AuditResults, -ExportPath, -OnlyExportNestedTables
+───────────────────────────────────────────────────────────────────────────
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: OnlyExportNestedTables
+Aliases:
+
+Required: True
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OutputTestNumber
+The test number to output as an object.
+Valid values are "1.1.1", "1.3.1", "6.1.2", "6.1.3", "7.3.4".
+
+```yaml
+Type: String
+Parameter Sets: SingleObject
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
