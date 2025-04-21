@@ -31,6 +31,7 @@ The format is based on and uses the types of changes according to [Keep a Change
 - Phish policy test to return if highest priority policy conforms to the benchmark.
 - Module assertion to check for minimum version of required modules.
 - Module assertion to not import the module if it already exists.
+- Fixed Export-M365SecurityAuditTable to ensure there are only 3 parameter sets: One for specific nested test output, one to export only nested tables, and one to export all tests along with options to export to CSV or Excel.
 
 ## [v0.1.28] - 2025-01-14
 
